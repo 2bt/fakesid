@@ -20,13 +20,6 @@ enum {
 };
 
 
-struct Vertex {
-    Vec pos;
-    Vec uv;
-    Col col;
-};
-
-
 struct Rect {
     Rect() {}
     Rect(const Vec& min, const Vec& max) : min(min), max(max) {}
@@ -57,6 +50,13 @@ enum RectStyle {
     RECT_STROKE_ROUND_1,
     RECT_STROKE_ROUND_2,
     RECT_STROKE_ROUND_3,
+};
+
+
+struct Vertex {
+    Vec pos;
+    Vec uv;
+    Col col;
 };
 
 
@@ -329,7 +329,7 @@ void init() {
     })");
     m_shader->set_uniform("texture", m_texture);
     m_shader->set_uniform("texture_scale",
-            glm::vec2(1.0 / m_texture->get_width(), 1.0 / m_texture->get_height()));
+            glm::vec2(1.0 / m_texture->width(), 1.0 / m_texture->height()));
 
     m_vb = gfx::VertexBuffer::create(gfx::BufferHint::StreamDraw);
     m_va = gfx::VertexArray::create();
@@ -429,7 +429,7 @@ void render() {
         if (vs.empty()) continue;
         m_vb->init_data(vs);
         m_va->set_count(vs.size());
-        gfx::draw(rs, m_shader, m_va);
+        gfx::screen()->draw(rs, m_shader, m_va);
     }
 }
 

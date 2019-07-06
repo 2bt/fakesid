@@ -8,7 +8,7 @@ add_compile_options(-std=c++17 -Wall -Og -g)
 file(GLOB SRC
 	"src/*.hpp"
 	"src/*.cpp"
-	)
+    )
 
 add_executable(${PROJECT_NAME} ${SRC})
 

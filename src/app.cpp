@@ -1,12 +1,37 @@
 #include "gui.hpp"
 #include "foo.hpp"
 #include "debug_renderer.hpp"
+#include "renderer.hpp"
 #include "app.hpp"
 
-DebugRenderer DBR;
 
-bool App::init() {
-    LOGI("App::init");
+namespace app {
+namespace {
+
+
+bool m_initialized = false;
+
+int m_width;
+int m_height;
+
+int m_touch_x;
+int m_touch_y;
+
+gfx::Texture2D*   m_canvas;
+gfx::Framebuffer* m_framebuffer;
+
+
+DebugRenderer DBR;
+Renderer renderer;
+
+gfx::Texture2D* tex;
+
+
+} // namespace
+
+
+bool init() {
+    LOGI("app::init");
     if (m_initialized) return true;
     m_initialized = true;
 
@@ -14,40 +39,44 @@ bool App::init() {
     gui::init();
 
     DBR.init();
+    renderer.init();
 
     m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGB, 400, 300);
     m_framebuffer = gfx::Framebuffer::create();
     m_framebuffer->attach_color(m_canvas);
 
+
+    tex = load_texture("gui.png");
     return true;
 }
 
-void App::free() {
-    LOGI("App::free");
+
+void free() {
+    LOGI("app::free");
     if (!m_initialized) return;
     m_initialized = false;
 
     gui::free();
 
     DBR.free();
+    renderer.free();
 
     delete m_canvas;
     delete m_framebuffer;
 }
 
-void App::exit() {
-    LOGI("App::exit");
+void exit() {
+    LOGI("app::exit");
     free();
 }
 
-void App::resize(int width, int height) {
-    LOGI("App::resize %d %d", width, height);
+void resize(int width, int height) {
+    LOGI("app::resize %d %d", width, height);
 
     m_width  = width;
     m_height = height;
-    gfx::resize(m_width, m_height);
+    gfx::screen()->resize(m_width, m_height);
     gui::resize(m_width, m_height);
-
 
     DBR.init();
     DBR.origin();
@@ -55,29 +84,41 @@ void App::resize(int width, int height) {
     DBR.scale(2.0 / m_width, 2.0 / m_height);
 }
 
-void App::touch(int x, int y) {
-    LOGI("App::touch %d %d", x, y);
+void touch(int x, int y) {
+    LOGI("app::touch %d %d", x, y);
 
     m_touch_x = x;
     m_touch_y = y;
 }
 
-void App::draw() {
+void draw() {
 
     static float i = 0;
     i += 0.01;
     if (i > 1) i = 0;
 
-    gfx::clear({i, i, i, 1});
+    gfx::screen()->clear({i, i, i, 1});
 
-    DBR.set_color(255, 255, 255, 255);
-    float d = i * 300;
-    DBR.rect({d, d}, {m_width - d, m_height - d});
-    DBR.set_color(255, 255, 0, 200);
-    glm::vec2 pos = {m_touch_x, m_touch_y};
-    DBR.filled_rect(pos - glm::vec2{100, 100}, pos + glm::vec2{100, 100});
-    DBR.flush();
+//    DBR.set_color(255, 255, 255, 255);
+//    float d = i * 300;
+//    DBR.rect({d, d}, {m_width - d, m_height - d});
+//    DBR.set_color(255, 255, 0, 200);
+//    glm::vec2 pos = {m_touch_x, m_touch_y};
+//    DBR.filled_rect(pos - glm::vec2{100, 100}, pos + glm::vec2{100, 100});
+//    DBR.flush();
 
+
+    m_framebuffer->clear({255, 0, 0, 255});
+    DrawContext dc;
+//    dc.rect(Rect({10, 10}, {200, 200}), {255, 0, 0, 255});
+//    renderer.draw(m_framebuffer, dc.vertices(), tex);
+//    dc.clear();
+
+    Vec pos = {50, 10};
+    Vec size = {m_canvas->width(), m_canvas->height()};
+    dc.rect(Rect(pos, pos + size), {0, 0, 0, 100});
+    dc.rect(Rect(pos, pos + size), {255, 255, 255, 255}, {});
+    renderer.draw(gfx::screen(), dc.vertices(), m_canvas);
 
     gui::new_frame();
     gui::button("Ok");
@@ -87,3 +128,5 @@ void App::draw() {
     gui::render();
 }
 
+
+} // namespace

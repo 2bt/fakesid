@@ -89,7 +89,7 @@ public:
     }
     void set_line_width(float w) {
         if (w != m_rs.line_width &&
-            m_va->get_primitive_type() == gfx::PrimitiveType::Lines) flush();
+            m_va->primitive_type() == gfx::PrimitiveType::Lines) flush();
         m_rs.line_width = w;
     }
 
@@ -97,7 +97,7 @@ public:
         point(glm::vec2(x, y));
     }
     void point(const glm::vec2& p) {
-        if (m_va->get_primitive_type() != gfx::PrimitiveType::Points) {
+        if (m_va->primitive_type() != gfx::PrimitiveType::Points) {
             flush();
             m_va->set_primitive_type(gfx::PrimitiveType::Points);
         }
@@ -107,7 +107,7 @@ public:
         line(glm::vec2(x1, y1), glm::vec2(x2, y2));
     }
     void line(const glm::vec2& p1, const glm::vec2& p2) {
-        if (m_va->get_primitive_type() != gfx::PrimitiveType::Lines) {
+        if (m_va->primitive_type() != gfx::PrimitiveType::Lines) {
             flush();
             m_va->set_primitive_type(gfx::PrimitiveType::Lines);
         }
@@ -146,7 +146,7 @@ public:
     }
 
     void triangle(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3) {
-        if (m_va->get_primitive_type() != gfx::PrimitiveType::Triangles) {
+        if (m_va->primitive_type() != gfx::PrimitiveType::Triangles) {
             flush();
             m_va->set_primitive_type(gfx::PrimitiveType::Triangles);
         }
@@ -159,7 +159,7 @@ public:
         m_vb->init_data(m_verts);
         m_va->set_count(m_verts.size());
         m_verts.clear();
-        gfx::draw(m_rs, m_shader, m_va);
+        gfx::screen()->draw(m_rs, m_shader, m_va);
     }
 
     glm::mat3x2& transform() { return m_transforms[m_transform_index]; }

@@ -113,7 +113,7 @@ struct VertexArray {
 
     virtual void set_index_buffer(IndexBuffer* ib) = 0;
 
-    virtual PrimitiveType get_primitive_type() const = 0;
+    virtual PrimitiveType primitive_type() const = 0;
 };
 
 
@@ -128,8 +128,8 @@ struct Texture2D {
                              FilterMode filter = FilterMode::Nearest, WrapMode wrap = WrapMode::Clamp);
 
     virtual ~Texture2D() {}
-    virtual int get_width() const = 0;
-    virtual int get_height() const = 0;
+    virtual int width() const = 0;
+    virtual int height() const = 0;
 };
 
 
@@ -149,21 +149,27 @@ struct Shader {
 };
 
 
-struct Framebuffer {
+struct RenderTarget {
+    virtual void clear(const glm::vec4& color) = 0;
+    virtual void draw(const RenderState& rs, Shader* shader, VertexArray* va) = 0;
+    virtual int width() const = 0;
+    virtual int height() const = 0;
+};
+
+struct Screen : virtual RenderTarget {
+    virtual void resize(int width, int height) = 0;
+};
+
+struct Framebuffer : virtual RenderTarget {
     static Framebuffer* create();
     virtual ~Framebuffer() {}
     virtual void attach_color(Texture2D* t) = 0;
     virtual void attach_depth(Texture2D* t) = 0;
     virtual bool is_complete() const = 0;
-
-    virtual void clear(const glm::vec4& color) = 0;
-    virtual void draw(const RenderState& rs, Shader* shader, VertexArray* va) = 0;
 };
 
 
-void clear(const glm::vec4& color);
-void draw(const RenderState& rs, Shader* shader, VertexArray* va);
-void resize(int width, int height);
-void init();
+void    init();
+Screen* screen();
 
 } // namespace

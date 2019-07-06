@@ -201,7 +201,7 @@ struct VertexArrayImpl : VertexArray {
         else m_indexed = false;
     }
 
-    PrimitiveType get_primitive_type() const override { return m_primitive_type; }
+    PrimitiveType primitive_type() const override { return m_primitive_type; }
 
     int           m_first = 0;
     int           m_count = 0;
@@ -220,8 +220,8 @@ struct Texture2DImpl : Texture2D {
         glDeleteTextures(1, &m_handle);
     }
 
-    int get_width() const override { return m_width; }
-    int get_height() const override { return m_height; }
+    int width() const override { return m_width; }
+    int height() const override { return m_height; }
 
     // TODO: sampler stuff
 //    void set_wrap(WrapMode horiz, WrapMode vert);
@@ -477,13 +477,30 @@ struct ShaderImpl : Shader {
 };
 
 
-template<bool is_screen=false>
-struct FramebufferImpl : Framebuffer {
+struct RenderTargetImpl : virtual RenderTarget {
+    void clear(const glm::vec4& color) override;
+    void draw(const RenderState& rs, Shader* shader, VertexArray* va) override;
+    int width() const override { return m_width; }
+    int height() const override { return m_height; }
+
+    uint32_t m_handle;
+    int      m_width;
+    int      m_height;
+};
+
+struct ScreenImpl : Screen, RenderTargetImpl {
+    void resize(int width, int height) {
+        m_width  = width;
+        m_height = height;
+    }
+};
+
+struct FramebufferImpl : Framebuffer, RenderTargetImpl {
     FramebufferImpl() {
-        if (!is_screen) glGenFramebuffers(1, &m_handle);
+        glGenFramebuffers(1, &m_handle);
     }
     ~FramebufferImpl() override {
-        if (!is_screen) glDeleteFramebuffers(1, &m_handle);
+        glDeleteFramebuffers(1, &m_handle);
     }
     void attach_color(Texture2D* t) override {
         auto ti = static_cast<Texture2DImpl*>(t);
@@ -511,17 +528,10 @@ struct FramebufferImpl : Framebuffer {
         gl.bind_framebuffer(m_handle);
         return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
     }
-
-    void clear(const glm::vec4& color) override;
-    void draw(const RenderState& rs, Shader* shader, VertexArray* va) override;
-
-    uint32_t m_handle;
-    int      m_width;
-    int      m_height;
 };
 
 
-FramebufferImpl<true> s_screen;
+ScreenImpl            s_screen;
 RenderState           s_render_state;
 glm::vec4             s_clear_color;
 ShaderImpl*           s_shader;
@@ -615,9 +625,7 @@ void sync_render_state(const RenderState& rs) {
 }
 
 
-
-template<bool is_screen>
-void FramebufferImpl<is_screen>::clear(const glm::vec4& color) {
+void RenderTargetImpl::clear(const glm::vec4& color) {
     if (s_clear_color != color) {
         s_clear_color = color;
         glClearColor(s_clear_color.x, s_clear_color.y, s_clear_color.z, s_clear_color.w);
@@ -627,8 +635,7 @@ void FramebufferImpl<is_screen>::clear(const glm::vec4& color) {
 }
 
 
-template<bool is_screen>
-void FramebufferImpl<is_screen>::draw(const RenderState& rs, Shader* shader, VertexArray* va) {
+void RenderTargetImpl::draw(const RenderState& rs, Shader* shader, VertexArray* va) {
     auto vai = static_cast<VertexArrayImpl*>(va);
 
     if (vai->m_count == 0) return;
@@ -710,19 +717,6 @@ Framebuffer* Framebuffer::create() {
     return new FramebufferImpl();
 }
 
-void clear(const glm::vec4& color) {
-    s_screen.clear(color);
-}
-
-void draw(const RenderState& rs, Shader* shader, VertexArray* va) {
-    s_screen.draw(rs, shader, va);
-}
-
-void resize(int width, int height) {
-    s_screen.m_width = width;
-    s_screen.m_height = height;
-}
-
 void init() {
     gl.reset();
     s_render_state = RenderState{
@@ -734,5 +728,6 @@ void init() {
     s_shader      = nullptr;
 }
 
+Screen* screen() { return &s_screen; }
 
 } // namespace
