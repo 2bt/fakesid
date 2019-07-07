@@ -1,7 +1,7 @@
 #pragma once
 
 namespace app {
-    bool init();
+    void init();
     void free();
     void resize(int width, int height);
     void draw();

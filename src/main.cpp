@@ -13,8 +13,8 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject a) {
         g_asset_manager = AAssetManager_fromJava(env, a);
     }
-    JNIEXPORT jboolean JNICALL Java_com_twobit_nativity_Lib_init(JNIEnv * env, jobject obj) {
-        return app::init();
+    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_init(JNIEnv * env, jobject obj) {
+        app::init();
     }
     JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
@@ -78,13 +78,7 @@ int main(int argc, char** argv) {
     glewExperimental = true;
     glewInit();
 
-    if (!app::init()) {
-        fprintf(stderr, "error: app.init() failed\n");
-        free();
-        return 1;
-    }
-
-    app::resize(s_screen_width, s_screen_height);
+    app::init();
 
     while (s_running) {
         SDL_Event e;

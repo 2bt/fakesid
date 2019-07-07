@@ -139,6 +139,7 @@ struct Shader {
     virtual ~Shader() {}
     virtual bool has_uniform(std::string const& name) = 0;
     virtual void set_uniform(std::string const& name, Texture2D* v) = 0;
+    virtual void set_uniform(std::string const& name, bool v) = 0;
     virtual void set_uniform(std::string const& name, int v) = 0;
     virtual void set_uniform(std::string const& name, float v) = 0;
     virtual void set_uniform(std::string const& name, glm::vec2 const& v) = 0;

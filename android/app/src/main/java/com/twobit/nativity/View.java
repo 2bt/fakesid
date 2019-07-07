@@ -28,16 +28,12 @@ class View extends GLSurfaceView {
     }
 
     public void onDestroy() {
-        queueEvent(new Runnable() { public void run() { Lib.exit(); }});
+        //queueEvent(new Runnable() { public void run() { Lib.exit(); }});
     }
 
 
     class Renderer implements GLSurfaceView.Renderer {
-        boolean mFirstInit = true;
-
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            if (!mFirstInit) Lib.free();
-            else mFirstInit = false;
             Lib.init();
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {

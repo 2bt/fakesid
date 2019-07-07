@@ -8,7 +8,7 @@ public class Lib {
     }
 
     public static native void setAssetManager(AssetManager am);
-    public static native boolean init();
+    public static native void init();
     public static native void free();
     public static native void exit();
     public static native void resize(int width, int height);

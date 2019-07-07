@@ -325,7 +325,7 @@ void init() {
     varying vec2 v_uv;
     varying vec4 v_col;
     void main() {
-        gl_FragColor = v_col * vec4(1.0, 1.0, 1.0, texture2D(texture, v_uv).a);
+        gl_FragColor = v_col * texture2D(texture, v_uv);
     })");
     m_shader->set_uniform("texture", m_texture);
     m_shader->set_uniform("texture_scale",

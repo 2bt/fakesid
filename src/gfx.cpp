@@ -76,6 +76,15 @@ constexpr uint32_t map_to_gl(WrapMode wm) {
     return lut[static_cast<int>(wm)];
 }
 
+int check_error(char const* op) {
+    //LOGI("%s", op);
+    int i = 0;
+    for (int e = glGetError(); e; e = glGetError(), ++i) {
+        LOGW("after %s() glError (0x%x)", op, e);
+    }
+    return i;
+}
+
 
 // opengl functions with caching
 class {
@@ -123,10 +132,12 @@ struct GpuBuffer : T {
 
     GpuBuffer(BufferHint hint) : m_hint(hint) {
         glGenBuffers(1, &m_handle);
+        check_error("glGenBuffers");
     }
 
     ~GpuBuffer() override {
         glDeleteBuffers(1, &m_handle);
+        check_error("glDeleteBuffers");
     }
 
     void init_data(void const* data, int size) override {
@@ -153,9 +164,11 @@ using IndexBufferImpl = GpuBuffer<IndexBuffer, GL_ELEMENT_ARRAY_BUFFER>;
 struct VertexArrayImpl : VertexArray {
     VertexArrayImpl() {
         glGenVertexArrays(1, &m_handle);
+        check_error("glGenVertexArrays");
     }
     ~VertexArrayImpl() override {
         glDeleteVertexArrays(1, &m_handle);
+        check_error("glDeleteVertexArrays");
     }
 
     void set_first(int i) override { m_first = i; }
@@ -213,11 +226,14 @@ struct VertexArrayImpl : VertexArray {
 
 struct Texture2DImpl : Texture2D {
     Texture2DImpl() {
+        gl.bind_texture(0, GL_TEXTURE_2D, 0); // android
         glGenTextures(1, &m_handle);
+        check_error("glGenTextures");
     }
 
     ~Texture2DImpl() override {
         glDeleteTextures(1, &m_handle);
+        check_error("glDeleteTextures");
     }
 
     int width() const override { return m_width; }
@@ -226,8 +242,6 @@ struct Texture2DImpl : Texture2D {
     // TODO: sampler stuff
 //    void set_wrap(WrapMode horiz, WrapMode vert);
 //    void set_filter(FilterMode min, FilterMode mag);
-
-
 
     bool init(TextureFormat format, int w, int h, void const* data, FilterMode filter, WrapMode wrap) {
         m_width  = w;
@@ -278,6 +292,7 @@ struct Texture2DImpl : Texture2D {
 
 
 void gl_uniform(int l, int v) { glUniform1i(l, v); }
+void gl_uniform(int l, bool v) { glUniform1i(l, v); }
 void gl_uniform(int l, float v) { glUniform1f(l, v); }
 void gl_uniform(int l, glm::vec2 const& v) { glUniform2fv(l, 1, &v.x); }
 void gl_uniform(int l, glm::vec3 const& v) { glUniform3fv(l, 1, &v.x); }
@@ -292,13 +307,13 @@ GLuint compile_shader(uint32_t type, const char* src) {
     GLint e = 0;
     glGetShaderiv(s, GL_COMPILE_STATUS, &e);
     if (e) return s;
-    LOGE("error: can't compile shader\n%s\n", src);
+    LOGE("cannot compile shader\n%s\n", src);
     int len = 0;
     glGetShaderiv(s, GL_INFO_LOG_LENGTH, &len);
     if (len > 0) {
         char log[len];
         glGetShaderInfoLog(s, len, &len, log);
-        LOGE("error: %s\n", log);
+        LOGE("%s\n", log);
     }
     glDeleteShader(s);
     return 0;
@@ -308,6 +323,7 @@ struct ShaderImpl : Shader {
 
     bool init(const char* vs, const char* fs) {
         m_program = glCreateProgram();
+        check_error("glCreateProgram");
         if (vs) {
             GLint v = compile_shader(GL_VERTEX_SHADER, vs);
             if (v == 0) return false;
@@ -354,6 +370,7 @@ struct ShaderImpl : Shader {
             Uniform& u = m_uniforms.back();
             switch (type) {
             case GL_INT:        u.extent = Uniform::Extent<int>(); break;
+            case GL_BOOL:       u.extent = Uniform::Extent<bool>(); break;
             case GL_FLOAT:      u.extent = Uniform::Extent<float>(); break;
             case GL_FLOAT_VEC2: u.extent = Uniform::Extent<glm::vec2>(); break;
             case GL_FLOAT_VEC3: u.extent = Uniform::Extent<glm::vec3>(); break;
@@ -362,7 +379,7 @@ struct ShaderImpl : Shader {
             case GL_FLOAT_MAT4: u.extent = Uniform::Extent<glm::mat4>(); break;
             case GL_SAMPLER_2D: u.extent = Uniform::ExtentTexture2D(); break;
             default:
-                LOGE("error: uniform '%s' has unknown type (%d)\n", name, type);
+                LOGE("uniform '%s' has unknown type (%d)\n", name, type);
                 assert(false);
             }
         }
@@ -372,6 +389,7 @@ struct ShaderImpl : Shader {
 
     ~ShaderImpl() override {
         glDeleteProgram(m_program);
+        check_error("glDeleteProgram");
     }
 
 
@@ -432,6 +450,7 @@ struct ShaderImpl : Shader {
         const int         location;
         std::variant<
             Extent<int>,
+            Extent<bool>,
             Extent<float>,
             Extent<glm::vec2>,
             Extent<glm::vec3>,
@@ -445,6 +464,7 @@ struct ShaderImpl : Shader {
 
     bool has_uniform(std::string const& name) override { return find_uniform(name) != nullptr; }
     void set_uniform(std::string const& name, Texture2D* v) override { set(name, v); }
+    void set_uniform(std::string const& name, bool v) override { set(name, v); }
     void set_uniform(std::string const& name, int v) override { set(name, v); }
     void set_uniform(std::string const& name, float v) override { set(name, v); }
     void set_uniform(std::string const& name, glm::vec2 const& v) override { set(name, v); }
@@ -497,10 +517,13 @@ struct ScreenImpl : Screen, RenderTargetImpl {
 
 struct FramebufferImpl : Framebuffer, RenderTargetImpl {
     FramebufferImpl() {
+        gl.bind_framebuffer(0); // android
         glGenFramebuffers(1, &m_handle);
+        check_error("glGenFramebuffers");
     }
     ~FramebufferImpl() override {
         glDeleteFramebuffers(1, &m_handle);
+        check_error("glDeleteFramebuffers");
     }
     void attach_color(Texture2D* t) override {
         auto ti = static_cast<Texture2DImpl*>(t);
@@ -719,6 +742,10 @@ Framebuffer* Framebuffer::create() {
 
 void init() {
     gl.reset();
+    GLint v[4];
+    glGetIntegerv(GL_VIEWPORT, v);
+    s_screen.m_width  = v[2];
+    s_screen.m_height = v[3];
     s_render_state = RenderState{
         .depth_test_enabled = false,
         .depth_test_func    = DepthTestFunc::Less,
