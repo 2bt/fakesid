@@ -13,27 +13,7 @@ gfx::VertexBuffer* m_vb;
 } // namespace
 
 
-void DrawContext::rect(Vec const& pos, Vec const& size, Color c) {
-    Vertex vs[] = {
-        { pos, {0, 0}, c},
-        { pos + Vec(0, size.y), {0, 1}, c},
-        { pos + Vec(size.x, 0), {1, 0}, c},
-        { pos + size, {1, 1}, c},
-    };
-    quad(vs[0], vs[1], vs[2], vs[3]);
-}
-
-void DrawContext::rect(Vec const& pos, Vec const& size, Vec const& uv, Color c) {
-    Vertex vs[] = {
-        { pos, uv, c},
-        { pos + Vec(0, size.y), uv + Vec(0, size.y), c},
-        { pos + Vec(size.x, 0), uv + Vec(size.x, 0), c},
-        { pos + size, uv + size, c},
-    };
-    quad(vs[0], vs[1], vs[2], vs[3]);
-}
-
-void DrawContext::rect(Vec const& pos, Vec const& size, Vec const& uv, Vec const& uv_size, Color c) {
+void DrawContext::copy(Vec const& pos, Vec const& size, Vec const& uv, Vec const& uv_size, Color c) {
     Vertex vs[] = {
         { pos, uv, c},
         { pos + Vec(0, size.y), uv + Vec(0, uv_size.y), c},

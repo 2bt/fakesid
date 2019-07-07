@@ -1,143 +1,136 @@
 #include "gui.hpp"
-#include "gfx.hpp"
 #include "foo.hpp"
 #include <cstdarg>
 #include <algorithm>
 #include <array>
-#include <memory>
 
 
 namespace gui {
-namespace {
 
-
-using Col = glm::u8vec4;
-
-
-enum {
-    FONT_WIDTH  = 7,
-    FONT_HEIGHT = 12,
-};
-
-
-struct Rect {
-    Rect() {}
-    Rect(const Vec& min, const Vec& max) : min(min), max(max) {}
-    Vec tl() const { return min; }
-    Vec tr() const { return Vec(max.x, min.y); }
-    Vec bl() const { return Vec(min.x, max.y); }
-    Vec br() const { return max; }
-    Vec center() const { Vec v = min + max; return Vec(v.x / 2, v.y / 2); }
-    Vec size() const { return max - min; }
-    Rect expand(short d) const { return { min - Vec(d), max + Vec(d) }; }
-    Rect expand(const Vec& d) const { return { min - d, max + d }; }
-    bool contains(const Vec& p) {
-        return p.x >= min.x && p.y >= min.y &&
-               p.x <  max.x && p.y <  max.y;
+namespace color {
+    Color make(uint32_t c, uint8_t a = 255) {
+        return { uint8_t(c >> 16), uint8_t(c >> 8), uint8_t(c), a };
     }
 
-    Vec min;
-    Vec max;
+    Color mix(Color a, Color b, float x) {
+        float w = (1 - x);
+        return {
+            uint8_t(a.r * w + b.r * x),
+            uint8_t(a.g * w + b.g * x),
+            uint8_t(a.b * w + b.b * x),
+            uint8_t(a.a * w + b.a * x),
+        };
+    }
+
+    const Color button_normal     = make(0x505050);
+    const Color button_active     = make(0x55a049);
+    const Color button_hover      = make(0x94e089);
+
+    const Color input_text_normal = make(0x222222);
+    const Color input_text_hover  = button_hover;
+    const Color input_text_active = button_active;
+
+    const Color drag              = make(0x222222);
+    const Color handle_normal     = button_active;
+    const Color handle_active     = button_hover;
+
+    const Color separator         = make(0x111111);
+
+    const Color highlight         = make(0x787878);
+
+    const Color note_normal       = handle_normal;
+    const Color note_active       = handle_active;
+
+} // namespace
+
+
+namespace {
+
+enum {
+    FONT_WIDTH  = 8,
+    FONT_HEIGHT = 8,
+    SEPARATOR_WIDTH = 2,
 };
+
+
+Vec text_size(char const* str) {
+    Vec size = { 0, FONT_HEIGHT };
+    int16_t width = 0;
+    while (int c = *str++) {
+        if (c == '\n') {
+            size.y += FONT_HEIGHT;
+            width = 0;
+            continue;
+        }
+        width += FONT_WIDTH;
+        size.x = std::max(size.x, width);
+    }
+    return size;
+}
 
 
 enum RectStyle {
     RECT_FILL,
-    RECT_FILL_ROUND_1,
-    RECT_FILL_ROUND_2,
-    RECT_FILL_ROUND_3,
-    RECT_STROKE,
-    RECT_STROKE_ROUND_1,
-    RECT_STROKE_ROUND_2,
-    RECT_STROKE_ROUND_3,
+    RECT_FILL_ROUND,
 };
 
 
-struct Vertex {
-    Vec pos;
-    Vec uv;
-    Col col;
-};
-
-
-class DrawContext {
+class DrawContext : public render::DrawContext {
 public:
 
-    void set_active(bool a) { m_active = a; }
+    void rect(const Vec& pos, const Vec& size, const Color& c, RectStyle style=RECT_FILL) {
+//        if (style == 0) {
+//            copy(pos, size, {0, 64}, {1, 1}, color);
+//            return;
+//        }
 
-    void clear() { m_vertices.clear(); }
+        Vec p0 = pos;
+        Vec p1 = pos + Vec(8);
+        Vec p2 = pos + size - Vec(8);
+        Vec p3 = pos + size;
+        Vec t0 = { 16 * style, 64 };
+        Vec t1 = t0 + Vec(8);
+        Vec t2 = t1;
+        Vec t3 = t2 + Vec(8);
 
-    std::vector<Vertex> const& vertices() const { return m_vertices; }
-
-    void draw_rect(const Rect& rect, const Col& color) {
-        if (!m_active) return;
-        Vertex vs[] = {
-            { rect.tl(), {0, 0}, color },
-            { rect.bl(), {0, 1}, color },
-            { rect.tr(), {1, 0}, color },
-            { rect.br(), {1, 1}, color },
+        render::Vertex vs[] = {
+            { Vec(p0.x, p0.y), Vec(t0.x, t0.y), c },
+            { Vec(p1.x, p0.y), Vec(t1.x, t0.y), c },
+            { Vec(p2.x, p0.y), Vec(t2.x, t0.y), c },
+            { Vec(p3.x, p0.y), Vec(t3.x, t0.y), c },
+            { Vec(p0.x, p1.y), Vec(t0.x, t1.y), c },
+            { Vec(p1.x, p1.y), Vec(t1.x, t1.y), c },
+            { Vec(p2.x, p1.y), Vec(t2.x, t1.y), c },
+            { Vec(p3.x, p1.y), Vec(t3.x, t1.y), c },
+            { Vec(p0.x, p2.y), Vec(t0.x, t2.y), c },
+            { Vec(p1.x, p2.y), Vec(t1.x, t2.y), c },
+            { Vec(p2.x, p2.y), Vec(t2.x, t2.y), c },
+            { Vec(p3.x, p2.y), Vec(t3.x, t2.y), c },
+            { Vec(p0.x, p3.y), Vec(t0.x, t3.y), c },
+            { Vec(p1.x, p3.y), Vec(t1.x, t3.y), c },
+            { Vec(p2.x, p3.y), Vec(t2.x, t3.y), c },
+            { Vec(p3.x, p3.y), Vec(t3.x, t3.y), c },
         };
-        draw_quad(vs[0], vs[1], vs[2], vs[3]);
+
+        quad(vs[0], vs[1], vs[4], vs[5]);
+        quad(vs[1], vs[2], vs[5], vs[6]);
+        quad(vs[2], vs[3], vs[6], vs[7]);
+        quad(vs[4], vs[5], vs[8], vs[9]);
+        //if (style < RECT_STROKE)
+        quad(vs[5], vs[6], vs[9], vs[10]);
+        quad(vs[6], vs[7], vs[10], vs[11]);
+        quad(vs[8], vs[9], vs[12], vs[13]);
+        quad(vs[9], vs[10], vs[13], vs[14]);
+        quad(vs[10], vs[11], vs[14], vs[15]);
     }
 
-    void draw_rect(const Rect& rect, const Col& color, const Vec& uv) {
-        if (!m_active) return;
-        Vec s = rect.size();
-        Vertex vs[] = {
-            { rect.tl(), uv, color },
-            { rect.bl(), uv + Vec(0, s.y), color },
-            { rect.tr(), uv + Vec(s.x, 0), color },
-            { rect.br(), uv + s, color },
-        };
-        draw_quad(vs[0], vs[1], vs[2], vs[3]);
+    void glyph(const Vec& pos, const Color& c, uint8_t g) {
+        copy(pos,
+             { FONT_WIDTH, FONT_HEIGHT },
+             { g % 32 * FONT_WIDTH, g / 32 * FONT_HEIGHT },
+             c);
     }
-
-    void draw_rect(const Rect& rect, const Col& color, RectStyle style) {
-        if (!m_active) return;
-        if (style == 0) {
-            draw_rect(rect, color);
-            return;
-        }
-        Vec o = { 16 * style, 0 };
-        Vec u = { 7, 0 };
-        Vec v = { 0, 7 };
-        Vertex vs[] = {
-            { rect.tl(),     o,     color },
-            { rect.tl() + v, o + v, color },
-            { rect.bl() - v, o + v, color },
-            { rect.bl(),     o,     color },
-            { rect.tl() + u,     o + u,     color },
-            { rect.tl() + u + v, o + u + v, color },
-            { rect.bl() + u - v, o + u + v, color },
-            { rect.bl() + u,     o + u,     color },
-            { rect.tr() - u,     o + u,     color },
-            { rect.tr() - u + v, o + u + v, color },
-            { rect.br() - u - v, o + u + v, color },
-            { rect.br() - u,     o + u,     color },
-            { rect.tr(),     o,     color },
-            { rect.tr() + v, o + v, color },
-            { rect.br() - v, o + v, color },
-            { rect.br(),     o,     color },
-        };
-        draw_quad(vs[0], vs[1], vs[4], vs[5]);
-        draw_quad(vs[1], vs[2], vs[5], vs[6]);
-        draw_quad(vs[2], vs[3], vs[6], vs[7]);
-        draw_quad(vs[4], vs[5], vs[8], vs[9]);
-        if (style < RECT_STROKE) draw_quad(vs[5], vs[6], vs[9], vs[10]);
-        draw_quad(vs[6], vs[7], vs[10], vs[11]);
-        draw_quad(vs[8], vs[9], vs[12], vs[13]);
-        draw_quad(vs[9], vs[10], vs[13], vs[14]);
-        draw_quad(vs[10], vs[11], vs[14], vs[15]);
-    }
-
-    void draw_glyph(const Vec& pos, const Col& color, uint8_t c) {
-        if (!m_active) return;
-        Vec uv = { c % 16 * FONT_WIDTH, c / 16 * FONT_HEIGHT };
-        Rect rect = { pos, pos + Vec(FONT_WIDTH, FONT_HEIGHT) };
-        draw_rect(rect, color, uv);
-    }
-    void draw_text(const Vec& pos, const char* text) {
-        if (!m_active) return;
+    void text(const Vec& pos, const char* text) {
         Vec p = pos;
         while (char c = *text++) {
             if (c == 10) {
@@ -145,70 +138,48 @@ public:
                 p.x = pos.x;
                 continue;
             }
-            if (c > 32 || c < 128) draw_glyph(p, { 255, 255, 255, 255 }, c);
+            if (c > 32 || c < 128) glyph(p, { 255, 255, 255, 255 }, c);
             p.x += FONT_WIDTH;
         }
     }
-
-private:
-    void draw_quad(const Vertex& v0,
-                   const Vertex& v1,
-                   const Vertex& v2,
-                   const Vertex& v3)
-    {
-        m_vertices.emplace_back(v0);
-        m_vertices.emplace_back(v1);
-        m_vertices.emplace_back(v2);
-        m_vertices.emplace_back(v2);
-        m_vertices.emplace_back(v1);
-        m_vertices.emplace_back(v3);
-    }
-
-    bool                m_active;
-    std::vector<Vertex> m_vertices;
 };
 
 
-struct Window {
-    const char* name;
-    Rect        rect;
+struct {
+    bool just_pressed()  const { return pressed && !prev_pressed; }
+    bool just_released() const { return !pressed && prev_pressed; }
+    bool box_touched(Box const& box) const { return (pressed | prev_pressed) && box.contains(pos); }
 
-    // drawing
-    bool        same_line;
-    Rect        current_line;
-    Rect        content_rect;
-    DrawContext dc;
-};
+    bool pressed;
+    bool prev_pressed;
+    Vec  pos;
+    Vec  prev_pos;
+} m_touch;
 
-Vec                                  m_mouse_pos;
-Vec                                  m_mouse_mov;
-std::array<bool, 3>                  m_mouse_buttons;
-std::array<bool, 3>                  m_mouse_buttons_clicked;
-int                                  m_mouse_wheel;
+Vec         m_cursor_min;
+Vec         m_cursor_max;
+Vec         m_min_item_size;
 
-const char*                          m_item_active;
-const char*                          m_item_hovered;
-const char*                          m_old_item_hovered;
+int         m_hold_count;
+bool        m_hold;
+bool        m_highlight;
+bool        m_same_line;
+void const* m_id;
+void const* m_active_item;
+char*       m_input_text_str = nullptr;
+int         m_input_text_len;
+int         m_input_text_pos;
+int         m_input_cursor_blink = 0;
+Align       m_align = CENTER;
 
-Vec                                  m_window_spawn_pos = { 100, 100 };
-std::vector<std::unique_ptr<Window>> m_windows;
-std::vector<Window*>                 m_window_stack;
-Window*                              m_window_active;
-Window*                              m_window_hovered;
-
-gfx::Texture2D*                      m_texture;
-gfx::Shader*                         m_shader;
-gfx::VertexArray*                    m_va;
-gfx::VertexBuffer*                   m_vb;
-
-std::array<char, 1024>               m_text_buffer;
+DrawContext     m_dc;
+gfx::Texture2D* m_texture;
 
 
+std::array<char, 1024> m_text_buffer;
 void print_to_text_buffer(const char* fmt, va_list args) {
     vsnprintf(m_text_buffer.data(), m_text_buffer.size(), fmt, args);
 }
-
-
 void print_to_text_buffer(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -217,473 +188,379 @@ void print_to_text_buffer(const char* fmt, ...) {
 }
 
 
-Window* find_or_create_window(const char* name) {
-    for (auto& w : m_windows) {
-        if (strcmp(w->name, name) == 0) return w.get();
-    }
 
-    m_windows.push_back(std::make_unique<Window>());
-    Window* w = m_windows.back().get();
-    w->name = name;
-    w->rect.min = w->rect.max = m_window_spawn_pos;
-
-    m_window_spawn_pos += Vec(200, 0);
-
-    return w;
+void const* get_id(void const* addr) {
+    if (m_id) {
+        addr = m_id;
+        m_id = nullptr;
+   }
+   return addr;
 }
 
 
-void move_window_to_front(Window* w) {
-    if (w != m_windows.back().get()) {
-        for (auto it = m_windows.begin(); it != m_windows.end(); ++it) {
-            if (it->get() == w) {
-                std::rotate(it, it + 1, m_windows.end());
-                break;
-            }
-        }
-    }
-}
-
-
-Rect new_item_rect(Window* w, const Vec& size) {
+Box item_box(Vec const& s) {
     Vec pos;
-    if (w->same_line) {
-        w->same_line = false;
-        pos = { w->current_line.max.x, w->current_line.min.y };
-        short h = w->current_line.size().y;
-        if (h > size.y) pos.y += (h - size.y) / 2;
-        w->current_line.max = glm::max(w->current_line.max, pos + size);
+    Vec size = glm::max(s, m_min_item_size);
+    if (m_same_line) {
+        m_same_line = false;
+        pos = Vec(m_cursor_max.x, m_cursor_min.y);
+        if (m_cursor_max.y - m_cursor_min.y > size.y) {
+            pos.y += (m_cursor_max.y - m_cursor_min.y - size.y) / 2;
+        }
+        m_cursor_max = glm::max(m_cursor_max, pos + size);
     }
     else {
-        pos = w->current_line.bl();
-        w->current_line = { pos, pos + size };
+        pos = Vec(m_cursor_min.x, m_cursor_max.y);
+        m_cursor_min.y = m_cursor_max.y;
+        m_cursor_max = pos + size;
     }
-    Rect rect = { pos, pos + size };
-    w->content_rect.max = glm::max(w->content_rect.max, rect.max);
-    return rect;
+    return { pos, size };
 }
 
 
-Vec text_size(const char* text) {
-    Vec s = { 0, FONT_HEIGHT };
-    short x = 0;
-    while (char c = *text++) {
-        if (c == '\n') {
-            s.y += FONT_HEIGHT;
-            x = 0;
-        }
-        else {
-            x += FONT_WIDTH;
-            s.x = std::max(s.x, x);
-        }
-    }
-    return s;
+Vec print_pos(Box const& box, Vec const& s) {
+    if      (m_align == CENTER) return box.pos + Vec((box.size.x - s.x) / 2, (box.size.y - s.y) / 2);
+    else if (m_align == LEFT)   return box.pos + Vec(15, (box.size.y - s.y) / 2);
+    else                        return box.pos + Vec(box.size.x - s.x - 15, box.size.y - s.y / 2);
 }
-
-
-Col make_color(uint32_t c, uint8_t a = 255) {
-    return { (c >> 16) & 255, (c >>  8) & 255, c & 255, a};
-}
-
-
-struct {
-    Col window         = make_color(0x111111, 200);
-    Col window_title   = make_color(0x000000, 100);
-    Col button         = make_color(0x225577, 200);
-    Col button_hovered = make_color(0x446688, 200);
-    Col button_active  = make_color(0x447799, 200);
-    Col frame          = make_color(0x225577, 100);
-    Col frame_hovered  = make_color(0x446688, 100);
-    Col frame_active   = make_color(0x447799, 100);
-    Col handle         = make_color(0x447799, 200);
-} const m_colors;
 
 
 } // namespace
 
 
-void init() {
-    m_texture = load_texture("gui.png", gfx::FilterMode::Nearest);
-
-    m_shader = gfx::Shader::create(
-    R"(#version 100
-    attribute vec2 a_pos;
-    attribute vec2 a_uv;
-    attribute vec4 a_col;
-    varying vec2 v_uv;
-    varying vec4 v_col;
-    uniform vec2 scale;
-    uniform vec2 texture_scale;
-    void main() {
-        v_uv = a_uv * texture_scale;
-        v_col = a_col;
-        gl_Position = vec4(vec2(2.0, -2.0) * scale * a_pos + vec2(-1.0, 1.0), 0.0, 1.0);
-    })",
-    R"(#version 100
-    precision mediump float;
-    uniform sampler2D texture;
-    varying vec2 v_uv;
-    varying vec4 v_col;
-    void main() {
-        gl_FragColor = v_col * texture2D(texture, v_uv);
-    })");
-    m_shader->set_uniform("texture", m_texture);
-    m_shader->set_uniform("texture_scale",
-            glm::vec2(1.0 / m_texture->width(), 1.0 / m_texture->height()));
-
-    m_vb = gfx::VertexBuffer::create(gfx::BufferHint::StreamDraw);
-    m_va = gfx::VertexArray::create();
-    m_va->set_primitive_type(gfx::PrimitiveType::Triangles);
-    m_va->set_attribute(0, m_vb, gfx::ComponentType::Int16, 2, false, 0, 12);
-    m_va->set_attribute(1, m_vb, gfx::ComponentType::Int16, 2, false, 4, 12);
-    m_va->set_attribute(2, m_vb, gfx::ComponentType::Uint8, 4, true,  8, 12);
+Vec cursor() {
+    if (m_same_line) return Vec(m_cursor_max.x, m_cursor_min.y);
+    else return Vec(m_cursor_min.x, m_cursor_max.y);
 }
 
-void resize(int width, int height) {
-    m_shader->set_uniform("scale", glm::vec2(1.0 / width, 1.0 / height));
-}
-
-void free() {
-    delete m_texture;
-    delete m_shader;
-    delete m_va;
-    delete m_vb;
-    m_texture = nullptr;
-    m_shader  = nullptr;
-    m_va      = nullptr;
-    m_vb      = nullptr;
-}
-
-
-//bool process_event(const SDL_Event& e) {
-//    switch (e.type) {
-//    case SDL_MOUSEWHEEL:
-//        m_mouse_wheel += e.wheel.y;
-//        return true;
-//    default: return false;
-//    }
-//}
-
-
-void new_frame() {
-    // mouse
-    int x, y;
-//    Uint32 b = SDL_GetMouseState(&x, &y);
-    x = y = 0;
-    bool bs[3] = {
-//        b & SDL_BUTTON(SDL_BUTTON_LEFT),
-//        b & SDL_BUTTON(SDL_BUTTON_MIDDLE),
-//        b & SDL_BUTTON(SDL_BUTTON_RIGHT),
-    };
-    for (int i = 0; i < 3; ++i) {
-        m_mouse_buttons_clicked[i] = !m_mouse_buttons[i] && bs[i];
-        m_mouse_buttons[i] = bs[i];
+void cursor(Vec const& c) {
+    if (m_same_line) {
+        m_cursor_max.x = c.x;
+        m_cursor_min.y = c.y;
     }
-    Vec p = { x, y };
-    m_mouse_mov = p - m_mouse_pos;
-    m_mouse_pos = p;
-
-    // reset things
-    if (!m_mouse_buttons[0]) {
-        m_window_active = nullptr;
-        m_item_active   = nullptr;
-    }
-
-    m_old_item_hovered = m_item_hovered;
-    m_item_hovered     = nullptr;
-    m_window_hovered   = nullptr;
-
-    for (int i = (int) m_windows.size() - 1; i >= 0; --i) {
-        auto& w = m_windows[i];
-        w->dc.clear();
-        w->dc.set_active(w->content_rect.size() != Vec(0, 0));
-
-        if (!m_window_hovered && w->rect.contains(m_mouse_pos)) m_window_hovered = w.get();
-
-        // adjust window size
-        if (w->content_rect.min != w->content_rect.max) {
-            w->rect.max = glm::max(w->rect.max, w->content_rect.max + Vec(4));
-        }
-    }
-
-    // have a default debug window
-    begin_window("Debug");
-}
-
-
-void render() {
-    end_window();
-
-    m_mouse_wheel = 0;
-
-    gfx::RenderState rs;
-    rs.blend_enabled = true;
-    rs.blend_func_src_rgb = gfx::BlendFunc::SrcAlpha;
-    rs.blend_func_dst_rgb = gfx::BlendFunc::OneMinusSrcAlpha;
-    rs.cull_face_enabled = false;
-
-
-    // render each window separately
-    for (auto& w : m_windows) {
-        auto& vs = w->dc.vertices();
-        if (vs.empty()) continue;
-        m_vb->init_data(vs);
-        m_va->set_count(vs.size());
-        gfx::screen()->draw(rs, m_shader, m_va);
+    else {
+        m_cursor_min.x = c.x;
+        m_cursor_max.y = c.y;
     }
 }
 
 
-void set_next_window_pos(const Vec& pos) {
-    m_window_spawn_pos = pos;
+void id(void const* addr) {
+    if (!m_id) m_id = addr;
 }
 
 
-void begin_window(const char* name) {
-    Window* w = find_or_create_window(name);
-    m_window_stack.emplace_back(w);
+void same_line() {
+    m_same_line = true;
+}
 
-    // have we been here before in this frame?
-    if (!w->dc.vertices().empty()) return;
 
-    bool hovered = w == m_window_hovered;
-    bool clicked = hovered && m_mouse_buttons_clicked[0] && !m_old_item_hovered;
-    if (clicked) {
-        m_window_active = w;
-        move_window_to_front(w);
+void next_line() {
+    m_same_line = false;
+}
+
+
+void align(Align a) {
+    m_align = a;
+}
+
+
+void min_item_size(Vec const& s) {
+    m_min_item_size = s;
+}
+
+
+void begin_frame() {
+    ++m_input_cursor_blink;
+
+    m_cursor_min = { 0, 0 };
+    m_cursor_max = { 0, 0 };
+    m_same_line = false;
+    if (!(m_touch.pressed | m_touch.prev_pressed)) {
+        m_active_item = nullptr;
+        m_hold_count = 0;
     }
-    bool active = w == m_window_active;
-    if (active) {
-        w->rect.min += m_mouse_mov;
-        w->rect.max += m_mouse_mov;
+    if (m_touch.just_pressed() && m_input_text_str) {
+        m_input_text_str = nullptr;
+//        SDL_StopTextInput();
     }
 
-    Rect title_rect  = { w->rect.min, w->rect.min + text_size(name) + Vec(12) };
-    w->rect.max      = glm::max(w->rect.max, title_rect.max);
-    title_rect.max.x = w->rect.max.x;
-
-    w->dc.draw_rect(w->rect, m_colors.window, RECT_FILL_ROUND_3);
-    w->dc.draw_rect(title_rect, m_colors.window_title, RECT_FILL_ROUND_3);
-    w->dc.draw_text(title_rect.min + Vec(6), name);
-
-    Vec p = title_rect.bl() + Vec(4);
-    w->content_rect = { p, p };
-    w->current_line = { p, p };
+    m_dc.clear();
 }
 
 
-void end_window() {
-    m_window_stack.pop_back();
+Box padding(Vec const& size) {
+    return item_box(size);
 }
-
-
-void same_line(short offset) {
-    Window* w = m_window_stack.back();
-    w->same_line = true;
-    w->current_line.max.x = std::max<short>(w->current_line.max.x,
-                                            w->current_line.min.x + offset);
-}
-
 
 void separator() {
-    Window* w = m_window_stack.back();
-    Vec size;
-    bool sl = w->same_line;
-    if (sl) size = Vec(5, w->current_line.size().y);
-    else size = Vec(w->rect.size().x - 8, 5);
-    w->dc.draw_rect(new_item_rect(w, size).expand(-2), { 255, 255, 255, 50 }, RECT_FILL);
-    if (sl) same_line();
+    Box box;
+    if (m_same_line) {
+        box = item_box({ SEPARATOR_WIDTH, m_cursor_max.y - m_cursor_min.y });
+        m_same_line = true;
+    }
+    else {
+        box = item_box({ m_cursor_max.x - m_cursor_min.x, SEPARATOR_WIDTH });
+    }
+    //m_dc.rect(box.pos, box.size, color::separator);
 }
 
 
-void text(const char* fmt, ...) {
-    Window* w = m_window_stack.back();
-
+void text(char const* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     print_to_text_buffer(fmt, args);
     va_end(args);
-
-    Rect rect = new_item_rect(w, text_size(m_text_buffer.data()) + Vec(4));
-
-    w->dc.draw_text(rect.min + Vec(2), m_text_buffer.data());
+    Vec s = text_size(m_text_buffer.data());
+    Box box = item_box(s);
+    m_dc.text(print_pos(box, s), m_text_buffer.data());
 }
 
 
-bool button(const char* label) {
-    Window* w = m_window_stack.back();
+void highlight() { m_highlight = true; }
 
-    Rect rect = new_item_rect(w, text_size(label) + Vec(12));
 
-    Rect bb = rect.expand(-2);
-    bool hovered = w == m_window_hovered && bb.contains(m_mouse_pos);
-    if (hovered) m_item_hovered = label;
-    bool clicked = hovered && m_mouse_buttons_clicked[0];
-    if (clicked) {
-        m_item_active = label;
-        move_window_to_front(w);
+bool button(char const* label, bool active) {
+    enum { HOLD_TIME = 10 };
+    m_hold = false;
+    Vec s = text_size(label);
+    Box box = item_box(s + Vec(8, 8));
+    Color color = color::button_normal;
+    bool clicked = false;
+    if (m_active_item == nullptr && m_touch.box_touched(box)) {
+        color = color::button_hover;
+        if (box.contains(m_touch.prev_pos)) {
+            if (++m_hold_count > HOLD_TIME) m_hold = true;
+        }
+        else m_hold_count = 0;
+        if (m_touch.just_released()) clicked = true;
     }
-    bool active = m_item_active == label;
+    else {
+        if (active) color = color::button_active;
+        else if (m_highlight) color = color::highlight;
+    }
+    m_highlight = false;
 
-    Col color = active  ? m_colors.button_active :
-                hovered ? m_colors.button_hovered :
-                          m_colors.button;
-
-    w->dc.draw_rect(bb, color, RECT_FILL_ROUND_1);
-    w->dc.draw_text(bb.min + Vec(4), label);
-
+    m_dc.rect(box.pos, box.size, color, RECT_FILL);
+    m_dc.text(print_pos(box, s), label);
     return clicked;
 }
 
 
-bool checkbox(const char* label, bool& v) {
-    Window* w = m_window_stack.back();
-
-    Vec s = text_size(label);
-
-    float check_width = s.y + 12;
-    float label_width = s.x + 4;
-
-    Rect rect = new_item_rect(w, Vec(check_width + label_width, check_width));
-
-    Rect bb = Rect(rect.min, rect.min + Vec(check_width)).expand(-2);
-
-    bool hovered = w == m_window_hovered && rect.expand(-2).contains(m_mouse_pos);
-    if (hovered) m_item_hovered = label;
-    bool clicked = hovered && m_mouse_buttons_clicked[0];
-    if (clicked) {
-        m_item_active = label;
-        move_window_to_front(w);
-        v = !v;
-    }
-    bool active = m_item_active == label;
-
-    // draw check
-    {
-        Col color = active  ? m_colors.frame_active :
-                    hovered ? m_colors.frame_hovered :
-                              m_colors.frame;
-        w->dc.draw_rect(bb, color, RECT_FILL_ROUND_1);
-
-        if (v) {
-            w->dc.draw_rect(bb.expand(-6), m_colors.handle, RECT_FILL);
-        }
-    }
-
-    // draw label
-    {
-        w->dc.draw_text(rect.min + Vec(check_width + 2, 6), label);
-    }
-
-    return clicked;
+bool hold() {
+    if (m_hold) m_active_item = (void const*) -1;
+    return m_hold;
 }
 
 
-bool radio_button(const char* label, int& v, int value) {
-    Window* w = m_window_stack.back();
+//bool process_event(const SDL_Event& e) {
+//    char c;
+//    switch (e.type) {
+//    case SDL_KEYDOWN:
+//        if (!m_input_text_str) return false;
+//        switch (e.key.keysym.scancode) {
+//        case SDL_SCANCODE_RETURN:
+//            SDL_StopTextInput();
+//            m_input_text_str = nullptr;
+//            break;
+//        case SDL_SCANCODE_BACKSPACE:
+//            m_input_cursor_blink = 0;
+//            if (m_input_text_pos > 0) {
+//                m_input_text_str[--m_input_text_pos] = '\0';
+//            }
+//            break;
+//        default:
+//            break;
+//        }
+//        return true;
+//    case SDL_TEXTINPUT:
+//        if (!m_input_text_str) return false;
+//        m_input_cursor_blink = 0;
+//        c = e.text.text[0];
+//        if ((isalnum(c) || (m_input_text_pos > 0 && strchr(" _-.+()", c))) &&
+//            m_input_text_pos < m_input_text_len)
+//        {
+//            m_input_text_str[m_input_text_pos++] = c;
+//        }
+//        return true;
+//    default:
+//        return false;
+//    }
+//}
 
-    Vec s = text_size(label);
 
-    float check_width = s.y + 12;
-    float label_width = s.x + 4;
+void input_text(char* str, int len) {
+    Vec s = text_size(str);
+    Box box = item_box(s + Vec(30, 10));
 
-    Rect rect = new_item_rect(w, Vec(check_width + label_width, check_width));
-
-    Rect bb = Rect(rect.min, rect.min + Vec(check_width)).expand(-2);
-
-    bool hovered = w == m_window_hovered && rect.expand(-2).contains(m_mouse_pos);
-    if (hovered) m_item_hovered = label;
-    bool clicked = hovered && m_mouse_buttons_clicked[0];
-    bool changed = false;
-    if (clicked) {
-        m_item_active = label;
-        move_window_to_front(w);
-        changed = v != value;
-        v = value;
-    }
-    bool active = m_item_active == label;
-
-    // draw check
-    {
-        Col color = active  ? m_colors.frame_active :
-                    hovered ? m_colors.frame_hovered :
-                              m_colors.frame;
-        w->dc.draw_rect(bb, color, RECT_FILL_ROUND_1);
-
-        if (v == value) {
-            w->dc.draw_rect(bb.expand(-6), m_colors.handle, RECT_FILL);
+    Color color = color::input_text_normal;
+    if (m_active_item == nullptr && m_touch.box_touched(box)) {
+        color = color::input_text_hover;
+        if (m_touch.just_released()) {
+            // start keyboard
+            //SDL_StartTextInput();
+            m_input_text_str = str;
+            m_input_text_len = len;
+            m_input_text_pos = strlen(m_input_text_str);
         }
     }
-
-    // draw label
-    {
-        w->dc.draw_text(rect.min + Vec(check_width + 2, 6), label);
+    if (m_input_text_str == str) {
+        color = color::input_text_active;
     }
 
-    return changed;
+//    gfx::color(color::input_text_normal);
+//    gfx::rectangle(box.pos, box.size, 1);
+//    gfx::color(color);
+//    gfx::rectangle(box.pos, box.size, 5);
+//    gfx::color(color::text);
+
+//    Vec p = print_pos(box, s);
+//    gfx::print(p, str);
+//    // cursor
+//    if (m_input_text_str == str && m_input_cursor_blink % 16 < 8) {
+//        gfx::print(p + Vec(s.x, 0), "_");
+//    }
 }
 
 
-const int item_width_default = 24 * FONT_WIDTH;
+bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page) {
+    Vec s1 = text_size(label);
+    print_to_text_buffer(fmt, value);
+    Vec s2 = text_size(m_text_buffer.data());
+    // padding
+    if (s2.x > 0) s1.x += 30;
 
+    Box box = item_box(Vec(s1.x + s2.x, std::max(s1.y, s2.y)) + Vec(30, 10));
+    int range = max - min;
+    int handle_w = box.size.x * page / (range + page);
+    int handle_x = range == 0 ? 0 : (value - min) * (box.size.x - handle_w) / range;
 
-bool drag_float(const char* label, float& v, float speed, float min, float max, const char* fmt) {
-    Window* w = m_window_stack.back();
-
-    Vec s = text_size(label);
-    Rect rect = new_item_rect(w, Vec(item_width_default + 12 + s.x + 4, s.y + 12));
-
-    Rect drag_rect  = { rect.min, rect.min + Vec(item_width_default + 12, s.y + 12) };
-    Rect bb = drag_rect.expand(-2);
-
-    bool hovered = w == m_window_hovered && bb.contains(m_mouse_pos);
-    if (hovered) m_item_hovered = label;
-    bool clicked = hovered && m_mouse_buttons_clicked[0];
-    if (clicked) {
-        m_item_active = label;
-        move_window_to_front(w);
+    void const* id = get_id(&value);
+    if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
+        m_active_item = id;
     }
-    bool active = m_item_active == label;
-    float old_v = v;
-    if (active || (hovered && m_mouse_wheel != 0)) {
-        if (min < max) {
-            // no need for speed
-            v +=  (m_mouse_mov.x + m_mouse_wheel) * (max - min) / (bb.size().x - 4) * 0.5;
-            v = glm::clamp(v, min, max);
-        }
-        else {
-            v += (m_mouse_mov.x + m_mouse_wheel) * speed;
-        }
-    }
-    bool changed = v != old_v;
-
-    // draw item
-    {
-        Col color = active  ? m_colors.frame_active :
-                    hovered ? m_colors.frame_hovered :
-                              m_colors.frame;
-
-        w->dc.draw_rect(bb, color, RECT_FILL_ROUND_1);
-
-        // handle
-        if (min < max) {
-            short x = (bb.size().x - 4) * (v - min) / (max - min);
-            Rect handle_rect = { Vec(bb.min.x + x, bb.min.y),
-                                 Vec(bb.min.x + x + 4, bb.max.y) };
-            w->dc.draw_rect(handle_rect, m_colors.handle);
-        }
-
-        print_to_text_buffer(fmt, v);
-        Vec s = text_size(m_text_buffer.data());
-        w->dc.draw_text(bb.center() - Vec(s.x / 2, s.y / 2), m_text_buffer.data());
+    int old_value = value;
+    if (m_active_item == id) {
+        int x = m_touch.pos.x - box.pos.x;
+        int v = min;
+        if (range > 0) v += (x - handle_w * (page - 1) / (2 * page)) * range / (box.size.x - handle_w);
+        value = glm::clamp(v, min, max);
     }
 
-    // draw label
-    {
-        w->dc.draw_text(drag_rect.tr() + Vec(2, 6), label);
+//    gfx::color(color::drag);
+//    gfx::rectangle(box.pos, box.size, 0);
+
+//    gfx::color(m_active_item == id ? color::handle_active : color::handle_normal);
+//    gfx::rectangle(box.pos + Vec(handle_x, 0), { handle_w, box.size.y }, 0);
+
+
+//    gfx::color(color::text);
+//    gfx::print(box.pos + Vec(15, box.size.y / 2 - s1.y / 2), label);
+
+//    gfx::color(color::text);
+//    gfx::print(box.pos + Vec(box.size.x - s2.x - 15, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
+
+    return value != old_value;
+}
+
+bool vertical_drag_int(int& value, int min, int max, int page) {
+    Box box = item_box({});
+    int range = max - min;
+    int handle_h = box.size.y * page / (range + page);
+    int handle_y = range == 0 ? 0 : (value - min) * (box.size.y - handle_h) / range;
+
+    void const* id = get_id(&value);
+    if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
+        m_active_item = id;
+    }
+    int old_value = value;
+    if (m_active_item == id) {
+        int y = m_touch.pos.y - box.pos.y;
+        int v = min;
+        if (range > 0) v += (y - handle_h * (page - 1) / (2 * page)) * range / (box.size.y - handle_h);
+        value = glm::clamp(v, min, max);
     }
 
-    return changed;
+//    gfx::color(color::drag);
+//    gfx::rectangle(box.pos, box.size, 0);
+
+//    gfx::color(m_active_item == id ? color::handle_active : color::handle_normal);
+//    gfx::rectangle(box.pos + Vec(0, handle_y), { box.size.x, handle_h }, 0);
+
+    return value != old_value;
+}
+
+
+bool clavier(uint8_t& n, int offset, bool highlight) {
+    Box box = item_box({ 100, 20 });
+
+    void const* id = get_id(&n);
+    if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
+        m_active_item = id;
+    }
+
+    uint8_t old_n = n;
+
+//    int x0 = 0;
+//    bool just_pressed = m_touch.just_pressed();
+//    for (int i = 0; i < CLAVIER_WIDTH; ++i) {
+//        int x1 = (box.size.x - (CLAVIER_WIDTH - 1) * PADDING) * (i + 1) / CLAVIER_WIDTH + (i + 1) * PADDING;
+//        int nn = i + 1 + offset;
+//        Box b = {
+//            { box.pos.x + x0, box.pos.y },
+//            { x1 - x0, box.size.y },
+//        };
+//        bool touch = b.contains({ m_touch.pos.x, b.pos.y });
+//        b.size.x -= PADDING;
+//        if (m_active_item == id && touch) {
+//            if (just_pressed) {
+//                if (n == nn) n = 0;
+//                else if (n == 0) n = nn;
+//            }
+//            else if (n != 0) n = nn;
+//        }
+//        Color color = color::make(0x222222);
+//        if ((i + offset) % 12 == 0) color = color::make(0x333333);
+//        if ((1 << (i + offset) % 12) & 0b010101001010) color = color::make(0x111111);
+//        if (highlight) color = color::mix(color, color::highlight, 0.2);
+//        gfx::color(color);
+//        gfx::rectangle(b.pos, b.size, 0);
+
+//        if (n == nn) {
+//            if (m_active_item == id && touch) gfx::color(color::note_active);
+//            else gfx::color(color::note_normal);
+//            gfx::rectangle(b.pos, b.size, 2);
+//        }
+
+//        x0 = x1;
+//    }
+    return n != old_n;
+}
+
+void init() {
+    m_texture = load_texture("gui.png");
+}
+void free() {
+    delete m_texture;
+    m_texture = nullptr;
+}
+
+void touch(int x, int y) {
+    m_touch.pos     = { x, y };
+    m_touch.pressed = true;
+}
+
+void render(gfx::RenderTarget* rt) {
+
+    m_dc.rect(m_touch.pos - Vec(4), Vec(8), {255, 0, 0, 255});
+
+    render::draw(rt, m_dc.vertices(), m_texture);
+    m_dc.clear();
+
+    // update touch
+    m_touch.prev_pos     = m_touch.pos;
+    m_touch.prev_pressed = m_touch.pressed;
+    m_touch.pressed = false;
 }
 
 

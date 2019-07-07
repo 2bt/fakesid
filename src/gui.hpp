@@ -1,30 +1,45 @@
 #pragma once
-#include <glm/glm.hpp>
+#include "render.hpp"
 
-union SDL_Event;
 
 namespace gui {
 
-    using Vec = glm::i16vec2;
+    struct Box {
+        bool contains(Vec const& p) const {
+            return p.x >= pos.x && p.y >= pos.y &&
+                   p.x < pos.x + size.x && p.y < pos.y + size.y;
+        }
+        Vec pos;
+        Vec size;
+    };
+
+
+    enum Align { CENTER, LEFT, RIGHT };
+
+
+    Vec  cursor();
+    void cursor(Vec const& c);
+    void id(void const* addr);
+    void same_line();
+    void next_line();
+    void align(Align a);
+    void min_item_size(Vec const& s = {});
+    void begin_frame();
+    Box  padding(Vec const& size);
+    void separator();
+    void text(char const* fmt, ...);
+    void highlight();
+    bool button(char const* label, bool active = false);
+    bool hold();
+    void input_text(char* str, int len);
+    bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 1);
+    bool vertical_drag_int(int& value, int min, int max, int page = 1);
+    bool clavier(uint8_t& n, int offset, bool highlight);
+
+    void touch(int x, int y);
 
     void init();
-    void resize(int width, int height);
     void free();
+    void render(gfx::RenderTarget* rt);
 
-    bool process_event(const SDL_Event& e);
-    void new_frame();
-    void render();
-
-    void set_next_window_pos(const Vec& pos);
-    void begin_window(const char* name);
-    void end_window();
-
-    void same_line(short offset = 0);
-    void separator();
-
-    void text(const char* fmt, ...);
-    bool button(const char* label);
-    bool checkbox(const char* label, bool& v);
-    bool radio_button(const char* label, int& v, int value);
-    bool drag_float(const char* label, float& v, float speed = 1, float min = 0, float max = 0, const char* fmt = "%.3f");
 }

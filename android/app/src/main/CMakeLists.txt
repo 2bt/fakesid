@@ -4,17 +4,15 @@ project(Lib)
 
 add_compile_options(-std=c++17 -O2 -Wall)
 
-add_library(${PROJECT_NAME} SHARED
-    cpp/main.cpp
-    cpp/app.cpp
-    cpp/gfx.cpp
-    cpp/foo.cpp
-    cpp/gui.cpp
+file(GLOB SRC
+	"cpp/*.hpp"
+	"cpp/*.cpp"
     )
 
+add_library(${PROJECT_NAME} SHARED ${SRC})
+
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    #/home/twobit/Programming/android/lib/
-    ../../../../../../lib
+    "../../../../../../lib"
     )
 
 # add lib dependencies

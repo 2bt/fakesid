@@ -1,32 +1,22 @@
 #include "gui.hpp"
 #include "foo.hpp"
-#include "debug_renderer.hpp"
 #include "render.hpp"
 #include "app.hpp"
 
-
 enum {
     WIDTH      = 360,
-    MIN_HEIGHT = 620,
+    MIN_HEIGHT = 590,
 };
 
 namespace app {
 namespace {
 
 
-bool m_initialized = false;
-
-int m_touch_x;
-int m_touch_y;
-
-gfx::Texture2D*   m_canvas;
+bool              m_initialized = false;
 gfx::Framebuffer* m_framebuffer;
-
-
-DebugRenderer DBR;
-
-gfx::Texture2D* tex;
-
+gfx::Texture2D*   m_canvas;
+float             m_canvas_scale;
+int               m_canvas_offset;
 
 } // namespace
 
@@ -44,10 +34,6 @@ void init() {
     gui::init();
     render::init();
 
-    DBR.init();
-
-    tex = load_texture("gui.png");
-
     resize(gfx::screen()->width(), gfx::screen()->height());
 }
 
@@ -59,8 +45,6 @@ void free() {
 
     gui::free();
     render::free();
-
-    DBR.free();
 
     delete m_canvas;
     delete m_framebuffer;
@@ -78,7 +62,6 @@ void resize(int width, int height) {
     if (!m_initialized) return;
 
     gfx::screen()->resize(width, height);
-    gui::resize(width, height);
 
     if (m_canvas) {
         delete m_canvas;
@@ -90,66 +73,62 @@ void resize(int width, int height) {
     m_framebuffer = gfx::Framebuffer::create();
     m_framebuffer->attach_color(m_canvas);
 
-    DBR.origin();
-    DBR.translate(-1, -1);
-    DBR.scale(2.0 / width, 2.0 / height);
+    // set canvas offset and scale
+    glm::vec2 scale = glm::vec2(width, height) / glm::vec2(WIDTH, h);
+    if (scale.y < scale.x) {
+        m_canvas_offset = (width - WIDTH * scale.y) * 0.5f;
+        m_canvas_scale  = scale.y;
+    }
+    else {
+        m_canvas_offset = 0;
+        m_canvas_scale  = scale.y;
+    }
+
 }
 
 void touch(int x, int y) {
     LOGI("app::touch %d %d", x, y);
 
-    m_touch_x = x;
-    m_touch_y = y;
+
+    gui::touch((x - m_canvas_offset) / m_canvas_scale, y / m_canvas_scale);
 }
 
 void draw() {
 
-    static float i = 0;
-    i += 0.01;
-    if (i > 1) i = 0;
-
-
-    Vec screen_size = {gfx::screen()->width(), gfx::screen()->height()};
-    Vec canvas_size = {m_canvas->width(), m_canvas->height()};
-
     // render to canvas
-    m_framebuffer->clear({0.3, 0.3, 0.3, 1});
-    render::DrawContext dc;
-    dc.rect({10, 10}, canvas_size - Vec(20), {200, 0, 0, 255});
-    dc.rect({10, 10}, {50, 50}, {0, 0});
+    Vec canvas_size = {m_canvas->width(), m_canvas->height()};
+    gui::begin_frame();
+
+
+    gui::min_item_size({30, 30});
+    for (int i = 0; i < 12; ++i) {
+        gui::same_line();
+        char t[3];
+        sprintf(t, "%02X", i);
+        gui::button(t);
+    }
+    gui::next_line();
+    gui::min_item_size();
+    gui::separator();
+
+    gui::min_item_size({20, 20});
+    gui::button("HALLO");
+    gui::text("%d x %d", m_canvas->width(), m_canvas->height());
+    gui::text("%d x %d", gfx::screen()->width(), gfx::screen()->height());
 
 
 
-    dc.rect({200 + i * 100, 10}, {50, 50}, {255, 200, 0, 255});
 
-    render::draw(m_framebuffer, dc.vertices(), tex);
-    dc.clear();
-
+    m_framebuffer->clear({0, 0, 0, 1});
+    gui::render(m_framebuffer);
 
 
     // render canvas to screen
     gfx::screen()->clear({0, 0, 0, 1});
-    glm::vec2 scale = glm::vec2(screen_size) / glm::vec2(canvas_size);
-    Vec pos, size;
-    if (scale.y < scale.x) {
-        pos = Vec((screen_size.x - canvas_size.x * scale.y) * 0.5f, 0);
-        size = Vec(glm::vec2(canvas_size) * scale.y);
-    }
-    else {
-        size = Vec(glm::vec2(canvas_size) * scale.x);
-    }
-
-
-    dc.rect(pos, size, {}, canvas_size);
+    render::DrawContext dc;
+    dc.copy(Vec(m_canvas_offset, 0), Vec(glm::vec2(canvas_size) * m_canvas_scale), {}, canvas_size);
     render::draw(gfx::screen(), dc.vertices(), m_canvas);
     dc.clear();
-
-//    gui::new_frame();
-//    gui::button("Ok");
-//    gui::text("Hello, world!");
-//    gui::text("foobar\nfoo");
-//    gui::button("button");
-//    gui::render();
 }
 
 
