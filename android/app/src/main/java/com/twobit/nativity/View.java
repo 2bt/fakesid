@@ -11,7 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 
 class View extends GLSurfaceView {
-    private static String TAG = "libgl2";
+    //private static String TAG = "libgl2";
 
     Renderer mRenderer = new Renderer();
 
@@ -22,9 +22,17 @@ class View extends GLSurfaceView {
         setEGLConfigChooser(8, 8, 8, 8, 0, 0);
         setRenderer(mRenderer);
     }
-    public boolean onTouchEvent(final MotionEvent event) {
-        queueEvent(new Runnable() { public void run() { Lib.touch((int)event.getX(), (int)event.getY()); }});
-        return true;
+    public boolean onTouchEvent(final MotionEvent e) {
+        switch (e.getAction()) {
+        case MotionEvent.ACTION_DOWN:
+        case MotionEvent.ACTION_UP:
+        case MotionEvent.ACTION_MOVE:
+            queueEvent(new Runnable() { public void run() {
+                Lib.touch((int)e.getX(), (int)e.getY(), e.getAction());
+            }});
+            return true;
+        }
+        return false;
     }
 
     public void onDestroy() {

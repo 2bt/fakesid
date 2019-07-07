@@ -34,7 +34,8 @@ namespace color {
     const Color handle_normal     = button_active;
     const Color handle_active     = button_hover;
 
-    const Color separator         = make(0x111111);
+    //const Color separator         = make(0x111111);
+    const Color separator         = make(0x222222);
 
     const Color highlight         = make(0x787878);
 
@@ -58,7 +59,7 @@ Vec text_size(char const* str) {
     int16_t width = 0;
     while (int c = *str++) {
         if (c == '\n') {
-            size.y += FONT_HEIGHT;
+            size.y += FONT_HEIGHT + 4;
             width = 0;
             continue;
         }
@@ -127,14 +128,14 @@ public:
     void glyph(const Vec& pos, const Color& c, uint8_t g) {
         copy(pos,
              { FONT_WIDTH, FONT_HEIGHT },
-             { g % 32 * FONT_WIDTH, g / 32 * FONT_HEIGHT },
+             { g % 16 * FONT_WIDTH, g / 16 * FONT_HEIGHT },
              c);
     }
     void text(const Vec& pos, const char* text) {
         Vec p = pos;
         while (char c = *text++) {
-            if (c == 10) {
-                p.y += FONT_HEIGHT;
+            if (c == '\n') {
+                p.y += FONT_HEIGHT + 4;
                 p.x = pos.x;
                 continue;
             }
@@ -302,7 +303,7 @@ void separator() {
     else {
         box = item_box({ m_cursor_max.x - m_cursor_min.x, SEPARATOR_WIDTH });
     }
-    //m_dc.rect(box.pos, box.size, color::separator);
+    m_dc.copy(box.pos, box.size - Vec(1), {}, {1, 1}, color::separator);
 }
 
 
@@ -545,14 +546,15 @@ void free() {
     m_texture = nullptr;
 }
 
-void touch(int x, int y) {
+void touch(int x, int y, bool pressed) {
     m_touch.pos     = { x, y };
-    m_touch.pressed = true;
+    m_touch.pressed = pressed;
 }
 
 void render(gfx::RenderTarget* rt) {
 
-    m_dc.rect(m_touch.pos - Vec(4), Vec(8), {255, 0, 0, 255});
+    // debug touch
+    //m_dc.rect(m_touch.pos - Vec(4), Vec(8), {255, 0, 0, 255});
 
     render::draw(rt, m_dc.vertices(), m_texture);
     m_dc.clear();
@@ -560,7 +562,6 @@ void render(gfx::RenderTarget* rt) {
     // update touch
     m_touch.prev_pos     = m_touch.pos;
     m_touch.prev_pressed = m_touch.pressed;
-    m_touch.pressed = false;
 }
 
 

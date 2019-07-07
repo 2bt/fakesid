@@ -52,10 +52,12 @@ void free() {
     m_framebuffer = nullptr;
 }
 
+
 void exit() {
     LOGI("app::exit");
     free();
 }
+
 
 void resize(int width, int height) {
     LOGI("app::resize %d %d", width, height);
@@ -83,14 +85,10 @@ void resize(int width, int height) {
         m_canvas_offset = 0;
         m_canvas_scale  = scale.y;
     }
-
 }
 
-void touch(int x, int y) {
-    LOGI("app::touch %d %d", x, y);
-
-
-    gui::touch((x - m_canvas_offset) / m_canvas_scale, y / m_canvas_scale);
+void touch(int x, int y, bool pressed) {
+    gui::touch((x - m_canvas_offset) / m_canvas_scale, y / m_canvas_scale, pressed);
 }
 
 void draw() {

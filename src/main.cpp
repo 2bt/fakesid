@@ -10,8 +10,8 @@
 AAssetManager* g_asset_manager;
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject a) {
-        g_asset_manager = AAssetManager_fromJava(env, a);
+    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject am) {
+        g_asset_manager = AAssetManager_fromJava(env, am);
     }
     JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_init(JNIEnv * env, jobject obj) {
         app::init();
@@ -28,8 +28,8 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_draw(JNIEnv * env, jobject obj) {
         app::draw();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_touch(JNIEnv * env, jobject obj, jint x, jint y) {
-        app::touch(x, y);
+    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_touch(JNIEnv * env, jobject obj, jint x, jint y, jint action) {
+        app::touch(x, y, action == 0 || action == 2);
     }
 }
 
@@ -102,13 +102,16 @@ int main(int argc, char** argv) {
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
+                if (e.button.button != SDL_BUTTON_LEFT) break;
+                app::touch(e.motion.x, e.motion.y, true);
+                break;
             case SDL_MOUSEBUTTONUP:
                 if (e.button.button != SDL_BUTTON_LEFT) break;
-                app::touch(e.motion.x, e.motion.y);
+                app::touch(e.motion.x, e.motion.y, false);
                 break;
             case SDL_MOUSEMOTION:
                 if (!(e.motion.state & SDL_BUTTON_LMASK)) break;
-                app::touch(e.motion.x, e.motion.y);
+                app::touch(e.motion.x, e.motion.y, true);
                 break;
 
             default: break;

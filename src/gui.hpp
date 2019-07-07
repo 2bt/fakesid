@@ -36,7 +36,7 @@ namespace gui {
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
     bool clavier(uint8_t& n, int offset, bool highlight);
 
-    void touch(int x, int y);
+    void touch(int x, int y, bool pressed);
 
     void init();
     void free();
