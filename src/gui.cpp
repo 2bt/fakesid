@@ -34,8 +34,7 @@ namespace color {
     const Color handle_normal     = button_active;
     const Color handle_active     = button_hover;
 
-    //const Color separator         = make(0x111111);
-    const Color separator         = make(0x222222);
+    const Color separator         = make(0x111111);
 
     const Color highlight         = make(0x787878);
 
@@ -46,12 +45,6 @@ namespace color {
 
 
 namespace {
-
-enum {
-    FONT_WIDTH  = 8,
-    FONT_HEIGHT = 8,
-    SEPARATOR_WIDTH = 2,
-};
 
 
 Vec text_size(char const* str) {
@@ -70,29 +63,30 @@ Vec text_size(char const* str) {
 }
 
 
-enum RectStyle {
-    RECT_FILL,
-    RECT_FILL_ROUND,
-};
-
-
 class DrawContext : public render::DrawContext {
 public:
 
-    void rect(const Vec& pos, const Vec& size, const Color& c, RectStyle style=RECT_FILL) {
+    void rect(const Vec& pos, const Vec& size, const Color& c, ButtonStyle style=BS_NORMAL) {
 //        if (style == 0) {
 //            copy(pos, size, {0, 64}, {1, 1}, color);
 //            return;
 //        }
 
+        int s = 8;
+        int o = 64;
+        if (size.x < 16 || size.y < 16) {
+            s = 4;
+            o += 16;
+        }
+
         Vec p0 = pos;
-        Vec p1 = pos + Vec(8);
-        Vec p2 = pos + size - Vec(8);
+        Vec p1 = pos + Vec(s);
+        Vec p2 = pos + size - Vec(s);
         Vec p3 = pos + size;
-        Vec t0 = { 16 * style, 64 };
-        Vec t1 = t0 + Vec(8);
+        Vec t0 = { 16 * style, o };
+        Vec t1 = t0 + Vec(s);
         Vec t2 = t1;
-        Vec t3 = t2 + Vec(8);
+        Vec t3 = t2 + Vec(s);
 
         render::Vertex vs[] = {
             { Vec(p0.x, p0.y), Vec(t0.x, t0.y), c },
@@ -117,7 +111,6 @@ public:
         quad(vs[1], vs[2], vs[5], vs[6]);
         quad(vs[2], vs[3], vs[6], vs[7]);
         quad(vs[4], vs[5], vs[8], vs[9]);
-        //if (style < RECT_STROKE)
         quad(vs[5], vs[6], vs[9], vs[10]);
         quad(vs[6], vs[7], vs[10], vs[11]);
         quad(vs[8], vs[9], vs[12], vs[13]);
@@ -171,7 +164,9 @@ char*       m_input_text_str = nullptr;
 int         m_input_text_len;
 int         m_input_text_pos;
 int         m_input_cursor_blink = 0;
-Align       m_align = CENTER;
+Align       m_align        = CENTER;
+ButtonStyle m_button_style = BS_NORMAL;
+
 
 DrawContext     m_dc;
 gfx::Texture2D* m_texture;
@@ -265,6 +260,9 @@ void align(Align a) {
     m_align = a;
 }
 
+void button_style(ButtonStyle s) {
+    m_button_style = s;
+}
 
 void min_item_size(Vec const& s) {
     m_min_item_size = s;
@@ -297,11 +295,13 @@ Box padding(Vec const& size) {
 void separator() {
     Box box;
     if (m_same_line) {
-        box = item_box({ SEPARATOR_WIDTH, m_cursor_max.y - m_cursor_min.y });
+        min_item_size({ SEPARATOR_WIDTH, m_cursor_max.y - m_cursor_min.y });
+        box = item_box({});
         m_same_line = true;
     }
     else {
-        box = item_box({ m_cursor_max.x - m_cursor_min.x, SEPARATOR_WIDTH });
+        min_item_size({ m_cursor_max.x - m_cursor_min.x, SEPARATOR_WIDTH });
+        box = item_box({});
     }
     m_dc.copy(box.pos, box.size - Vec(1), {}, {1, 1}, color::separator);
 }
@@ -342,7 +342,7 @@ bool button(char const* label, bool active) {
     }
     m_highlight = false;
 
-    m_dc.rect(box.pos, box.size, color, RECT_FILL);
+    m_dc.rect(box.pos, box.size, color, m_button_style);
     m_dc.text(print_pos(box, s), label);
     return clicked;
 }
@@ -448,18 +448,12 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
         value = glm::clamp(v, min, max);
     }
 
-//    gfx::color(color::drag);
-//    gfx::rectangle(box.pos, box.size, 0);
+    m_dc.rect(box.pos, box.size, color::drag);
+    Color c = m_active_item == id ? color::handle_active : color::handle_normal;
+    m_dc.rect(box.pos + Vec(handle_x, 0), Vec(handle_w, box.size.y), c, BS_ROUND);
 
-//    gfx::color(m_active_item == id ? color::handle_active : color::handle_normal);
-//    gfx::rectangle(box.pos + Vec(handle_x, 0), { handle_w, box.size.y }, 0);
-
-
-//    gfx::color(color::text);
-//    gfx::print(box.pos + Vec(15, box.size.y / 2 - s1.y / 2), label);
-
-//    gfx::color(color::text);
-//    gfx::print(box.pos + Vec(box.size.x - s2.x - 15, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
+    m_dc.text(box.pos + Vec(15, box.size.y / 2 - s1.y / 2), label);
+    m_dc.text(box.pos + Vec(box.size.x - s2.x - 15, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
 
     return value != old_value;
 }
@@ -482,14 +476,13 @@ bool vertical_drag_int(int& value, int min, int max, int page) {
         value = glm::clamp(v, min, max);
     }
 
-//    gfx::color(color::drag);
-//    gfx::rectangle(box.pos, box.size, 0);
-
-//    gfx::color(m_active_item == id ? color::handle_active : color::handle_normal);
-//    gfx::rectangle(box.pos + Vec(0, handle_y), { box.size.x, handle_h }, 0);
+    m_dc.rect(box.pos, box.size, color::drag);
+    Color c = m_active_item == id ? color::handle_active : color::handle_normal;
+    m_dc.rect(box.pos + Vec(0, handle_y), Vec(box.size.x, handle_h), c, BS_ROUND);
 
     return value != old_value;
 }
+
 
 
 bool clavier(uint8_t& n, int offset, bool highlight) {
@@ -502,39 +495,37 @@ bool clavier(uint8_t& n, int offset, bool highlight) {
 
     uint8_t old_n = n;
 
-//    int x0 = 0;
-//    bool just_pressed = m_touch.just_pressed();
-//    for (int i = 0; i < CLAVIER_WIDTH; ++i) {
-//        int x1 = (box.size.x - (CLAVIER_WIDTH - 1) * PADDING) * (i + 1) / CLAVIER_WIDTH + (i + 1) * PADDING;
-//        int nn = i + 1 + offset;
-//        Box b = {
-//            { box.pos.x + x0, box.pos.y },
-//            { x1 - x0, box.size.y },
-//        };
-//        bool touch = b.contains({ m_touch.pos.x, b.pos.y });
-//        b.size.x -= PADDING;
-//        if (m_active_item == id && touch) {
-//            if (just_pressed) {
-//                if (n == nn) n = 0;
-//                else if (n == 0) n = nn;
-//            }
-//            else if (n != 0) n = nn;
-//        }
-//        Color color = color::make(0x222222);
-//        if ((i + offset) % 12 == 0) color = color::make(0x333333);
-//        if ((1 << (i + offset) % 12) & 0b010101001010) color = color::make(0x111111);
-//        if (highlight) color = color::mix(color, color::highlight, 0.2);
-//        gfx::color(color);
-//        gfx::rectangle(b.pos, b.size, 0);
+    int x0 = 0;
+    bool just_pressed = m_touch.just_pressed();
+    for (int i = 0; i < CLAVIER_WIDTH; ++i) {
+        int x1 = (box.size.x - CLAVIER_WIDTH) * (i + 1) / CLAVIER_WIDTH + (i + 1);
+        int nn = i + 1 + offset;
+        Box b = {
+            { box.pos.x + x0, box.pos.y },
+            { x1 - x0, box.size.y },
+        };
+        bool touch = b.contains({ m_touch.pos.x, b.pos.y });
+        if (m_active_item == id && touch) {
+            if (just_pressed) {
+                if (n == nn) n = 0;
+                else if (n == 0) n = nn;
+            }
+            else if (n != 0) n = nn;
+        }
+        Color color = color::make(0x222222);
+        if ((i + offset) % 12 == 0) color = color::make(0x333333);
+        if ((1 << (i + offset) % 12) & 0b010101001010) color = color::make(0x111111);
+        if (highlight) color = color::mix(color, color::highlight, 0.2);
+        m_dc.rect(b.pos, b.size, color);
 
-//        if (n == nn) {
-//            if (m_active_item == id && touch) gfx::color(color::note_active);
-//            else gfx::color(color::note_normal);
-//            gfx::rectangle(b.pos, b.size, 2);
-//        }
+        if (n == nn) {
+            if (m_active_item == id && touch) color = color::note_active;
+            else color = color::note_normal;
+            m_dc.rect(b.pos, b.size, color, BS_ROUND);
+        }
 
-//        x0 = x1;
-//    }
+        x0 = x1;
+    }
     return n != old_n;
 }
 

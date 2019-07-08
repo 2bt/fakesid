@@ -22,4 +22,3 @@ target_link_libraries(${PROJECT_NAME}
     EGL
     GLESv2
     )
-

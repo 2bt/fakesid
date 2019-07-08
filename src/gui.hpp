@@ -1,8 +1,15 @@
 #pragma once
 #include "render.hpp"
 
+// XXX
 
 namespace gui {
+    enum {
+        FONT_WIDTH  = 8,
+        FONT_HEIGHT = 8,
+        SEPARATOR_WIDTH = 2,
+        CLAVIER_WIDTH   = 24,
+    };
 
     struct Box {
         bool contains(Vec const& p) const {
@@ -15,6 +22,12 @@ namespace gui {
 
 
     enum Align { CENTER, LEFT, RIGHT };
+    enum ButtonStyle {
+        BS_NORMAL,
+        BS_ROUND,
+        BS_TAB,
+    };
+
 
 
     Vec  cursor();
@@ -23,6 +36,7 @@ namespace gui {
     void same_line();
     void next_line();
     void align(Align a);
+    void button_style(ButtonStyle s = BS_NORMAL);
     void min_item_size(Vec const& s = {});
     void begin_frame();
     Box  padding(Vec const& size);
@@ -43,3 +57,4 @@ namespace gui {
     void render(gfx::RenderTarget* rt);
 
 }
+
