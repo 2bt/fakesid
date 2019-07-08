@@ -71,7 +71,7 @@ void resize(int width, int height) {
     }
 
     int h = std::max<int>(WIDTH * height / width, MIN_HEIGHT);
-    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, WIDTH, h);
+    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, WIDTH, h, nullptr, gfx::FilterMode::Linear);
     m_framebuffer = gfx::Framebuffer::create();
     m_framebuffer->attach_color(m_canvas);
 
