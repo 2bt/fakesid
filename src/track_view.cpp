@@ -58,7 +58,7 @@ void draw_cache(Cache& cache, int& data) {
 
 uint8_t  m_track          = 1;
 int      m_clavier_offset = 36;
-int      m_track_page     = 0;
+int      m_track_offset   = 0;
 
 Track    m_copy_track;
 
@@ -234,16 +234,18 @@ void draw_track_view() {
     gui::next_line();
     gui::separator();
 
-    enum {
-        PAGE_LENGTH = 16
-    };
+    int free_space = app::canvas_size().y - gui::cursor().y - gui::SEPARATOR_WIDTH - BUTTON_BAR;
+    int page_length = free_space / BUTTON_SMALL;
 
     int player_row = player::row();
-    for (int i = 0; i < PAGE_LENGTH; ++i) {
-        // TODO
-        //if (i % 4 == 0) gui::separator();
+    for (int i = 0; i < page_length; ++i) {
 
-        int row_nr = m_track_page * PAGE_LENGTH + i;
+        int row_nr = m_track_offset + i;
+
+        // TODO: hightlight row
+        //if (n % 4 == 0)
+
+
         if (row_nr >= song.track_length) {
             gui::padding({ 0, BUTTON_SMALL });
             continue;
@@ -322,7 +324,7 @@ void draw_track_view() {
     Vec c2 = gui::cursor();
     gui::cursor(c1);
     gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
-    gui::vertical_drag_int(m_track_page, 0, (song.track_length + PAGE_LENGTH - 1) / PAGE_LENGTH - 1);
+    gui::vertical_drag_int(m_track_offset, 0, std::max(0, song.track_length - page_length), page_length);
     gui::cursor(c2);
     gui::separator();
 

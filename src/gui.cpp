@@ -34,7 +34,7 @@ namespace color {
     const Color handle_normal     = button_active;
     const Color handle_active     = button_hover;
 
-    const Color separator         = make(0x111111);
+    const Color separator         = make(0x222222);
 
     const Color highlight         = make(0x787878);
 
@@ -295,13 +295,13 @@ Box padding(Vec const& size) {
 void separator() {
     Box box;
     if (m_same_line) {
-        min_item_size({ SEPARATOR_WIDTH, m_cursor_max.y - m_cursor_min.y });
-        box = item_box({});
+        m_min_item_size.x = 0;
+        box = item_box({ SEPARATOR_WIDTH, m_cursor_max.y - m_cursor_min.y });
         m_same_line = true;
     }
     else {
-        min_item_size({ m_cursor_max.x - m_cursor_min.x, SEPARATOR_WIDTH });
-        box = item_box({});
+        m_min_item_size.y = 0;
+        box = item_box({ m_cursor_max.x - m_cursor_min.x, SEPARATOR_WIDTH });
     }
     m_dc.copy(box.pos, box.size - Vec(1), {}, {1, 1}, color::separator);
 }
@@ -433,7 +433,7 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
 
     Box box = item_box(Vec(s1.x + s2.x, std::max(s1.y, s2.y)) + Vec(30, 10));
     int range = max - min;
-    int handle_w = box.size.x * page / (range + page);
+    int handle_w = std::max(10, box.size.x * page / (range + page));
     int handle_x = range == 0 ? 0 : (value - min) * (box.size.x - handle_w) / range;
 
     void const* id = get_id(&value);

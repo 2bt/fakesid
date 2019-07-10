@@ -3,7 +3,7 @@
 //#include "song_view.hpp"
 #include "track_view.hpp"
 //#include "jam_view.hpp"
-//#include "instrument_effect_view.hpp"
+#include "instrument_effect_view.hpp"
 //#include "help_view.hpp"
 #include "app.hpp"
 #include "player.hpp"
@@ -70,8 +70,8 @@ void draw() {
         View{ "PROJ", 0 },
         View{ "SONG", 0 },
         View{ "TRACK", draw_track_view },
-        View{ "INSTR", 0 },
-        View{ "EFFECT", 0 },
+        View{ "INSTR", draw_instrument_view },
+        View{ "EFFECT", draw_effect_view },
         View{ "JAM", 0 },
         View{ "?", 0 },
     };
@@ -98,12 +98,12 @@ void draw() {
             case VIEW_TRACK:
                 enter_track_select();
                 break;
-//            case VIEW_INSTRUMENT:
-//                enter_instrument_select();
-//                break;
-//            case VIEW_EFFECT:
-//                enter_effect_select();
-//                break;
+            case VIEW_INSTRUMENT:
+                enter_instrument_select();
+                break;
+            case VIEW_EFFECT:
+                enter_effect_select();
+                break;
             default: break;
             }
         }

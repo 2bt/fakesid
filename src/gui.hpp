@@ -50,8 +50,16 @@ namespace gui {
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
     bool clavier(uint8_t& n, int offset, bool highlight);
 
-    void touch(int x, int y, bool pressed);
+    template<class T>
+    bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 1) {
+        int v = value;
+        id(&value);
+        bool b = drag_int(label, fmt, v, min, max, page);
+        if (b) value = v;
+        return b;
+    }
 
+    void touch(int x, int y, bool pressed);
     void init();
     void free();
     void render(gfx::RenderTarget* rt);
