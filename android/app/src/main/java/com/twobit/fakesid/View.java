@@ -1,4 +1,4 @@
-package com.twobit.nativity;
+package com.twobit.fakesid;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;

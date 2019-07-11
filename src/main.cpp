@@ -10,25 +10,25 @@
 AAssetManager* g_asset_manager;
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject am) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject am) {
         g_asset_manager = AAssetManager_fromJava(env, am);
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_init(JNIEnv * env, jobject obj) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj) {
         app::init();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_free(JNIEnv * env, jobject obj) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_exit(JNIEnv * env, jobject obj) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_exit(JNIEnv * env, jobject obj) {
         app::exit();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
         app::resize(width, height);
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_draw(JNIEnv * env, jobject obj) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_draw(JNIEnv * env, jobject obj) {
         app::draw();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_nativity_Lib_touch(JNIEnv * env, jobject obj, jint x, jint y, jint action) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_touch(JNIEnv * env, jobject obj, jint x, jint y, jint action) {
         app::touch(x, y, action == 0 || action == 2);
     }
 }

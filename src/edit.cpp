@@ -1,6 +1,6 @@
 #include "edit.hpp"
 //#include "project_view.hpp"
-//#include "song_view.hpp"
+#include "song_view.hpp"
 #include "track_view.hpp"
 //#include "jam_view.hpp"
 #include "instrument_effect_view.hpp"
@@ -67,13 +67,13 @@ void draw() {
         void (*draw)(void);
     };
     constexpr std::array<View, 7> views = {
-        View{ "PROJ", 0 },
-        View{ "SONG", 0 },
-        View{ "TRACK", draw_track_view },
-        View{ "INSTR", draw_instrument_view },
+        View{ "PROJ",   0 },
+        View{ "SONG",   draw_song_view },
+        View{ "TRACK",  draw_track_view },
+        View{ "INSTR",  draw_instrument_view },
         View{ "EFFECT", draw_effect_view },
-        View{ "JAM", 0 },
-        View{ "?", 0 },
+        View{ "JAM",    0 },
+        View{ "?",      0 },
     };
     std::vector<int> weights = std::vector<int>(views.size() - 1, -1);
     weights.push_back(BUTTON_BIG);

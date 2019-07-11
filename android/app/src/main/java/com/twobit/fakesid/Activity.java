@@ -1,4 +1,4 @@
-package com.twobit.nativity;
+package com.twobit.fakesid;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;

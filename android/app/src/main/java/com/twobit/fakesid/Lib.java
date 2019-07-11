@@ -1,10 +1,10 @@
-package com.twobit.nativity;
+package com.twobit.fakesid;
 
 import android.content.res.AssetManager;
 
 public class Lib {
     static {
-        System.loadLibrary("Lib");
+        System.loadLibrary("main");
     }
 
     public static native void setAssetManager(AssetManager am);

@@ -58,7 +58,7 @@ void draw_cache(Cache& cache, int& data) {
 
 uint8_t  m_track          = 1;
 int      m_clavier_offset = 36;
-int      m_track_offset   = 0;
+int      m_track_scroll   = 0;
 
 Track    m_copy_track;
 
@@ -228,19 +228,19 @@ void draw_track_view() {
     // clavier slider
     gui::min_item_size({ app::canvas_size().x, BUTTON_SMALL });
     gui::drag_int("", "", m_clavier_offset, 0, 96 - gui::CLAVIER_WIDTH, gui::CLAVIER_WIDTH);
-
-    gui::same_line();
-    Vec c1 = gui::cursor() + Vec(-BUTTON_SMALL, BUTTON_SMALL + gui::SEPARATOR_WIDTH);
-    gui::next_line();
     gui::separator();
+    Vec c1 = gui::cursor();
 
     int free_space = app::canvas_size().y - gui::cursor().y - gui::SEPARATOR_WIDTH - BUTTON_BAR;
     int page_length = free_space / BUTTON_SMALL;
 
+    int max_scroll = std::max(0, song.track_length - page_length);
+    m_track_scroll = std::min(m_track_scroll, max_scroll);
+
     int player_row = player::row();
     for (int i = 0; i < page_length; ++i) {
 
-        int row_nr = m_track_offset + i;
+        int row_nr = m_track_scroll + i;
 
         // TODO: hightlight row
         //if (n % 4 == 0)
@@ -322,9 +322,9 @@ void draw_track_view() {
 
     // track pages
     Vec c2 = gui::cursor();
-    gui::cursor(c1);
+    gui::cursor({ app::canvas_size().x - BUTTON_SMALL, c1.y });
     gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
-    gui::vertical_drag_int(m_track_offset, 0, std::max(0, song.track_length - page_length), page_length);
+    gui::vertical_drag_int(m_track_scroll, 0, max_scroll, page_length);
     gui::cursor(c2);
     gui::separator();
 
