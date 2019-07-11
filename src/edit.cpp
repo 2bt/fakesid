@@ -1,9 +1,9 @@
 #include "edit.hpp"
-//#include "project_view.hpp"
+#include "project_view.hpp"
 #include "song_view.hpp"
 #include "track_view.hpp"
-//#include "jam_view.hpp"
 #include "instrument_effect_view.hpp"
+//#include "jam_view.hpp"
 //#include "help_view.hpp"
 #include "app.hpp"
 #include "player.hpp"
@@ -67,7 +67,7 @@ void draw() {
         void (*draw)(void);
     };
     constexpr std::array<View, 7> views = {
-        View{ "PROJ",   0 },
+        View{ "PROJ",   draw_project_view },
         View{ "SONG",   draw_song_view },
         View{ "TRACK",  draw_track_view },
         View{ "INSTR",  draw_instrument_view },

@@ -100,7 +100,6 @@ void draw_song_view() {
 
     // song scrollbar
     Vec c2 = gui::cursor();
-    //gui::cursor(c1);
     gui::cursor({ app::canvas_size().x - BUTTON_SMALL, c1.y });
     gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
     gui::vertical_drag_int(m_song_scroll, 0, max_scroll, page_length);

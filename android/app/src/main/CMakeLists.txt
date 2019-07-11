@@ -9,7 +9,6 @@ file(GLOB SRC
 	"cpp/*.cpp"
     )
 
-
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC

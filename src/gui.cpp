@@ -216,8 +216,8 @@ Box item_box(Vec const& s) {
 
 Vec print_pos(Box const& box, Vec const& s) {
     if      (m_align == CENTER) return box.pos + Vec((box.size.x - s.x) / 2, (box.size.y - s.y) / 2);
-    else if (m_align == LEFT)   return box.pos + Vec(15, (box.size.y - s.y) / 2);
-    else                        return box.pos + Vec(box.size.x - s.x - 15, box.size.y - s.y / 2);
+    else if (m_align == LEFT)   return box.pos + Vec(4, (box.size.y - s.y) / 2);
+    else                        return box.pos + Vec(box.size.x - s.x - 4, box.size.y - s.y / 2);
 }
 
 
@@ -452,8 +452,8 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
     Color c = m_active_item == id ? color::handle_active : color::handle_normal;
     m_dc.rect(box.pos + Vec(handle_x, 0), Vec(handle_w, box.size.y), c, BS_ROUND);
 
-    m_dc.text(box.pos + Vec(15, box.size.y / 2 - s1.y / 2), label);
-    m_dc.text(box.pos + Vec(box.size.x - s2.x - 15, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
+    m_dc.text(box.pos + Vec(4, box.size.y / 2 - s1.y / 2), label);
+    m_dc.text(box.pos + Vec(box.size.x - s2.x - 4, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
 
     return value != old_value;
 }
