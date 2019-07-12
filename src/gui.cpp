@@ -408,7 +408,7 @@ bool hold() {
 
 void input_text(char* str, int len) {
     Vec s = text_size(str);
-    Box box = item_box(s + Vec(30, 10));
+    Box box = item_box(s);
 
     Color color = color::input_text_normal;
     if (m_active_item == nullptr && m_touch.box_touched(box)) {
@@ -425,10 +425,9 @@ void input_text(char* str, int len) {
         color = color::input_text_active;
     }
 
-//    gfx::color(color::input_text_normal);
-//    gfx::rectangle(box.pos, box.size, 1);
-//    gfx::color(color);
-//    gfx::rectangle(box.pos, box.size, 5);
+    m_dc.rect(box.pos, box.size, color::input_text_normal, BS_NORMAL);
+    m_dc.rect(box.pos, box.size, color, BS_FRAME);
+
 //    gfx::color(color::text);
 
 //    Vec p = print_pos(box, s);

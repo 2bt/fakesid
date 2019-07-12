@@ -26,6 +26,7 @@ namespace gui {
         BS_NORMAL,
         BS_ROUND,
         BS_TAB,
+        BS_FRAME,
     };
 
     enum Icon {
