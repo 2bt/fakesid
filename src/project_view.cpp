@@ -389,7 +389,7 @@ void draw_project_view() {
 
     // title and author
     auto widths = calculate_column_widths({ 120, -1 });
-    gui::align(gui::LEFT);
+    gui::align(gui::A_LEFT);
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::text("TITLE");
     gui::same_line();
@@ -406,7 +406,7 @@ void draw_project_view() {
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::text("TRACK LENGTH");
     gui::same_line();
-    gui::align(gui::CENTER);
+    gui::align(gui::A_CENTER);
     gui::min_item_size({ widths2[1], BUTTON_BIG });
     if (gui::button("16", song.track_length == 16)) song.track_length = 16;
     gui::same_line();
@@ -415,7 +415,7 @@ void draw_project_view() {
     gui::same_line();
     gui::min_item_size({ widths2[3], BUTTON_BIG });
     if (gui::button("32", song.track_length == 32)) song.track_length = 32;
-    gui::align(gui::LEFT);
+    gui::align(gui::A_LEFT);
 
     // length
     gui::min_item_size({ widths[0], BUTTON_BIG });
@@ -466,7 +466,7 @@ void draw_project_view() {
         gui::separator();
         gui::padding({ widths[2], 0 });
     }
-    gui::align(gui::CENTER);
+    gui::align(gui::A_CENTER);
 
     // scrollbar
     Vec c2 = gui::cursor();
@@ -496,9 +496,9 @@ void draw_project_view() {
     widths = calculate_column_widths({ widths2[0], -1, -1, gui::SEPARATOR_WIDTH, -1 });
 
     gui::min_item_size({ widths2[0], BUTTON_BIG });
-    gui::align(gui::LEFT);
+    gui::align(gui::A_LEFT);
     gui::text("FORMAT");
-    gui::align(gui::CENTER);
+    gui::align(gui::A_CENTER);
     gui::same_line();
 
     gui::min_item_size({ widths[1], BUTTON_BIG });
@@ -516,9 +516,9 @@ void draw_project_view() {
     // status
     widths = calculate_column_widths({ -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::align(gui::LEFT);
+    gui::align(gui::A_LEFT);
     gui::text(m_status_msg.c_str());
-    gui::align(gui::CENTER);
+    gui::align(gui::A_CENTER);
     if (++m_status_age > 100) m_status_msg = "";
 }
 

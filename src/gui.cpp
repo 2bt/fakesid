@@ -52,7 +52,7 @@ Vec text_size(char const* str) {
     int16_t width = 0;
     while (int c = *str++) {
         if (c == '\n') {
-            size.y += FONT_HEIGHT + 4;
+            size.y += FONT_HEIGHT + 5;
             width = 0;
             continue;
         }
@@ -128,7 +128,7 @@ public:
         Vec p = pos;
         while (char c = *text++) {
             if (c == '\n') {
-                p.y += FONT_HEIGHT + 4;
+                p.y += FONT_HEIGHT + 5;
                 p.x = pos.x;
                 continue;
             }
@@ -164,7 +164,7 @@ char*       m_input_text_str = nullptr;
 int         m_input_text_len;
 int         m_input_text_pos;
 int         m_input_cursor_blink = 0;
-Align       m_align        = CENTER;
+Align       m_align        = A_CENTER;
 ButtonStyle m_button_style = BS_NORMAL;
 
 
@@ -215,9 +215,11 @@ Box item_box(Vec const& s) {
 
 
 Vec print_pos(Box const& box, Vec const& s) {
-    if      (m_align == CENTER) return box.pos + Vec((box.size.x - s.x) / 2, (box.size.y - s.y) / 2);
-    else if (m_align == LEFT)   return box.pos + Vec(4, (box.size.y - s.y) / 2);
-    else                        return box.pos + Vec(box.size.x - s.x - 4, box.size.y - s.y / 2);
+    switch (m_align) {
+    case A_CENTER: return box.pos + Vec((box.size.x - s.x) / 2, (box.size.y - s.y) / 2);
+    case A_LEFT:   return box.pos + Vec(5, (box.size.y - s.y) / 2);
+    default:       return box.pos + Vec(box.size.x - s.x - 5, box.size.y - s.y / 2);
+    }
 }
 
 
@@ -321,11 +323,9 @@ void text(char const* fmt, ...) {
 void highlight() { m_highlight = true; }
 
 
-bool button(char const* label, bool active) {
+static bool button_helper(Box const& box, bool active) {
     enum { HOLD_TIME = 10 };
     m_hold = false;
-    Vec s = text_size(label);
-    Box box = item_box(s + Vec(8, 8));
     Color color = color::button_normal;
     bool clicked = false;
     if (m_active_item == nullptr && m_touch.box_touched(box)) {
@@ -341,9 +341,25 @@ bool button(char const* label, bool active) {
         else if (m_highlight) color = color::highlight;
     }
     m_highlight = false;
-
     m_dc.rect(box.pos, box.size, color, m_button_style);
+    return clicked;
+}
+
+
+bool button(char const* label, bool active) {
+    Vec s = text_size(label);
+    Box box = item_box(s);
+    bool clicked = button_helper(box, active);
     m_dc.text(print_pos(box, s), label);
+    return clicked;
+}
+
+
+bool button(Icon icon, bool active) {
+    Vec s = Vec(16);
+    Box box = item_box(s);
+    bool clicked = button_helper(box, active);
+    m_dc.copy(print_pos(box, s), s, { icon % 8 * 16, 96 + icon / 8 * 16 });
     return clicked;
 }
 
@@ -429,9 +445,9 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
     print_to_text_buffer(fmt, value);
     Vec s2 = text_size(m_text_buffer.data());
     // padding
-    if (s2.x > 0) s1.x += 30;
+    if (s1.x > 0 && s2.x > 0) s1.x += 8;
 
-    Box box = item_box(Vec(s1.x + s2.x, std::max(s1.y, s2.y)) + Vec(30, 10));
+    Box box = item_box(Vec(s1.x + s2.x, std::max(s1.y, s2.y)));
     int range = max - min;
     int handle_w = std::max(10, box.size.x * page / (range + page));
     int handle_x = range == 0 ? 0 : (value - min) * (box.size.x - handle_w) / range;
@@ -452,8 +468,8 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
     Color c = m_active_item == id ? color::handle_active : color::handle_normal;
     m_dc.rect(box.pos + Vec(handle_x, 0), Vec(handle_w, box.size.y), c, BS_ROUND);
 
-    m_dc.text(box.pos + Vec(4, box.size.y / 2 - s1.y / 2), label);
-    m_dc.text(box.pos + Vec(box.size.x - s2.x - 4, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
+    m_dc.text(box.pos + Vec(5, box.size.y / 2 - s1.y / 2), label);
+    m_dc.text(box.pos + Vec(box.size.x - s2.x - 5, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
 
     return value != old_value;
 }
@@ -543,10 +559,6 @@ void touch(int x, int y, bool pressed) {
 }
 
 void render(gfx::RenderTarget* rt) {
-
-    // debug touch
-    //m_dc.rect(m_touch.pos - Vec(4), Vec(8), {255, 0, 0, 255});
-
     render::draw(rt, m_dc.vertices(), m_texture);
     m_dc.clear();
 

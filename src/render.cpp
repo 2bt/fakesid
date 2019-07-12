@@ -58,6 +58,7 @@ void init() {
     void main() {
         vec2 f = fract(v_uv);
         f = max(min(f * 3.0, 0.5), 1.0 - (vec2(1.0) - f) * 3.0);
+        //gl_FragColor = v_col * vec4(vec3(1.0), texture2D(texture, (floor(v_uv) + f) * texture_scale).x);
         gl_FragColor = v_col * texture2D(texture, (floor(v_uv) + f) * texture_scale);
     })");
     m_vb = gfx::VertexBuffer::create(gfx::BufferHint::StreamDraw);
@@ -68,13 +69,11 @@ void init() {
     m_va->set_attribute(2, m_vb, gfx::ComponentType::Uint8, 4, true,  8, 12);
 
     m_rs.blend_enabled      = true;
-    //m_rs.blend_func_src_rgb = gfx::BlendFunc::SrcAlpha;
-    //m_rs.blend_func_dst_rgb = gfx::BlendFunc::OneMinusSrcAlpha;
     m_rs.blend_func_src_rgb   = gfx::BlendFunc::SrcAlpha;
     m_rs.blend_func_src_alpha = gfx::BlendFunc::SrcAlpha;
     m_rs.blend_func_dst_rgb   = gfx::BlendFunc::OneMinusSrcAlpha;
     m_rs.blend_func_dst_alpha = gfx::BlendFunc::OneMinusSrcAlpha;
-    m_rs.cull_face_enabled  = false;
+    m_rs.cull_face_enabled    = false;
 }
 
 void free() {

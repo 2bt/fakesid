@@ -125,12 +125,12 @@ void draw() {
 
     // loop
     gui::min_item_size({ widths[0], BUTTON_BAR });
-    if (gui::button("\x13", block_loop)) player::block_loop(!block_loop);
+    if (gui::button(gui::I_LOOP, block_loop)) player::block_loop(!block_loop);
 
     // stop
     gui::same_line();
     gui::min_item_size({ widths[1], BUTTON_BAR });
-    if (gui::button("\x11")) {
+    if (gui::button(gui::I_STOP)) {
         player::set_playing(false);
         player::reset();
 //        player::block(get_selected_block());
@@ -139,7 +139,7 @@ void draw() {
     // play/pause
     gui::same_line();
     gui::min_item_size({ widths[2], BUTTON_BAR });
-    if (gui::button("\x10\x12", player::is_playing())) {
+    if (gui::button(gui::I_PLAY, player::is_playing())) {
         player::set_playing(!player::is_playing());
     }
 

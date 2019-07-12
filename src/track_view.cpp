@@ -212,9 +212,9 @@ void draw_track_view() {
 
     // copy & paste
     gui::same_line();
-    if (gui::button("\x1d")) m_copy_track = track;
+    if (gui::button(gui::I_COPY)) m_copy_track = track;
     gui::same_line();
-    if (gui::button("\x1e")) track = m_copy_track;
+    if (gui::button(gui::I_PASTE)) track = m_copy_track;
     gui::min_item_size();
     gui::separator();
 
@@ -294,11 +294,10 @@ void draw_track_view() {
         str[3] = '\0';
         gui::same_line();
         if (highlight) gui::highlight();
+        gui::min_item_size({ 32, BUTTON_SMALL });
         if (gui::button(str)) {
             if (row.note == 0) row.note = 255;
-            else {
-                row = {};
-            }
+            else row = {};
         }
 
         // clavier

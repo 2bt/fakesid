@@ -746,11 +746,10 @@ void init() {
     glGetIntegerv(GL_VIEWPORT, v);
     s_screen.m_width  = v[2];
     s_screen.m_height = v[3];
-    s_render_state = RenderState{
-        .depth_test_enabled = false,
-        .depth_test_func    = DepthTestFunc::Less,
-        .cull_face_enabled  = false,
-    };
+    s_render_state = RenderState{};
+    s_render_state.depth_test_enabled = false,
+    s_render_state.depth_test_func    = DepthTestFunc::Less,
+    s_render_state.cull_face_enabled  = false,
     s_clear_color = {};
     s_shader      = nullptr;
 }

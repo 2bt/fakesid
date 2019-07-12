@@ -43,9 +43,9 @@ void draw_instrument_select() {
             gui::text(str);
             gui::same_line();
             gui::min_item_size({ widths[x] - BUTTON_SMALL, BUTTON_SMALL });
-            gui::align(gui::LEFT);
+            gui::align(gui::A_LEFT);
             gui::text(inst.name.data());
-            gui::align(gui::CENTER);
+            gui::align(gui::A_CENTER);
             gui::same_line();
             gui::cursor(c2);
         }
@@ -85,9 +85,9 @@ void draw_effect_select() {
             gui::text(str);
             gui::same_line();
             gui::min_item_size({ widths[x] - BUTTON_SMALL, BUTTON_SMALL });
-            gui::align(gui::LEFT);
+            gui::align(gui::A_LEFT);
             gui::text(effect.name.data());
-            gui::align(gui::CENTER);
+            gui::align(gui::A_CENTER);
             gui::same_line();
             gui::cursor(c2);
         }
@@ -125,16 +125,16 @@ void draw_instrument_view() {
     // name
     auto widths = calculate_column_widths({ -1, BUTTON_BIG, BUTTON_BIG });
     gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::align(gui::LEFT);
+    gui::align(gui::A_LEFT);
     gui::input_text(inst.name.data(), inst.name.size() - 1);
-    gui::align(gui::CENTER);
+    gui::align(gui::A_CENTER);
 
     // copy & paste
     gui::same_line();
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-    if (gui::button("\x1d")) m_copy_inst = inst;
+    if (gui::button(gui::I_COPY)) m_copy_inst = inst;
     gui::same_line();
-    if (gui::button("\x1e")) inst = m_copy_inst;
+    if (gui::button(gui::I_PASTE)) inst = m_copy_inst;
     gui::separator();
 
 
@@ -163,7 +163,7 @@ void draw_instrument_view() {
         Vec c = gui::cursor();
         gui::same_line();
         gui::min_item_size({ BUTTON_BIG, BUTTON_SMALL * 2 });
-        if (gui::button("\x11", inst.hard_restart)) inst.hard_restart ^= 1;
+        if (gui::button(gui::I_STOP, inst.hard_restart)) inst.hard_restart ^= 1;
         gui::cursor(c);
         for (int i = 0; i < 2; ++i) {
             if (i > 0) gui::same_line();
@@ -194,21 +194,19 @@ void draw_instrument_view() {
             auto& row = inst.rows[i];
 
             // flags
-            constexpr std::pair<uint8_t, char const*> flags[] = {
-                { Instrument::F_NOISE, "\x14" },
-                { Instrument::F_PULSE, "\x15" },
-                { Instrument::F_SAW,   "\x16" },
-                { Instrument::F_TRI,   "\x17" },
-                { Instrument::F_RING,  "R" },
-                { Instrument::F_SYNC,  "S" },
-                { Instrument::F_GATE,  "G" },
+            constexpr std::pair<uint8_t, gui::Icon> flags[] = {
+                { Instrument::F_NOISE, gui::I_NOISE },
+                { Instrument::F_PULSE, gui::I_PULSE },
+                { Instrument::F_SAW,   gui::I_SAW },
+                { Instrument::F_TRI,   gui::I_TRI },
+                { Instrument::F_RING,  gui::I_RING },
+                { Instrument::F_SYNC,  gui::I_SYNC },
+                { Instrument::F_GATE,  gui::I_GATE },
             };
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
             for (auto p : flags) {
                 gui::same_line();
-                if (gui::button(p.second, row.flags & p.first)) {
-                    row.flags ^= p.first;
-                }
+                if (gui::button(p.second, row.flags & p.first)) row.flags ^= p.first;
             }
 
             gui::same_line();
@@ -262,13 +260,7 @@ void draw_instrument_view() {
             gui::same_line();
             gui::separator();
             if (i >= filter.length) {
-                gui::padding({ 199, 0 });
-                gui::same_line();
-                gui::separator();
-                gui::padding({ 240, 0 });
-                gui::same_line();
-                gui::separator();
-                gui::padding({});
+                gui::next_line();
                 continue;
             }
             auto& row = filter.rows[i];
@@ -277,19 +269,19 @@ void draw_instrument_view() {
             // type
             gui::same_line();
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-            if (gui::button("\x18", row.type & FILTER_LOW)) row.type ^= FILTER_LOW;
+            if (gui::button(gui::I_LOWPASS, row.type & FILTER_LOW)) row.type ^= FILTER_LOW;
             gui::same_line();
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-            if (gui::button("\x19", row.type & FILTER_BAND)) row.type ^= FILTER_BAND;
+            if (gui::button(gui::I_BANDPASS, row.type & FILTER_BAND)) row.type ^= FILTER_BAND;
             gui::same_line();
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-            if (gui::button("\x1a", row.type & FILTER_HIGH)) row.type ^= FILTER_HIGH;
+            if (gui::button(gui::I_HIGHPASS, row.type & FILTER_HIGH)) row.type ^= FILTER_HIGH;
 
             // resonance
             gui::same_line();
             gui::separator();
 
-            gui::min_item_size({ 240, BUTTON_SMALL });
+            gui::min_item_size({ 90, BUTTON_SMALL });
             gui::drag_int("", "%X", row.resonance, 0, 15);
 
 
@@ -342,21 +334,21 @@ void draw_effect_view() {
     // name
     auto widths = calculate_column_widths({ -1, BUTTON_BIG, BUTTON_BIG });
     gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::align(gui::LEFT);
+    gui::align(gui::A_LEFT);
     gui::input_text(effect.name.data(), effect.name.size() - 1);
-    gui::align(gui::CENTER);
+    gui::align(gui::A_CENTER);
 
     // copy & paste
     gui::same_line();
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-    if (gui::button("\x1d")) m_copy_effect = effect;
+    if (gui::button(gui::I_COPY)) m_copy_effect = effect;
     gui::same_line();
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-    if (gui::button("\x1e")) effect = m_copy_effect;
+    if (gui::button(gui::I_PASTE)) effect = m_copy_effect;
 
     gui::separator();
 
-    widths = calculate_column_widths({ BUTTON_SMALL, gui::SEPARATOR_WIDTH, BUTTON_SMALL, -1, BUTTON_SMALL, BUTTON_SMALL });
+    widths = calculate_column_widths({ BUTTON_SMALL, gui::SEPARATOR_WIDTH, BUTTON_SMALL, -1 });
 
     // rows
     for (int i = 0; i < MAX_EFFECT_LENGTH; ++i) {
@@ -398,15 +390,6 @@ void draw_effect_view() {
             max_value = 96;
             gui::drag_int("", "%d", row.value, min_value, max_value, 2);
         }
-
-        gui::same_line();
-        gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-        if (gui::button("\x1b")) row.value = std::max(row.value - 1, min_value);
-        gui::same_line();
-        gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-        if (gui::button("\x1c")) row.value = std::min(row.value + 1, max_value);
-
-
     }
 
     gui::min_item_size({ app::canvas_size().x, 0 });

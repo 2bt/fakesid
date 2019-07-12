@@ -21,13 +21,30 @@ namespace gui {
     };
 
 
-    enum Align { CENTER, LEFT, RIGHT };
+    enum Align { A_CENTER, A_LEFT, A_RIGHT };
     enum ButtonStyle {
         BS_NORMAL,
         BS_ROUND,
         BS_TAB,
     };
 
+    enum Icon {
+        I_LOOP,
+        I_STOP,
+        I_PLAY,
+        I_COPY,
+        I_PASTE,
+        I_LOWPASS,
+        I_BANDPASS,
+        I_HIGHPASS,
+        I_NOISE,
+        I_PULSE,
+        I_SAW,
+        I_TRI,
+        I_RING,
+        I_SYNC,
+        I_GATE,
+    };
 
 
     Vec  cursor();
@@ -44,6 +61,7 @@ namespace gui {
     void text(char const* fmt, ...);
     void highlight();
     bool button(char const* label, bool active = false);
+    bool button(Icon icon, bool active = false);
     bool hold();
     void input_text(char* str, int len);
     bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 1);
