@@ -14,11 +14,16 @@
 #endif
 
 
-bool load_asset(char const* name, std::vector<uint8_t>& buf);
+namespace android {
 
+
+bool load_asset(char const* name, std::vector<uint8_t>& buf);
 gfx::Texture2D* load_texture(char const*     name,
                              gfx::FilterMode filter = gfx::FilterMode::Nearest,
                              gfx::WrapMode   wrap   = gfx::WrapMode::Clamp);
-
+std::string get_storage_dir();
 void show_keyboard();
 void hide_keyboard();
+
+
+} // namespace

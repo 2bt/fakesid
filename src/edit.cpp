@@ -26,7 +26,7 @@ void (*m_popup_func)(void);
 
 void set_view(EView v) {
     m_view = v;
-//    if (m_view == VIEW_PROJECT) init_project_view();
+    if (m_view == VIEW_PROJECT) init_project_view();
 }
 
 

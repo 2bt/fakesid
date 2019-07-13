@@ -1,6 +1,5 @@
 #include "song.hpp"
 #include <cstring>
-//#include <SDL.h>
 
 
 void init_song(Song& song) {

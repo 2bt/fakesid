@@ -11,25 +11,13 @@
 AAssetManager* g_asset_manager;
 JNIEnv*        g_env;
 
-void show_keyboard() {
-    jclass clazz = g_env->FindClass("com/twobit/fakesid/Activity");
-    jmethodID method = g_env->GetStaticMethodID(clazz, "showKeyboard", "()V");
-    g_env->CallStaticVoidMethod(clazz, method);
-}
-
-void hide_keyboard() {
-    jclass clazz = g_env->FindClass("com/twobit/fakesid/Activity");
-    jmethodID method = g_env->GetStaticMethodID(clazz, "hideKeyboard", "()V");
-    g_env->CallStaticVoidMethod(clazz, method);
-}
-
 extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject am) {
         g_asset_manager = AAssetManager_fromJava(env, am);
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj) {
-        app::init();
         g_env = env;
+        app::init();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
@@ -52,9 +40,6 @@ extern "C" {
 }
 
 #else
-
-void show_keyboard() {}
-void hide_keyboard() {}
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>

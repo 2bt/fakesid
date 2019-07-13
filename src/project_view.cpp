@@ -2,20 +2,17 @@
 #include "edit.hpp"
 #include "app.hpp"
 #include "player.hpp"
-//#include "android.hpp"
+#include "foo.hpp"
 #include <algorithm>
 #include <string>
-//#include <dirent.h>
-//#include <unistd.h>
-//#include <sys/stat.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
 //#include <sndfile.h>
 
 
 #define FILE_SUFFIX ".sng"
 
-
-// android
-//std::string get_storage_dir();
 
 
 namespace {
@@ -95,22 +92,23 @@ bool copy_demo_song(std::string const& name) {
 
 bool init_dirs() {
 
-//    if (m_root_dir.empty()) {
-//        m_root_dir = android::get_storage_dir();
-//        if (m_root_dir.empty()) return false;
-//    }
+    if (m_root_dir.empty()) {
+        m_root_dir = android::get_storage_dir();
+    }
+    LOGI("root dir: %s", m_root_dir.c_str());
+    if (m_root_dir.empty()) return false;
 
-//    struct stat st = {};
+    struct stat st = {};
 
-//    m_songs_dir   = m_root_dir + "/songs/";
-//    m_exports_dir = m_root_dir + "/exports/";
+    m_songs_dir   = m_root_dir + "/songs/";
+    m_exports_dir = m_root_dir + "/exports/";
 
-//    if (stat(m_root_dir.c_str(), &st) == -1)    mkdir(m_root_dir.c_str(), 0700);
-//    if (stat(m_songs_dir.c_str(), &st) == -1)   mkdir(m_songs_dir.c_str(), 0700);
-//    if (stat(m_exports_dir.c_str(), &st) == -1) mkdir(m_exports_dir.c_str(), 0700);
+    if (stat(m_root_dir.c_str(), &st) == -1)    mkdir(m_root_dir.c_str(), 0700);
+    if (stat(m_songs_dir.c_str(), &st) == -1)   mkdir(m_songs_dir.c_str(), 0700);
+    if (stat(m_exports_dir.c_str(), &st) == -1) mkdir(m_exports_dir.c_str(), 0700);
 
-//    copy_demo_song("demo1");
-//    copy_demo_song("demo2");
+    copy_demo_song("demo1");
+    copy_demo_song("demo2");
 
     return true;
 }
@@ -119,10 +117,10 @@ bool init_dirs() {
 enum ExportFormat { EF_OGG, EF_WAV };
 
 ExportFormat m_export_format = EF_OGG;
-//SDL_Thread*  m_export_thread;
 bool         m_export_canceled;
 bool         m_export_done;
 float        m_export_progress;
+//SDL_Thread*  m_export_thread;
 //SDL_RWops*   m_export_file;
 //SNDFILE*     m_export_sndfile;
 
@@ -301,7 +299,7 @@ void draw_confirmation() {
         std::string path = m_songs_dir + m_file_name.data() + FILE_SUFFIX;
         switch (m_confirmation_type) {
         case CT_DELETE:
-//            unlink(path.c_str());
+            unlink(path.c_str());
             init_project_view();
             status("SONG WAS DELETED");
             break;
@@ -340,12 +338,12 @@ void init_confirmation(ConfirmationType t) {
             return;
         }
         std::string path = m_songs_dir + name + FILE_SUFFIX;
-//        struct stat st;
-//        if (stat(path.c_str(), &st) == -1) {
-//            // the file doesn't exist yet, so no confirmation needed
-//            save();
-//            return;
-//        }
+        struct stat st;
+        if (stat(path.c_str(), &st) == -1) {
+            // the file doesn't exist yet, so no confirmation needed
+            save();
+            return;
+        }
     }
     m_confirmation_type = t;
     edit::set_popup(draw_confirmation);
@@ -358,26 +356,25 @@ void init_confirmation(ConfirmationType t) {
 
 void init_project_view() {
 
-//    static bool init_dirs_done = false;
-//    if (!init_dirs_done) {
-//        init_dirs();
-//        init_dirs_done = true;
-//    }
+    static bool init_dirs_done = false;
+    if (!init_dirs_done) {
+        init_dirs();
+        init_dirs_done = true;
+    }
 
-//    m_file_names.clear();
-//    if (DIR* dir = opendir(m_songs_dir.c_str())) {
-
-//        while (struct dirent* ent = readdir(dir)) {
-//            if (ent->d_type == DT_REG) {
-//                std::string name = ent->d_name;
-//                if (name.size() > 4 && name.substr(name.size() - 4) == FILE_SUFFIX) {
-//                    m_file_names.emplace_back(name.substr(0, name.size() - 4));
-//                }
-//            }
-//        }
-//        closedir(dir);
-//        std::sort(m_file_names.begin(), m_file_names.end());
-//    }
+    m_file_names.clear();
+    if (DIR* dir = opendir(m_songs_dir.c_str())) {
+        while (struct dirent* ent = readdir(dir)) {
+            if (ent->d_type == DT_REG) {
+                std::string name = ent->d_name;
+                if (name.size() > 4 && name.substr(name.size() - 4) == FILE_SUFFIX) {
+                    m_file_names.emplace_back(name.substr(0, name.size() - 4));
+                }
+            }
+        }
+        closedir(dir);
+        std::sort(m_file_names.begin(), m_file_names.end());
+    }
 
     m_status_msg = "";
 }

@@ -1,10 +1,14 @@
 package com.twobit.fakesid;
 
-import android.os.Bundle;
-import android.util.Log;
 import android.content.Context;
-import android.view.KeyEvent;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
+import android.view.KeyEvent;
 
 
 public class Activity extends android.app.Activity {
@@ -45,6 +49,7 @@ public class Activity extends android.app.Activity {
         mView = new MainView(getApplication());
         setContentView(mView);
 
+        getWritePermission();
         Lib.setAssetManager(getResources().getAssets());
     }
 
@@ -62,4 +67,28 @@ public class Activity extends android.app.Activity {
         super.onDestroy();
         mView.onDestroy();
     }
+
+
+    static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;
+
+    boolean mWritePermission = false;
+
+    public void getWritePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            mWritePermission = true;
+        }
+        else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode != PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) return;
+        if (grantResults.length < 1) return;
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) mWritePermission = true;
+    }
+
 }

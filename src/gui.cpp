@@ -284,7 +284,7 @@ void begin_frame() {
     }
     if (m_touch.just_pressed() && m_input_text_str) {
         m_input_text_str = nullptr;
-        hide_keyboard();
+        android::hide_keyboard();
     }
 
     m_dc.clear();
@@ -373,10 +373,6 @@ bool hold() {
 
 void key(int key, int unicode) {
     if (!m_input_text_str) return;
-    enum {
-        KEYCODE_ENTER = 66,
-        KEYCODE_DEL   = 67,
-    };
     switch (key) {
     case KEYCODE_DEL:
         LOGI("DELETE");
@@ -384,7 +380,7 @@ void key(int key, int unicode) {
         if (m_input_text_pos > 0) m_input_text_str[--m_input_text_pos] = '\0';
         return;
     case KEYCODE_ENTER:
-        hide_keyboard();
+        android::hide_keyboard();
         m_input_text_str = nullptr;
         return;
     default: break;
@@ -445,8 +441,7 @@ void input_text(char* str, int len) {
     if (m_active_item == nullptr && m_touch.box_touched(box)) {
         color = color::input_text_hover;
         if (m_touch.just_released()) {
-            // show keyboard
-            show_keyboard();
+            android::show_keyboard();
             m_input_text_str = str;
             m_input_text_len = len;
             m_input_text_pos = strlen(m_input_text_str);
@@ -572,7 +567,7 @@ bool clavier(uint8_t& n, int offset, bool highlight) {
 }
 
 void init() {
-    m_texture = load_texture("gui.png");
+    m_texture = android::load_texture("gui.png");
 }
 void free() {
     delete m_texture;

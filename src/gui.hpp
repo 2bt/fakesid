@@ -51,6 +51,10 @@ namespace gui {
         I_DELETE_ROW,
     };
 
+    enum {
+        KEYCODE_ENTER = 66,
+        KEYCODE_DEL   = 67,
+    };
 
     Vec  cursor();
     void cursor(Vec const& c);
