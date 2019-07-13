@@ -111,7 +111,9 @@ void draw_song_view() {
 
     // buttons
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-    if (gui::button("-")) {
+
+
+    if (gui::button(gui::I_DELETE_ROW)) {
         if (m_block < song.table_length && song.table_length > 1) {
             table[m_block] = {};
             std::rotate(
@@ -122,8 +124,7 @@ void draw_song_view() {
         }
     }
     gui::same_line();
-    gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-    if (gui::button("+")) {
+    if (gui::button(gui::I_ADD_ROW_ABOVE)) {
         if (m_block <= song.table_length && song.table_length < MAX_SONG_LENGTH) {
             std::rotate(
                 table.begin() + m_block,
@@ -132,6 +133,11 @@ void draw_song_view() {
             ++song.table_length;
         }
     }
+    gui::same_line();
+    if (gui::button(gui::I_ADD_ROW_BELOW)) {
+    }
+
+
     gui::min_item_size({ app::canvas_size().x, 0 });
     gui::separator();
 }

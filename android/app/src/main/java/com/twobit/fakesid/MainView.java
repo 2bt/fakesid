@@ -3,25 +3,26 @@ package com.twobit.fakesid;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 
-class View extends GLSurfaceView {
-    //private static String TAG = "libgl2";
+class MainView extends GLSurfaceView {
+    static String TAG = "FOOBAR";
+    Renderer mRenderer;
 
-    Renderer mRenderer = new Renderer();
-
-    public View(Context context) {
+    public MainView(Context context) {
         super(context);
+        mRenderer = new Renderer();
         setPreserveEGLContextOnPause(true);
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 0, 0);
         setRenderer(mRenderer);
     }
+
+    @Override
     public boolean onTouchEvent(final MotionEvent e) {
         switch (e.getAction()) {
         case MotionEvent.ACTION_DOWN:
@@ -38,7 +39,6 @@ class View extends GLSurfaceView {
     public void onDestroy() {
         //queueEvent(new Runnable() { public void run() { Lib.exit(); }});
     }
-
 
     class Renderer implements GLSurfaceView.Renderer {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {

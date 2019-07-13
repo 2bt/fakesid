@@ -86,9 +86,10 @@ void resize(int width, int height) {
         WIDTH,
         std::max<int16_t>(WIDTH * height / width, MIN_HEIGHT)
     };
-    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA,
-                                      m_canvas_size.x, m_canvas_size.y,
-                                      nullptr, gfx::FilterMode::Linear);
+    Vec s = { 2, 2 };
+    while (s.x < m_canvas_size.x) s.x *= 2;
+    while (s.y < m_canvas_size.y) s.y *= 2;
+    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, s.x, s.y);
 
     m_framebuffer = gfx::Framebuffer::create();
     m_framebuffer->attach_color(m_canvas);
@@ -111,76 +112,19 @@ void touch(int x, int y, bool pressed) {
 }
 
 
+void key(int key, int unicode) {
+    LOGI("app::key %d %d", key, unicode);
+    gui::key(key, unicode);
+}
+
+
 void draw() {
     gui::begin_frame();
-
-/*
-    gui::min_item_size({30, 30});
-
-    static int button_nr = 0;
-    for (int i = 0; i < 12; ++i) {
-        gui::same_line();
-        char t[2];
-        sprintf(t, "%X", i);
-        if (gui::button(t, button_nr == i)) button_nr = i;
-    }
-    gui::next_line();
-    gui::min_item_size();
-    gui::separator();
-
-//    gui::min_item_size({20, 20});
-//    gui::button("HALLO");
-//    gui::text("%d x %d", gfx::screen()->width(), gfx::screen()->height());
-    gui::text(R"(
-# 1. INTRODUCTION
-
-Fake SID is a chiptune tracker that let's
-you create Commodore 64 music.
-
-At the top of the screen you find certain
-tabs, which let you switch to different
-views.  Let's go through each view and
-discuss them in more detail.
-
-
-# 2. PROJECT
-
-Here you set the title, author, track
-length, and tempo of the current song.
-Additionally, songs can be loaded, saved,
-deleted, and exported.
-
-*Track length* is the number of rows
-per track.  All tracks of a song have the
-same length.  As is common with most C64
-trackers, time is split into slices of
-1/50 of a second, called frames.  *Tempo*
-is the number of frames spent per track row.
-*Swing* is the number additional frames for
-even-numbered track rows.
-
-Pres *New* to reset the current song.
-To load a previously saved song, simply
-select a song from the song list.  This will
-enter the song name in the song name input
-field.  Now press *Load*.  Press *Save* to
-save the current song under the name in the
-input field.  Press *Delete* to delete the
-selected song.  You may render the current
-song to *WAV* or *OGG* by first selecting
-the desired file format and then pressing
-*Export*.  Song files and exported songs are
-stored in the directories `fakesid/songs`
-and `fakesid/exports` of your phone's
-internal shared storage.
-)");
-*/
 
     edit::draw();
 
     m_framebuffer->clear({0, 0, 0, 1});
     gui::render(m_framebuffer);
-
 
     // render canvas to screen
     gfx::screen()->clear({0, 0, 0, 1});

@@ -26,7 +26,8 @@ namespace color {
     const Color button_active     = make(0x55a049);
     const Color button_hover      = make(0x94e089);
 
-    const Color input_text_normal = make(0x222222);
+    const Color input_text_background = make(0x222222);
+    const Color input_text_normal = make(0x505050);
     const Color input_text_hover  = button_hover;
     const Color input_text_active = button_active;
 
@@ -214,11 +215,11 @@ Box item_box(Vec const& s) {
 }
 
 
-Vec print_pos(Box const& box, Vec const& s) {
+Vec print_pos(Box const& box, Vec const& s, int padding=5) {
     switch (m_align) {
     case A_CENTER: return box.pos + Vec((box.size.x - s.x) / 2, (box.size.y - s.y) / 2);
-    case A_LEFT:   return box.pos + Vec(5, (box.size.y - s.y) / 2);
-    default:       return box.pos + Vec(box.size.x - s.x - 5, box.size.y - s.y / 2);
+    case A_LEFT:   return box.pos + Vec(padding, (box.size.y - s.y) / 2);
+    default:       return box.pos + Vec(box.size.x - s.x - padding, box.size.y - s.y / 2);
     }
 }
 
@@ -283,7 +284,7 @@ void begin_frame() {
     }
     if (m_touch.just_pressed() && m_input_text_str) {
         m_input_text_str = nullptr;
-//        SDL_StopTextInput();
+        hide_keyboard();
     }
 
     m_dc.clear();
@@ -370,6 +371,35 @@ bool hold() {
 }
 
 
+void key(int key, int unicode) {
+    if (!m_input_text_str) return;
+    enum {
+        KEYCODE_ENTER = 66,
+        KEYCODE_DEL   = 67,
+    };
+    switch (key) {
+    case KEYCODE_DEL:
+        LOGI("DELETE");
+        m_input_cursor_blink = 0;
+        if (m_input_text_pos > 0) m_input_text_str[--m_input_text_pos] = '\0';
+        return;
+    case KEYCODE_ENTER:
+        hide_keyboard();
+        m_input_text_str = nullptr;
+        return;
+    default: break;
+    }
+
+    if (unicode == 0) return;
+    if (m_input_text_pos >= m_input_text_len) return;
+
+    m_input_cursor_blink = 0;
+    int c = unicode;
+    if (isalnum(c) || (m_input_text_pos > 0 && strchr(" _-.+()", c))) {
+        m_input_text_str[m_input_text_pos++] = c;
+    }
+}
+
 //bool process_event(const SDL_Event& e) {
 //    char c;
 //    switch (e.type) {
@@ -408,14 +438,15 @@ bool hold() {
 
 void input_text(char* str, int len) {
     Vec s = text_size(str);
-    Box box = item_box(s);
+    Box box = item_box(s + Vec(8, 0));
 
+    //Color color = color::input_text_normal;
     Color color = color::input_text_normal;
     if (m_active_item == nullptr && m_touch.box_touched(box)) {
         color = color::input_text_hover;
         if (m_touch.just_released()) {
-            // start keyboard
-            //SDL_StartTextInput();
+            // show keyboard
+            show_keyboard();
             m_input_text_str = str;
             m_input_text_len = len;
             m_input_text_pos = strlen(m_input_text_str);
@@ -425,17 +456,15 @@ void input_text(char* str, int len) {
         color = color::input_text_active;
     }
 
-    m_dc.rect(box.pos, box.size, color::input_text_normal, BS_NORMAL);
+    m_dc.rect(box.pos, box.size, color::input_text_background, BS_NORMAL);
     m_dc.rect(box.pos, box.size, color, BS_FRAME);
 
-//    gfx::color(color::text);
-
-//    Vec p = print_pos(box, s);
-//    gfx::print(p, str);
-//    // cursor
-//    if (m_input_text_str == str && m_input_cursor_blink % 16 < 8) {
-//        gfx::print(p + Vec(s.x, 0), "_");
-//    }
+    Vec p = box.pos + Vec(8, box.size.y / 2 - s.y / 2);
+    m_dc.text(p, str);
+    // cursor
+    if (m_input_text_str == str && m_input_cursor_blink % 16 < 8) {
+        m_dc.text(p + Vec(s.x, 0), "\x7f");
+    }
 }
 
 
@@ -449,18 +478,17 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
     Box box = item_box(Vec(s1.x + s2.x, std::max(s1.y, s2.y)));
     int range = max - min;
     int handle_w = std::max(10, box.size.x * page / (range + page));
-    int handle_x = range == 0 ? 0 : (value - min) * (box.size.x - handle_w) / range;
+    int w = box.size.x - handle_w;
+    int handle_x = range == 0 ? 0 : (value - min) * w / range;
 
     void const* id = get_id(&value);
     if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
         m_active_item = id;
     }
     int old_value = value;
-    if (m_active_item == id) {
-        int x = m_touch.pos.x - box.pos.x;
-        int v = min;
-        if (range > 0) v += (x - handle_w * (page - 1) / (2 * page)) * range / (box.size.x - handle_w);
-        value = glm::clamp(v, min, max);
+    if (m_active_item == id && range > 0) {
+        int x = m_touch.pos.x - box.pos.x - handle_w / 2 + w / range / 2;
+        value = glm::clamp(min + x * range / w, min, max);
     }
 
     m_dc.rect(box.pos, box.size, color::drag);
@@ -477,6 +505,7 @@ bool vertical_drag_int(int& value, int min, int max, int page) {
     Box box = item_box({});
     int range = max - min;
     int handle_h = box.size.y * page / (range + page);
+    int h = box.size.y - handle_h;
     int handle_y = range == 0 ? 0 : (value - min) * (box.size.y - handle_h) / range;
 
     void const* id = get_id(&value);
@@ -484,11 +513,9 @@ bool vertical_drag_int(int& value, int min, int max, int page) {
         m_active_item = id;
     }
     int old_value = value;
-    if (m_active_item == id) {
-        int y = m_touch.pos.y - box.pos.y;
-        int v = min;
-        if (range > 0) v += (y - handle_h * (page - 1) / (2 * page)) * range / (box.size.y - handle_h);
-        value = glm::clamp(v, min, max);
+    if (m_active_item == id && range > 0) {
+        int y = m_touch.pos.y - box.pos.y - handle_h / 2 + h / range / 2;
+        value = glm::clamp(min + y * range / h, min, max);
     }
 
     m_dc.rect(box.pos, box.size, color::drag);

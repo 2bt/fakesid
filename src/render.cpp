@@ -42,24 +42,25 @@ void init() {
     varying vec2 v_uv;
     varying vec4 v_col;
     uniform vec2 screen_scale;
+    uniform vec2 texture_scale;
     uniform bool flip;
     void main() {
-        v_uv = a_uv;
+//        v_uv = a_uv;
+        v_uv = a_uv * texture_scale;
         v_col = a_col;
         gl_Position = vec4(vec2(screen_scale) * a_pos - vec2(1.0), 0.0, 1.0);
         if (flip) gl_Position.y = -gl_Position.y;
     })",
     R"(#version 100
     precision mediump float;
-    uniform vec2 texture_scale;
     uniform sampler2D texture;
     varying vec2 v_uv;
     varying vec4 v_col;
     void main() {
-        vec2 f = fract(v_uv);
-        f = max(min(f * 3.0, 0.5), 1.0 - (vec2(1.0) - f) * 3.0);
-        //gl_FragColor = v_col * vec4(vec3(1.0), texture2D(texture, (floor(v_uv) + f) * texture_scale).x);
-        gl_FragColor = v_col * texture2D(texture, (floor(v_uv) + f) * texture_scale);
+//        vec2 f = fract(v_uv);
+//        f = max(min(f * 3.0, 0.5), 1.0 - (vec2(1.0) - f) * 3.0);
+//        gl_FragColor = v_col * texture2D(texture, (floor(v_uv) + f) * texture_scale);
+        gl_FragColor = v_col * texture2D(texture, v_uv);
     })");
     m_vb = gfx::VertexBuffer::create(gfx::BufferHint::StreamDraw);
     m_va = gfx::VertexArray::create();

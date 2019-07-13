@@ -1,15 +1,48 @@
 package com.twobit.fakesid;
 
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.WindowManager;
+import android.content.Context;
+import android.view.KeyEvent;
+import android.view.inputmethod.InputMethodManager;
+
 
 public class Activity extends android.app.Activity {
+    static String TAG = "FOOBAR";
+    static Activity sInstance;
+    MainView        mView;
+
+    static public void showKeyboard() {
+        sInstance.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) sInstance.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(sInstance.getWindow().getDecorView(), InputMethodManager.SHOW_FORCED);
+            }
+        });
+    }
+    static public void hideKeyboard() {
+        sInstance.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) sInstance.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(sInstance.getWindow().getDecorView().getWindowToken(), 0);
+            }
+        });
+    }
+
+    @Override
+    public boolean onKeyDown(final int code, final KeyEvent e) {
+        mView.queueEvent(new Runnable() { public void run() {
+            Lib.key(code, e.getUnicodeChar());
+        }});
+        return true;
+    }
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
-        mView = new View(getApplication());
+        sInstance = this;
+        mView = new MainView(getApplication());
         setContentView(mView);
 
         Lib.setAssetManager(getResources().getAssets());
@@ -29,6 +62,4 @@ public class Activity extends android.app.Activity {
         super.onDestroy();
         mView.onDestroy();
     }
-
-    View mView;
 }

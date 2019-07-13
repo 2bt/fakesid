@@ -45,6 +45,10 @@ namespace gui {
         I_RING,
         I_SYNC,
         I_GATE,
+        I_EMPTY,
+        I_ADD_ROW_ABOVE,
+        I_ADD_ROW_BELOW,
+        I_DELETE_ROW,
     };
 
 
@@ -65,12 +69,12 @@ namespace gui {
     bool button(Icon icon, bool active = false);
     bool hold();
     void input_text(char* str, int len);
-    bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 1);
+    bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 0);
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
     bool clavier(uint8_t& n, int offset, bool highlight);
 
     template<class T>
-    bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 1) {
+    bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 0) {
         int v = value;
         id(&value);
         bool b = drag_int(label, fmt, v, min, max, page);
@@ -79,6 +83,7 @@ namespace gui {
     }
 
     void touch(int x, int y, bool pressed);
+    void key(int key, int unicode);
     void init();
     void free();
     void render(gfx::RenderTarget* rt);

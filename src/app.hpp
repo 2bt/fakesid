@@ -8,6 +8,7 @@ namespace app {
     void draw();
     void exit();
     void touch(int x, int y, bool pressed);
+    void key(int key, int unicode);
     Vec const& canvas_size();
 }
 

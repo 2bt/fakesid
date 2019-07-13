@@ -3,9 +3,9 @@
 
 #ifdef ANDROID
 #include <android/log.h>
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,  "foo", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN,  "foo", __VA_ARGS__))
-#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "foo", __VA_ARGS__))
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,  "FOOBAR", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN,  "FOOBAR", __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "FOOBAR", __VA_ARGS__))
 #else
 #include <cstdio>
 #define LOGI(fmt, ...) printf(            fmt "\n", ##__VA_ARGS__)
@@ -13,8 +13,12 @@
 #define LOGE(fmt, ...) printf("error: "   fmt "\n", ##__VA_ARGS__)
 #endif
 
+
 bool load_asset(char const* name, std::vector<uint8_t>& buf);
 
 gfx::Texture2D* load_texture(char const*     name,
                              gfx::FilterMode filter = gfx::FilterMode::Nearest,
                              gfx::WrapMode   wrap   = gfx::WrapMode::Clamp);
+
+void show_keyboard();
+void hide_keyboard();

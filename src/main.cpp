@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "foo.hpp"
 
 #ifdef ANDROID
 
@@ -8,6 +9,19 @@
 #include <android/asset_manager_jni.h>
 
 AAssetManager* g_asset_manager;
+JNIEnv*        g_env;
+
+void show_keyboard() {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/Activity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "showKeyboard", "()V");
+    g_env->CallStaticVoidMethod(clazz, method);
+}
+
+void hide_keyboard() {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/Activity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "hideKeyboard", "()V");
+    g_env->CallStaticVoidMethod(clazz, method);
+}
 
 extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject am) {
@@ -15,6 +29,7 @@ extern "C" {
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj) {
         app::init();
+        g_env = env;
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
@@ -31,9 +46,15 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_touch(JNIEnv * env, jobject obj, jint x, jint y, jint action) {
         app::touch(x, y, action == 0 || action == 2);
     }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_key(JNIEnv * env, jobject obj, jint key, jint unicode) {
+        app::key(key, unicode);
+    }
 }
 
 #else
+
+void show_keyboard() {}
+void hide_keyboard() {}
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
