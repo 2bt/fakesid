@@ -60,31 +60,19 @@ void status(std::string const& msg) {
 
 
 bool copy_demo_song(std::string const& name) {
+    std::string dst_name = m_songs_dir + name + FILE_SUFFIX;
+    struct stat st;
+    if (stat(dst_name.c_str(), &st) != -1) return true;
 
-//    std::string dst_name = m_songs_dir + name + FILE_SUFFIX;
-//    std::string src_name = ASSET_DIR + name + FILE_SUFFIX;
+    std::vector<uint8_t> buffer;
+    if (!android::load_asset(name + FILE_SUFFIX, buffer)) {
+        return false;
+    }
 
-//    struct stat st;
-//    if (stat(dst_name.c_str(), &st) != -1) return true;
-
-//    SDL_RWops* src = SDL_RWFromFile(src_name.c_str(), "rb");
-//    if (!src) return false;
-
-//    SDL_RWops* dst = SDL_RWFromFile(dst_name.c_str(), "wb");
-//    if (!dst) {
-//        SDL_RWclose(src);
-//        return false;
-//    }
-
-//    int len = SDL_RWseek(src, 0, RW_SEEK_END);
-//    SDL_RWseek(src, 0, RW_SEEK_SET);
-//    std::vector<uint8_t> buffer(len);
-
-//    SDL_RWread(src, buffer.data(), sizeof(uint8_t), buffer.size());
-//    SDL_RWclose(src);
-
-//    SDL_RWwrite(dst, buffer.data(), sizeof(uint8_t), buffer.size());
-//    SDL_RWclose(dst);
+    FILE* file = fopen(dst_name.c_str(), "wb");
+    if (!file) return false;
+    fwrite(buffer.data(), sizeof(uint8_t), buffer.size(), file);
+    fclose(file);
 
     return true;
 }

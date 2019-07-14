@@ -75,10 +75,10 @@ void hide_keyboard() {
 namespace android {
 
 
-bool load_asset(char const* name, std::vector<uint8_t>& buf) {
-    std::ifstream f("assets/" + std::string(name), std::ios::in | std::ios::binary);
+bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
+    std::ifstream f("assets/" + name, std::ios::in | std::ios::binary);
     if (!f.is_open()) {
-        LOGE("could not open asset %s", name);
+        LOGE("could not open asset %s", name.c_str());
         return false;
     }
     buf = std::vector<uint8_t>((std::istreambuf_iterator<char>(f)),

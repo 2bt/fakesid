@@ -17,7 +17,7 @@
 namespace android {
 
 
-bool load_asset(char const* name, std::vector<uint8_t>& buf);
+bool load_asset(std::string const& name, std::vector<uint8_t>& buf);
 gfx::Texture2D* load_texture(char const*     name,
                              gfx::FilterMode filter = gfx::FilterMode::Nearest,
                              gfx::WrapMode   wrap   = gfx::WrapMode::Clamp);
