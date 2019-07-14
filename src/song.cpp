@@ -64,37 +64,37 @@ void init_song(Song& song) {
 
 
 bool load_song(Song& song, char const* name) {
-//    SDL_RWops* file = SDL_RWFromFile(name, "rb");
-//    if (!file) return false;
-//    SDL_RWread(file, song.title.data(), sizeof(char), song.title.size());
-//    SDL_RWread(file, song.author.data(), sizeof(char), song.author.size());
-//    song.tempo = SDL_ReadU8(file);
-//    song.swing = SDL_ReadU8(file);
-//    song.track_length = SDL_ReadU8(file);
-//    SDL_RWread(file, song.tracks.data(), sizeof(Track), song.tracks.size());
-//    SDL_RWread(file, song.instruments.data(), sizeof(Instrument), song.instruments.size());
-//    SDL_RWread(file, song.effects.data(), sizeof(Effect), song.effects.size());
-//    song.table_length = SDL_ReadLE16(file);
-//    song.table = {};
-//    SDL_RWread(file, song.table.data(), sizeof(Song::Block), song.table_length);
-//    SDL_RWclose(file);
+    FILE* file = fopen(name, "rb");
+    if (!file) return false;
+    fread(song.title.data(), sizeof(char), song.title.size(), file);
+    fread(song.author.data(), sizeof(char), song.author.size(), file);
+    fread(&song.tempo, sizeof(uint8_t), 1, file);
+    fread(&song.swing, sizeof(uint8_t), 1, file);
+    fread(&song.track_length, sizeof(uint8_t), 1, file);
+    fread(song.tracks.data(), sizeof(Track), song.tracks.size(), file);
+    fread(song.instruments.data(), sizeof(Instrument), song.instruments.size(), file);
+    fread(song.effects.data(), sizeof(Effect), song.effects.size(), file);
+    fread(&song.table_length , sizeof(uint16_t), 1, file);
+    song.table = {};
+    fread(song.table.data(), sizeof(Song::Block), song.table_length, file);
+    fclose(file);
     return true;
 }
 
 
 bool save_song(Song const& song, char const* name) {
-//    SDL_RWops* file = SDL_RWFromFile(name, "wb");
-//    if (!file) return false;
-//    SDL_RWwrite(file, song.title.data(), sizeof(char), song.title.size());
-//    SDL_RWwrite(file, song.author.data(), sizeof(char), song.author.size());
-//    SDL_WriteU8(file, song.tempo);
-//    SDL_WriteU8(file, song.swing);
-//    SDL_WriteU8(file, song.track_length);
-//    SDL_RWwrite(file, song.tracks.data(), sizeof(Track), song.tracks.size());
-//    SDL_RWwrite(file, song.instruments.data(), sizeof(Instrument), song.instruments.size());
-//    SDL_RWwrite(file, song.effects.data(), sizeof(Effect), song.effects.size());
-//    SDL_WriteLE16(file, song.table_length);
-//    SDL_RWwrite(file, song.table.data(), sizeof(Song::Block), song.table_length);
-//    SDL_RWclose(file);
+    FILE* file = fopen(name, "wb");
+    if (!file) return false;
+    fwrite(song.title.data(), sizeof(char), song.title.size(), file);
+    fwrite(song.author.data(), sizeof(char), song.author.size(), file);
+    fwrite(&song.tempo, sizeof(uint8_t), 1, file);
+    fwrite(&song.swing, sizeof(uint8_t), 1, file);
+    fwrite(&song.track_length, sizeof(uint8_t), 1, file);
+    fwrite(song.tracks.data(), sizeof(Track), song.tracks.size(), file);
+    fwrite(song.instruments.data(), sizeof(Instrument), song.instruments.size(), file);
+    fwrite(song.effects.data(), sizeof(Effect), song.effects.size(), file);
+    fwrite(&song.table_length, sizeof(uint16_t), 1, file);
+    fwrite(song.table.data(), sizeof(Song::Block), song.table_length, file);
+    fclose(file);
     return true;
 }
