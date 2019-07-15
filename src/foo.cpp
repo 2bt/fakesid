@@ -19,17 +19,17 @@ extern JNIEnv*        g_env;
 
 namespace android {
 
-bool load_asset(char const* name, std::vector<uint8_t>& buf) {
-    AAsset* ad = AAssetManager_open(g_asset_manager, name, AASSET_MODE_BUFFER);
+bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
+    AAsset* ad = AAssetManager_open(g_asset_manager, name.c_str(), AASSET_MODE_BUFFER);
     if (!ad) {
-        LOGE("could not open asset %s", name);
+        LOGE("could not open asset %s", name.c_str());
         return false;
     }
     buf.resize(AAsset_getLength(ad));
     int len = AAsset_read(ad, buf.data(), buf.size());
     AAsset_close(ad);
     if (len != buf.size()) {
-        LOGE("could not open asset %s", name);
+        LOGE("could not open asset %s", name.c_str());
         return false;
     }
     return true;

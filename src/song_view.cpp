@@ -19,7 +19,7 @@ void draw_song_view() {
     Song& song = player::song();
 
     // mute buttons
-    auto widths = calculate_column_widths({ BUTTON_BIG, gui::SEPARATOR_WIDTH, -1, -1, -1, -1, gui::SEPARATOR_WIDTH, BUTTON_SMALL });
+    auto widths = calculate_column_widths({ BUTTON_BIG, gui::SEPARATOR_WIDTH, -1, -1, -1, -1, gui::SEPARATOR_WIDTH, SCROLLBAR_WIDTH });
     gui::padding({ widths[0], BUTTON_SMALL });
     gui::same_line();
     gui::separator();
@@ -99,8 +99,8 @@ void draw_song_view() {
 
     // song scrollbar
     Vec c2 = gui::cursor();
-    gui::cursor({ edit::screen_size().x - BUTTON_SMALL, c1.y });
-    gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
+    gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
+    gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
     gui::vertical_drag_int(m_song_scroll, 0, max_scroll, page_length);
     gui::cursor(c2);
 

@@ -1,5 +1,4 @@
 #include "track_view.hpp"
-#include "gui.hpp"
 #include "player.hpp"
 #include "edit.hpp"
 

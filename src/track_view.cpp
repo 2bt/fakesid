@@ -225,7 +225,7 @@ void draw_track_view() {
 
 
     // clavier slider
-    gui::min_item_size({ edit::screen_size().x, BUTTON_SMALL });
+    gui::min_item_size({ edit::screen_size().x, SCROLLBAR_WIDTH });
     gui::drag_int("", "", m_clavier_offset, 0, 96 - gui::CLAVIER_WIDTH, gui::CLAVIER_WIDTH);
     gui::separator();
     Vec c1 = gui::cursor();
@@ -302,7 +302,7 @@ void draw_track_view() {
         // clavier
         gui::same_line();
         gui::separator();
-        int w = edit::screen_size().x - gui::cursor().x - BUTTON_SMALL - gui::SEPARATOR_WIDTH;
+        int w = edit::screen_size().x - gui::cursor().x - SCROLLBAR_WIDTH - gui::SEPARATOR_WIDTH;
         gui::min_item_size({ w, BUTTON_SMALL });
         uint8_t old_note = row.note;
         if (gui::clavier(row.note, m_clavier_offset, highlight)) {
@@ -320,13 +320,10 @@ void draw_track_view() {
 
     // track pages
     Vec c2 = gui::cursor();
-    gui::cursor({ edit::screen_size().x - BUTTON_SMALL, c1.y });
-    gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
+    gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
+    gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
     gui::vertical_drag_int(m_track_scroll, 0, max_scroll, page_length);
     gui::cursor(c2);
     gui::separator();
-
-
 }
-
 

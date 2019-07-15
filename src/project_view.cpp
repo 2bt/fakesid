@@ -430,10 +430,9 @@ void draw_project_view() {
     enum { PAGE_LENGTH = 10 };
     int max_scroll = std::max<int>(0, m_file_names.size() - PAGE_LENGTH);
     if (m_file_scroll > max_scroll) m_file_scroll = max_scroll;
-    gui::same_line();
-    Vec c1 = gui::cursor() + Vec(-BUTTON_SMALL, gui::SEPARATOR_WIDTH);
-    gui::next_line();
-    widths = calculate_column_widths({ -1, gui::SEPARATOR_WIDTH, BUTTON_SMALL });
+    Vec c1 = gui::cursor();
+    widths = calculate_column_widths({ -1, gui::SEPARATOR_WIDTH, SCROLLBAR_WIDTH });
+
     for (int i = 0; i < PAGE_LENGTH; ++i) {
         int nr = i + m_file_scroll;
         gui::min_item_size({ widths[0], BUTTON_SMALL });
@@ -454,8 +453,8 @@ void draw_project_view() {
 
     // scrollbar
     Vec c2 = gui::cursor();
-    gui::cursor(c1);
-    gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
+    gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
+    gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
     gui::vertical_drag_int(m_file_scroll, 0, max_scroll, PAGE_LENGTH);
     gui::cursor(c2);
     gui::separator();

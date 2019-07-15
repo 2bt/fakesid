@@ -50,4 +50,5 @@ enum {
     BUTTON_BAR = 40,
     BUTTON_BIG = 30,
     BUTTON_SMALL = 20,
+    SCROLLBAR_WIDTH = 16,
 };

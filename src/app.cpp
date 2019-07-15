@@ -1,4 +1,3 @@
-#include "gui.hpp"
 #include "foo.hpp"
 #include "render.hpp"
 #include "app.hpp"
@@ -27,12 +26,7 @@ enum {
 
 
 void init() {
-    LOGI("app::init");
-    if (m_initialized) {
-        LOGI("app: already initialized, calling free...");
-        free();
-        LOGI("app: free done.");
-    }
+    if (m_initialized) free();
     m_initialized = true;
 
     gfx::init();
@@ -46,7 +40,6 @@ void init() {
 
 
 void free() {
-    LOGI("app::free");
     if (!m_initialized) return;
     m_initialized = false;
 
@@ -61,13 +54,11 @@ void free() {
 
 
 void exit() {
-    LOGI("app::exit");
     free();
 }
 
 
 void resize(int width, int height) {
-    LOGI("app::resize %d %d", width, height);
     if (!m_initialized) return;
 
     gfx::screen()->resize(width, height);
@@ -110,7 +101,6 @@ void touch(int x, int y, bool pressed) {
 
 
 void key(int key, int unicode) {
-    LOGI("app::key %d %d", key, unicode);
     gui::key(key, unicode);
 }
 
