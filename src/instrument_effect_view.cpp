@@ -1,7 +1,6 @@
 #include "track_view.hpp"
 #include "gui.hpp"
 #include "player.hpp"
-#include "app.hpp"
 #include "edit.hpp"
 
 
@@ -171,7 +170,7 @@ void draw_instrument_view() {
             gui::drag_int(labels[i + 2], "%X", inst.adsr[i + 2], 0, 15);
         };
 
-        gui::min_item_size({ app::canvas_size().x, 0 });
+        gui::min_item_size({ edit::screen_size().x, 0 });
         gui::separator();
 
         // wave
@@ -216,11 +215,11 @@ void draw_instrument_view() {
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
             if (gui::button(str)) row.operation = !row.operation;
             gui::same_line();
-            gui::min_item_size({ app::canvas_size().x - gui::cursor().x, BUTTON_SMALL });
+            gui::min_item_size({ edit::screen_size().x - gui::cursor().x, BUTTON_SMALL });
             gui::drag_int("", "%02X", row.value, 0, 31);
         }
 
-        gui::min_item_size({ app::canvas_size().x, 0 });
+        gui::min_item_size({ edit::screen_size().x, 0 });
         gui::separator();
 
 
@@ -295,11 +294,11 @@ void draw_instrument_view() {
 
             // cutoff
             gui::same_line();
-            gui::min_item_size({ app::canvas_size().x - gui::cursor().x, BUTTON_SMALL });
+            gui::min_item_size({ edit::screen_size().x - gui::cursor().x, BUTTON_SMALL });
             gui::drag_int("", "%02X", row.value, 0, 31);
         }
 
-        gui::min_item_size({ app::canvas_size().x, 0 });
+        gui::min_item_size({ edit::screen_size().x, 0 });
         gui::separator();
 
 
@@ -316,7 +315,7 @@ void draw_instrument_view() {
             ++filter.length;
         }
     }
-    gui::min_item_size({ app::canvas_size().x, 0 });
+    gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
 }
 
@@ -392,7 +391,7 @@ void draw_effect_view() {
         }
     }
 
-    gui::min_item_size({ app::canvas_size().x, 0 });
+    gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
 
 
@@ -409,7 +408,7 @@ void draw_effect_view() {
         effect.rows[effect.length] = { Effect::OP_RELATIVE, 0x30 };
         ++effect.length;
     }
-    gui::min_item_size({ app::canvas_size().x, 0 });
+    gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
 }
 

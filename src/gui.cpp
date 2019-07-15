@@ -375,7 +375,6 @@ void key(int key, int unicode) {
     if (!m_input_text_str) return;
     switch (key) {
     case KEYCODE_DEL:
-        LOGI("DELETE");
         m_input_cursor_blink = 0;
         if (m_input_text_pos > 0) m_input_text_str[--m_input_text_pos] = '\0';
         return;

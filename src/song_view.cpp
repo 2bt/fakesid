@@ -1,7 +1,6 @@
 #include "song_view.hpp"
 #include "track_view.hpp"
 #include "edit.hpp"
-#include "app.hpp"
 #include "player.hpp"
 #include <algorithm>
 
@@ -42,7 +41,7 @@ void draw_song_view() {
 
     // prepare scrollbar
     Vec c1 = gui::cursor();
-    int free_space = app::canvas_size().y - gui::cursor().y -
+    int free_space = edit::screen_size().y - gui::cursor().y -
             gui::SEPARATOR_WIDTH - BUTTON_BIG - gui::SEPARATOR_WIDTH - BUTTON_BAR;
     int page_length = free_space / BUTTON_SMALL;
 
@@ -100,12 +99,12 @@ void draw_song_view() {
 
     // song scrollbar
     Vec c2 = gui::cursor();
-    gui::cursor({ app::canvas_size().x - BUTTON_SMALL, c1.y });
+    gui::cursor({ edit::screen_size().x - BUTTON_SMALL, c1.y });
     gui::min_item_size({ BUTTON_SMALL, c2.y - c1.y });
     gui::vertical_drag_int(m_song_scroll, 0, max_scroll, page_length);
     gui::cursor(c2);
 
-    gui::min_item_size({ app::canvas_size().x, 0 });
+    gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
 
 
@@ -138,7 +137,7 @@ void draw_song_view() {
     }
 
 
-    gui::min_item_size({ app::canvas_size().x, 0 });
+    gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
 }
 

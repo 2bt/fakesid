@@ -1,7 +1,12 @@
 #pragma once
 #include "render.hpp"
 
-// XXX
+
+enum {
+    KEYCODE_ENTER = 66,
+    KEYCODE_DEL   = 67,
+};
+
 
 namespace gui {
     enum {
@@ -49,11 +54,6 @@ namespace gui {
         I_ADD_ROW_ABOVE,
         I_ADD_ROW_BELOW,
         I_DELETE_ROW,
-    };
-
-    enum {
-        KEYCODE_ENTER = 66,
-        KEYCODE_DEL   = 67,
     };
 
     Vec  cursor();

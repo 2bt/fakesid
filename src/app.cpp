@@ -16,8 +16,6 @@ gfx::Framebuffer* m_framebuffer;
 gfx::Texture2D*   m_canvas;
 float             m_canvas_scale;
 int               m_canvas_offset;
-Vec               m_canvas_size;
-
 
 enum {
     WIDTH      = 360,
@@ -26,9 +24,6 @@ enum {
 
 
 } // namespace
-
-
-Vec const& canvas_size() { return m_canvas_size; }
 
 
 void init() {
@@ -82,22 +77,24 @@ void resize(int width, int height) {
         delete m_framebuffer;
     }
 
-    m_canvas_size = {
+    Vec s = {
         WIDTH,
-        std::max<int16_t>(WIDTH * height / width, MIN_HEIGHT)
+        std::max<int16_t>(WIDTH * height / width, MIN_HEIGHT),
     };
-    Vec s = { 2, 2 };
-    while (s.x < m_canvas_size.x) s.x *= 2;
-    while (s.y < m_canvas_size.y) s.y *= 2;
-    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, s.x, s.y);
+    edit::resize(s.x, s.y);
+
+    Vec t = { 2, 2 };
+    while (t.x < s.x) t.x *= 2;
+    while (t.y < s.y) t.y *= 2;
+    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, t.x, t.y);
 
     m_framebuffer = gfx::Framebuffer::create();
     m_framebuffer->attach_color(m_canvas);
 
     // set canvas offset and scale
-    glm::vec2 scale = glm::vec2(width, height) / glm::vec2(m_canvas_size);
+    glm::vec2 scale = glm::vec2(width, height) / glm::vec2(s);
     if (scale.y < scale.x) {
-        m_canvas_offset = (width - WIDTH * scale.y) * 0.5f;
+        m_canvas_offset = (width - s.x * scale.y) * 0.5f;
         m_canvas_scale  = scale.y;
     }
     else {
@@ -129,7 +126,8 @@ void draw() {
     // render canvas to screen
     gfx::screen()->clear({0, 0, 0, 1});
     render::DrawContext dc;
-    dc.copy(Vec(m_canvas_offset, 0), Vec(glm::vec2(m_canvas_size) * m_canvas_scale), {}, m_canvas_size);
+    Vec s = { m_canvas->width(),  m_canvas->height() };
+    dc.copy(Vec(m_canvas_offset, 0), Vec(glm::vec2(s) * m_canvas_scale), {}, s);
     render::draw(gfx::screen(), dc.vertices(), m_canvas);
     dc.clear();
 }

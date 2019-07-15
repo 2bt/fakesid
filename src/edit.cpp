@@ -5,7 +5,6 @@
 #include "instrument_effect_view.hpp"
 //#include "jam_view.hpp"
 //#include "help_view.hpp"
-#include "app.hpp"
 #include "player.hpp"
 
 
@@ -17,6 +16,7 @@ namespace {
 //    player::fill_buffer((short*) stream, len / 2);
 //}
 
+Vec   m_screen_size;
 EView m_view;
 void (*m_popup_func)(void);
 
@@ -34,6 +34,13 @@ void set_popup(void (*func)(void)) {
     m_popup_func = func;
 }
 
+void resize(int width, int height) {
+    m_screen_size = { width, height };
+}
+
+Vec const& screen_size() {
+    return m_screen_size;
+}
 
 void init() {
     bool first = true;
@@ -119,7 +126,7 @@ void draw() {
 
 
     // bottom bar
-    gui::cursor({ 0, app::canvas_size().y  - BUTTON_BAR });
+    gui::cursor({ 0, m_screen_size.y  - BUTTON_BAR });
     bool block_loop = player::block_loop();
     widths = calculate_column_widths({ -1, -1, -1 });
 

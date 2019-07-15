@@ -1,6 +1,5 @@
 #include "project_view.hpp"
 #include "edit.hpp"
-#include "app.hpp"
 #include "player.hpp"
 #include "foo.hpp"
 #include <algorithm>

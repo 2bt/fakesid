@@ -95,8 +95,21 @@ int main(int argc, char** argv) {
                 break;
 
             case SDL_KEYDOWN:
-                if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) s_running = false;
-//                else app::key(e.key.keysym.scancode);
+                switch (e.key.keysym.scancode) {
+                case SDL_SCANCODE_ESCAPE:
+                    s_running = false;
+                    break;
+                case SDL_SCANCODE_RETURN:
+                    app::key(KEYCODE_ENTER, 0);
+                    break;
+                case SDL_SCANCODE_BACKSPACE:
+                    app::key(KEYCODE_DEL, 0);
+                    break;
+                default: break;
+                }
+                break;
+            case SDL_TEXTINPUT:
+                app::key(0, e.text.text[0]);
                 break;
 
             case SDL_WINDOWEVENT:
