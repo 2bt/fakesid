@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
         mView.queueEvent(new Runnable() { public void run() {
             Lib.key(code, e.getUnicodeChar());
         }});
-        return true;
+        return false;
     }
 
     @Override protected void onCreate(Bundle b) {

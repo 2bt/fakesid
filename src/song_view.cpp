@@ -2,6 +2,7 @@
 #include "track_view.hpp"
 #include "edit.hpp"
 #include "player.hpp"
+#include "foo.hpp"
 #include <algorithm>
 
 namespace {
@@ -54,11 +55,11 @@ void draw_song_view() {
     int player_block = player::block();
     for (int i = 0; i < page_length; ++i) {
         int block_nr = m_song_scroll + i;
-        bool highlight = block_nr == player_block;
+        if (block_nr == player_block) gui::highlight(gui::H_CURSOR);
+        else gui::no_highlight();
 
         snprintf(str, 3, "%02X", block_nr);
         gui::min_item_size({ widths[0], BUTTON_SMALL });
-        if (highlight) gui::highlight();
         if (gui::button(str, block_nr == m_block)) {
             m_block = block_nr;
             if (!player::is_playing()) player::block(m_block);
@@ -80,7 +81,6 @@ void draw_song_view() {
                 char str[3];
                 sprint_track_id(str, block[c]);
                 gui::min_item_size({ widths[c + 2], BUTTON_SMALL });
-                if (highlight) gui::highlight();
                 if (gui::button(str)) {
                     enter_track_select(block[c]);
                 }
@@ -96,6 +96,7 @@ void draw_song_view() {
         gui::next_line();
 
     }
+    gui::no_highlight();
 
     // song scrollbar
     Vec c2 = gui::cursor();

@@ -105,7 +105,9 @@ void draw_track_select() {
             char str[3] = "  ";
             sprint_track_id(str, n);
 
-            if (!m_empty_tracks[n - 1]) gui::highlight();
+            if (!m_empty_tracks[n - 1]) gui::highlight(gui::H_NORMAL);
+            else gui::no_highlight();
+
             if (gui::button(str, n == track_nr)) {
                 *m_track_select_value = n;
                 edit::set_popup(nullptr);
@@ -238,19 +240,17 @@ void draw_track_view() {
 
     int player_row = player::row();
     for (int i = 0; i < page_length; ++i) {
-
         int row_nr = m_track_scroll + i;
-
-        // TODO: hightlight row
-        //if (n % 4 == 0)
-
-
         if (row_nr >= song.track_length) {
             gui::padding({ 0, BUTTON_SMALL });
             continue;
         }
 
-        bool highlight = row_nr == player_row;
+        // hightlight
+        if (row_nr == player_row) gui::highlight(gui::H_CURSOR);
+        else if (row_nr % 4 == 0) gui::highlight(gui::H_NORMAL);
+        else gui::no_highlight();
+
         Track::Row& row = track.rows[row_nr];
 
         char str[4];
@@ -258,7 +258,6 @@ void draw_track_view() {
         // instrument
         sprint_inst_effect_id(str, row.instrument);
         gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-        if (highlight) gui::highlight();
         if (gui::button(str)) {
             if (row.instrument > 0) row.instrument = 0;
             else row.instrument = selected_instrument();
@@ -270,7 +269,6 @@ void draw_track_view() {
         // effect
         sprint_inst_effect_id(str, row.effect);
         gui::same_line();
-        if (highlight) gui::highlight();
         if (gui::button(str)) {
             if (row.effect > 0) row.effect = 0;
             else row.effect = selected_effect();
@@ -292,7 +290,6 @@ void draw_track_view() {
         }
         str[3] = '\0';
         gui::same_line();
-        if (highlight) gui::highlight();
         gui::min_item_size({ 32, BUTTON_SMALL });
         if (gui::button(str)) {
             if (row.note == 0) row.note = 255;
@@ -305,7 +302,11 @@ void draw_track_view() {
         int w = edit::screen_size().x - gui::cursor().x - SCROLLBAR_WIDTH - gui::SEPARATOR_WIDTH;
         gui::min_item_size({ w, BUTTON_SMALL });
         uint8_t old_note = row.note;
-        if (gui::clavier(row.note, m_clavier_offset, highlight)) {
+
+        if (row_nr == player_row) gui::highlight(gui::H_CURSOR);
+        else gui::no_highlight();
+
+        if (gui::clavier(row.note, m_clavier_offset)) {
             if (row.note == 0) row = {};
             else if (old_note == 0) {
                 row.instrument = selected_instrument();
@@ -317,6 +318,7 @@ void draw_track_view() {
         gui::separator();
         gui::next_line();
     }
+    gui::no_highlight();
 
     // track pages
     Vec c2 = gui::cursor();

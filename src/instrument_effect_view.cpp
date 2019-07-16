@@ -26,7 +26,9 @@ void draw_instrument_select() {
 
             Vec c1 = gui::cursor();
             gui::min_item_size({ widths[x], BUTTON_SMALL });
-            if (inst.length > 0) gui::highlight();
+            if (inst.length > 0) gui::highlight(gui::H_NORMAL);
+            else gui::no_highlight();
+
             if (gui::button("", nr == selected_instrument())) {
                 edit::set_popup(nullptr);
                 select_instrument(nr);
@@ -49,6 +51,7 @@ void draw_instrument_select() {
         }
         gui::next_line();
     }
+    gui::no_highlight();
 }
 // XXX: this is a copy of instrument_select with s/instrument/effect/g :(
 void draw_effect_select() {
@@ -68,7 +71,9 @@ void draw_effect_select() {
 
             Vec c1 = gui::cursor();
             gui::min_item_size({ widths[x], BUTTON_SMALL });
-            if (effect.length > 0) gui::highlight();
+            if (effect.length > 0) gui::highlight(gui::H_NORMAL);
+            else gui::no_highlight();
+
             if (gui::button("", nr == selected_effect())) {
                 edit::set_popup(nullptr);
                 select_effect(nr);
@@ -91,6 +96,7 @@ void draw_effect_select() {
         }
         gui::next_line();
     }
+    gui::no_highlight();
 }
 
 

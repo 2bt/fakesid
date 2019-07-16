@@ -426,7 +426,9 @@ void set_playing(bool p) {
 
 int   row() { return m_row; }
 int   block() { return m_block; }
-void  block(int b) { m_block = b; }
+void  block(int b) {
+    m_block = std::min(b, (int) m_song.table_length - 1);
+}
 bool  block_loop() { return m_block_loop; }
 void  block_loop(bool b) { m_block_loop = b; }
 bool  is_channel_active(int c) { return m_channels[c].active; }

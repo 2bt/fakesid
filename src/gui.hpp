@@ -56,6 +56,12 @@ namespace gui {
         I_DELETE_ROW,
     };
 
+    enum Highlight {
+        H_NONE   = 0,
+        H_NORMAL = 1,
+        H_CURSOR = 2,
+    };
+
     Vec  cursor();
     void cursor(Vec const& c);
     void id(void const* addr);
@@ -68,14 +74,15 @@ namespace gui {
     Box  padding(Vec const& size);
     void separator();
     void text(char const* fmt, ...);
-    void highlight();
+    void highlight(Highlight highlight);
+    inline void no_highlight() { highlight(H_NONE); }
     bool button(char const* label, bool active = false);
     bool button(Icon icon, bool active = false);
     bool hold();
     void input_text(char* str, int len);
     bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 0);
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
-    bool clavier(uint8_t& n, int offset, bool highlight);
+    bool clavier(uint8_t& n, int offset);
 
     template<class T>
     bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 0) {

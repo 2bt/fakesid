@@ -37,7 +37,12 @@ namespace color {
 
     const Color separator         = make(0x222222);
 
-    const Color highlight         = make(0x787878);
+    const Color highlight[] = {
+        {},
+        make(0x787878),
+        make(0x998855),
+    };
+
 
     const Color note_normal       = handle_normal;
     const Color note_active       = handle_active;
@@ -152,7 +157,7 @@ Vec         m_min_item_size;
 
 int         m_hold_count;
 bool        m_hold;
-bool        m_highlight;
+Highlight   m_highlight;
 bool        m_same_line;
 void const* m_id;
 void const* m_active_item;
@@ -258,6 +263,10 @@ void align(Align a) {
     m_align = a;
 }
 
+void highlight(Highlight highlight) {
+    m_highlight = highlight;
+}
+
 void button_style(ButtonStyle s) {
     m_button_style = s;
 }
@@ -316,9 +325,6 @@ void text(char const* fmt, ...) {
 }
 
 
-void highlight() { m_highlight = true; }
-
-
 static bool button_helper(Box const& box, bool active) {
     enum { HOLD_TIME = 10 };
     m_hold = false;
@@ -334,9 +340,8 @@ static bool button_helper(Box const& box, bool active) {
     }
     else {
         if (active) color = color::button_active;
-        else if (m_highlight) color = color::highlight;
+        else if (m_highlight) color = color::highlight[m_highlight];
     }
-    m_highlight = false;
     m_dc.rect(box.pos, box.size, color, m_button_style);
     return clicked;
 }
@@ -481,7 +486,7 @@ bool vertical_drag_int(int& value, int min, int max, int page) {
 
 
 
-bool clavier(uint8_t& n, int offset, bool highlight) {
+bool clavier(uint8_t& n, int offset) {
     Box box = item_box({ 100, 20 });
 
     void const* id = get_id(&n);
@@ -511,7 +516,7 @@ bool clavier(uint8_t& n, int offset, bool highlight) {
         Color color = color::make(0x222222);
         if ((i + offset) % 12 == 0) color = color::make(0x333333);
         if ((1 << (i + offset) % 12) & 0b010101001010) color = color::make(0x111111);
-        if (highlight) color = color::mix(color, color::highlight, 0.2);
+        if (m_highlight) color = color::mix(color, color::highlight[m_highlight], 0.3);
         m_dc.rect(b.pos, b.size, color);
 
         if (n == nn) {

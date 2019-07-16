@@ -118,7 +118,6 @@ void init() {
 
     init_song(player::song());
 
-
     start_audio();
 
     return;
