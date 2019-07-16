@@ -4,9 +4,6 @@
 #include <string>
 
 
-struct SDL_Surface;
-
-
 namespace gfx {
 
 

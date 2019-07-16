@@ -15,10 +15,24 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     "../../../../../../lib"
     )
 
-# add lib dependencies
 target_link_libraries(${PROJECT_NAME}
     android
     log
     EGL
     GLESv2
+    )
+
+
+set(OBOE_DIR "../../../../../oboe")
+
+add_subdirectory(${OBOE_DIR} ./oboe-bin)
+
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
+    "${OBOE_DIR}/include"
+    "${OBOE_DIR}/src"
+    )
+
+target_link_libraries(${PROJECT_NAME}
+    oboe
+    atomic
     )

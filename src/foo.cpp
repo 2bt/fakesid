@@ -57,13 +57,13 @@ std::string get_storage_dir() {
 
 
 void show_keyboard() {
-    jclass clazz = g_env->FindClass("com/twobit/fakesid/Activity");
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
     jmethodID method = g_env->GetStaticMethodID(clazz, "showKeyboard", "()V");
     g_env->CallStaticVoidMethod(clazz, method);
 }
 
 void hide_keyboard() {
-    jclass clazz = g_env->FindClass("com/twobit/fakesid/Activity");
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
     jmethodID method = g_env->GetStaticMethodID(clazz, "hideKeyboard", "()V");
     g_env->CallStaticVoidMethod(clazz, method);
 }

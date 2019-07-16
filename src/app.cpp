@@ -4,8 +4,6 @@
 #include "edit.hpp"
 
 
-
-
 namespace app {
 namespace {
 
@@ -23,6 +21,7 @@ enum {
 
 
 } // namespace
+
 
 
 void init() {
@@ -77,8 +76,13 @@ void resize(int width, int height) {
     Vec t = { 2, 2 };
     while (t.x < s.x) t.x *= 2;
     while (t.y < s.y) t.y *= 2;
-    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, t.x, t.y);
-
+    m_canvas = gfx::Texture2D::create(gfx::TextureFormat::RGBA, t.x, t.y, nullptr,
+#ifdef ANDROID
+                                      gfx::FilterMode::Nearest
+#else
+                                      gfx::FilterMode::Linear
+#endif
+                                      );
     m_framebuffer = gfx::Framebuffer::create();
     m_framebuffer->attach_color(m_canvas);
 

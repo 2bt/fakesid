@@ -3,18 +3,85 @@
 #include "song_view.hpp"
 #include "track_view.hpp"
 #include "instrument_effect_view.hpp"
-//#include "jam_view.hpp"
+#include "jam_view.hpp"
 //#include "help_view.hpp"
 #include "player.hpp"
+#include "foo.hpp"
+
+
+#ifdef ANDROID
+
+#include <oboe/Oboe.h>
+
+class : public oboe::AudioStreamCallback {
+public:
+    oboe::DataCallbackResult onAudioReady(
+            oboe::AudioStream *oboeStream,
+            void              *audioData,
+            int32_t           numFrames) override
+    {
+        player::fill_buffer((short*) audioData, numFrames);
+        return oboe::DataCallbackResult::Continue;
+    }
+} audio_callback;
+
+
+bool start_audio() {
+
+    oboe::AudioStreamBuilder builder;
+    builder.setDirection(oboe::Direction::Output);
+    builder.setSampleRate(MIXRATE);
+    builder.setFormat(oboe::AudioFormat::I16);
+    builder.setChannelCount(oboe::ChannelCount::Mono);
+    builder.setCallback(&audio_callback);
+//    builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
+//    builder.setSharingMode(oboe::SharingMode::Exclusive);
+
+    oboe::AudioStream* stream = nullptr;
+    oboe::Result result = builder.openStream(&stream);
+    if (result != oboe::Result::OK) {
+        LOGE("openStream: %s", oboe::convertToText(result));
+        return false;
+    }
+
+//    LOGI("getFramesPerBurst: %d", stream->getFramesPerBurst());
+//    stream->setBufferSizeInFrames(stream->getFramesPerBurst() * 4);
+
+    auto rate = stream->getSampleRate();
+    if (rate != MIXRATE) {
+        LOGW("mixrate is %d but should be %d", rate, MIXRATE);
+    }
+
+    result = stream->requestStart();
+    if (result != oboe::Result::OK) {
+        LOGE("result is not okay: %s", oboe::convertToText(result));
+        return false;
+    }
+    return true;
+}
+
+#else
+
+#include <SDL2/SDL.h>
+static void audio_callback(void* userdata, Uint8* stream, int len) {
+    player::fill_buffer((short*) stream, len / 2);
+}
+
+bool start_audio() {
+    SDL_AudioSpec spec = { MIXRATE, AUDIO_S16, 1, 0, SAMPLES_PER_FRAME, 0, 0, audio_callback };
+    SDL_OpenAudio(&spec, nullptr);
+    SDL_PauseAudio(0);
+    return true;
+}
+
+#endif
 
 
 
 namespace edit {
 namespace {
 
-//void audio_callback(void* userdata, Uint8* stream, int len) {
-//    player::fill_buffer((short*) stream, len / 2);
-//}
+
 
 Vec   m_screen_size;
 EView m_view;
@@ -51,9 +118,9 @@ void init() {
 
     init_song(player::song());
 
-//    SDL_AudioSpec spec = { MIXRATE, AUDIO_S16, 1, 0, SAMPLES_PER_FRAME, 0, 0, audio_callback };
-//    SDL_OpenAudio(&spec, nullptr);
-//    SDL_PauseAudio(0);
+
+    start_audio();
+
     return;
 }
 
@@ -79,7 +146,7 @@ void draw() {
         View{ "TRACK",  draw_track_view },
         View{ "INSTR",  draw_instrument_view },
         View{ "EFFECT", draw_effect_view },
-        View{ "JAM",    0 },
+        View{ "JAM",    draw_jam_view },
         View{ "?",      0 },
     };
     std::vector<int> weights = std::vector<int>(views.size() - 1, -1);
@@ -140,7 +207,7 @@ void draw() {
     if (gui::button(gui::I_STOP)) {
         player::set_playing(false);
         player::reset();
-//        player::block(get_selected_block());
+        player::block(get_selected_block());
     }
 
     // play/pause

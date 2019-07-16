@@ -68,11 +68,6 @@ class DrawContext : public render::DrawContext {
 public:
 
     void rect(const Vec& pos, const Vec& size, const Color& c, ButtonStyle style=BS_NORMAL) {
-//        if (style == 0) {
-//            copy(pos, size, {0, 64}, {1, 1}, color);
-//            return;
-//        }
-
         int s = 8;
         int o = 64;
         if (size.x < 16 || size.y < 16) {
@@ -394,41 +389,6 @@ void key(int key, int unicode) {
         m_input_text_str[m_input_text_pos++] = c;
     }
 }
-
-//bool process_event(const SDL_Event& e) {
-//    char c;
-//    switch (e.type) {
-//    case SDL_KEYDOWN:
-//        if (!m_input_text_str) return false;
-//        switch (e.key.keysym.scancode) {
-//        case SDL_SCANCODE_RETURN:
-//            SDL_StopTextInput();
-//            m_input_text_str = nullptr;
-//            break;
-//        case SDL_SCANCODE_BACKSPACE:
-//            m_input_cursor_blink = 0;
-//            if (m_input_text_pos > 0) {
-//                m_input_text_str[--m_input_text_pos] = '\0';
-//            }
-//            break;
-//        default:
-//            break;
-//        }
-//        return true;
-//    case SDL_TEXTINPUT:
-//        if (!m_input_text_str) return false;
-//        m_input_cursor_blink = 0;
-//        c = e.text.text[0];
-//        if ((isalnum(c) || (m_input_text_pos > 0 && strchr(" _-.+()", c))) &&
-//            m_input_text_pos < m_input_text_len)
-//        {
-//            m_input_text_str[m_input_text_pos++] = c;
-//        }
-//        return true;
-//    default:
-//        return false;
-//    }
-//}
 
 
 void input_text(char* str, int len) {

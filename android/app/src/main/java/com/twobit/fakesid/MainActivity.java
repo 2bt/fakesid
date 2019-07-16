@@ -4,17 +4,17 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.Manifest;
 import android.os.Bundle;
+import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 
-
-public class Activity extends android.app.Activity {
+public class MainActivity extends Activity {
     static String TAG = "FOOBAR";
-    static Activity sInstance;
-    MainView        mView;
+    static MainActivity sInstance;
+    MainView mView;
 
     static public void showKeyboard() {
         sInstance.runOnUiThread(new Runnable() {
@@ -48,29 +48,23 @@ public class Activity extends android.app.Activity {
         sInstance = this;
         mView = new MainView(getApplication());
         setContentView(mView);
-
         getWritePermission();
-        Lib.setAssetManager(getResources().getAssets());
     }
 
-    @Override protected void onPause() {
-        super.onPause();
-        mView.onPause();
-    }
-
-    @Override protected void onResume() {
-        super.onResume();
-        mView.onResume();
-    }
-
-    @Override protected void onDestroy() {
-        super.onDestroy();
-        mView.onDestroy();
-    }
-
+//    @Override protected void onPause() {
+//        super.onPause();
+//        mView.onPause();
+//    }
+//    @Override protected void onResume() {
+//        super.onResume();
+//        mView.onResume();
+//    }
+//    @Override protected void onDestroy() {
+//        mView.queueEvent(new Runnable() { public void run() { Lib.exit(); }});
+//        super.onDestroy();
+//    }
 
     static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;
-
     boolean mWritePermission = false;
 
     public void getWritePermission() {

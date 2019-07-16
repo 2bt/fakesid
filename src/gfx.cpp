@@ -226,7 +226,7 @@ struct VertexArrayImpl : VertexArray {
 
 struct Texture2DImpl : Texture2D {
     Texture2DImpl() {
-        gl.bind_texture(0, GL_TEXTURE_2D, 0); // android
+        gl.bind_texture(0, GL_TEXTURE_2D, 0); // android needs that
         glGenTextures(1, &m_handle);
         check_error("glGenTextures");
     }
@@ -517,7 +517,7 @@ struct ScreenImpl : Screen, RenderTargetImpl {
 
 struct FramebufferImpl : Framebuffer, RenderTargetImpl {
     FramebufferImpl() {
-        gl.bind_framebuffer(0); // android
+        gl.bind_framebuffer(0); // android needs that
         glGenFramebuffers(1, &m_handle);
         check_error("glGenFramebuffers");
     }

@@ -6,8 +6,7 @@ public class Lib {
     static {
         System.loadLibrary("main");
     }
-    public static native void setAssetManager(AssetManager am);
-    public static native void init();
+    public static native void init(AssetManager am);
     public static native void free();
     public static native void exit();
     public static native void resize(int width, int height);

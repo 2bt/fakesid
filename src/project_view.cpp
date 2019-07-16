@@ -82,7 +82,6 @@ bool init_dirs() {
     if (m_root_dir.empty()) {
         m_root_dir = android::get_storage_dir();
     }
-    LOGI("root dir: %s", m_root_dir.c_str());
     if (m_root_dir.empty()) return false;
 
     struct stat st = {};

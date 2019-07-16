@@ -12,11 +12,9 @@ AAssetManager* g_asset_manager;
 JNIEnv*        g_env;
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setAssetManager(JNIEnv * env, jobject obj, jobject am) {
-        g_asset_manager = AAssetManager_fromJava(env, am);
-    }
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am) {
         g_env = env;
+        g_asset_manager = AAssetManager_fromJava(env, am);
         app::init();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {

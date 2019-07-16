@@ -8,7 +8,6 @@ import android.view.MotionEvent;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-
 class MainView extends GLSurfaceView {
     static String TAG = "FOOBAR";
     Renderer mRenderer;
@@ -36,13 +35,9 @@ class MainView extends GLSurfaceView {
         return false;
     }
 
-    public void onDestroy() {
-        //queueEvent(new Runnable() { public void run() { Lib.exit(); }});
-    }
-
     class Renderer implements GLSurfaceView.Renderer {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            Lib.init();
+            Lib.init(getResources().getAssets());
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             Lib.resize(width, height);
