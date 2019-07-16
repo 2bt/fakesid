@@ -32,6 +32,7 @@ namespace gui {
         BS_ROUND,
         BS_TAB,
         BS_FRAME,
+        BS_JAM,
     };
 
     enum Icon {
@@ -83,6 +84,7 @@ namespace gui {
     bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 0);
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
     bool clavier(uint8_t& n, int offset);
+    void jam(int index);
 
     template<class T>
     bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 0) {
@@ -92,6 +94,18 @@ namespace gui {
         if (b) value = v;
         return b;
     }
+
+    struct Touch {
+        bool just_pressed()  const { return pressed && !prev_pressed; }
+        bool just_released() const { return !pressed && prev_pressed; }
+        bool box_touched(Box const& box) const { return (pressed | prev_pressed) && box.contains(pos); }
+        bool pressed;
+        bool prev_pressed;
+        Vec  pos;
+        Vec  prev_pos;
+    };
+
+    Touch const& touch();
 
     void touch(int x, int y, bool pressed);
     void key(int key, int unicode);

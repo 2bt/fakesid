@@ -8,7 +8,6 @@ public class Lib {
     }
     public static native void init(AssetManager am);
     public static native void free();
-    public static native void exit();
     public static native void resize(int width, int height);
     public static native void draw();
     public static native void touch(int x, int y, int action);

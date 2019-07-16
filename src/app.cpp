@@ -52,11 +52,6 @@ void free() {
 }
 
 
-void exit() {
-    free();
-}
-
-
 void resize(int width, int height) {
     if (!m_initialized) return;
 

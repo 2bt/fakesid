@@ -50,7 +50,6 @@ public class MainActivity extends Activity {
         setContentView(mView);
         getWritePermission();
     }
-
     @Override protected void onResume() {
         super.onResume();
         mView.onResume();
@@ -61,10 +60,6 @@ public class MainActivity extends Activity {
         mView.onPause();
         Lib.stopAudio();
     }
-//    @Override protected void onDestroy() {
-//        mView.queueEvent(new Runnable() { public void run() { Lib.exit(); }});
-//        super.onDestroy();
-//    }
 
     static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;
     boolean mWritePermission = false;

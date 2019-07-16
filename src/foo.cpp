@@ -50,8 +50,8 @@ bool start_audio() {
     builder.setFormat(oboe::AudioFormat::I16);
     builder.setChannelCount(oboe::ChannelCount::Mono);
     builder.setCallback(&s_audio_callback);
-//    builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
-//    builder.setSharingMode(oboe::SharingMode::Exclusive);
+    builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
+    builder.setSharingMode(oboe::SharingMode::Exclusive);
 
     oboe::Result result = builder.openStream(&s_stream);
     if (result != oboe::Result::OK) {

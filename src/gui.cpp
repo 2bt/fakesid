@@ -39,7 +39,7 @@ namespace color {
 
     const Color highlight[] = {
         {},
-        make(0x787878),
+        make(0x555577),
         make(0x998855),
     };
 
@@ -140,17 +140,7 @@ public:
 };
 
 
-struct {
-    bool just_pressed()  const { return pressed && !prev_pressed; }
-    bool just_released() const { return !pressed && prev_pressed; }
-    bool box_touched(Box const& box) const { return (pressed | prev_pressed) && box.contains(pos); }
-
-    bool pressed;
-    bool prev_pressed;
-    Vec  pos;
-    Vec  prev_pos;
-} m_touch;
-
+Touch       m_touch;
 Vec         m_cursor_min;
 Vec         m_cursor_max;
 Vec         m_min_item_size;
@@ -225,6 +215,11 @@ Vec print_pos(Box const& box, Vec const& s, int padding=5) {
 
 
 } // namespace
+
+
+Touch const& touch() {
+    return m_touch;
+}
 
 
 Vec cursor() {
@@ -516,7 +511,7 @@ bool clavier(uint8_t& n, int offset) {
         Color color = color::make(0x222222);
         if ((i + offset) % 12 == 0) color = color::make(0x333333);
         if ((1 << (i + offset) % 12) & 0b010101001010) color = color::make(0x111111);
-        if (m_highlight) color = color::mix(color, color::highlight[m_highlight], 0.3);
+        if (m_highlight) color = color::mix(color, color::highlight[m_highlight], 0.1);
         m_dc.rect(b.pos, b.size, color);
 
         if (n == nn) {
@@ -528,6 +523,16 @@ bool clavier(uint8_t& n, int offset) {
         x0 = x1;
     }
     return n != old_n;
+}
+
+void jam(int index) {
+    static const Color colors[] = {
+        color::make(0x111111),
+        color::make(0x222222),
+        color::highlight[H_CURSOR],
+    };
+    Box box = item_box({});
+    m_dc.rect(box.pos, box.size, colors[index], BS_JAM);
 }
 
 void init() {

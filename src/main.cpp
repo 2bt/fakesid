@@ -20,9 +20,6 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_exit(JNIEnv * env, jobject obj) {
-        app::exit();
-    }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
         app::resize(width, height);
     }
@@ -146,7 +143,7 @@ int main(int argc, char** argv) {
         SDL_GL_SwapWindow(s_window);
     }
 
-    app::exit();
+    app::free();
     android::stop_audio();
     free();
     return 0;

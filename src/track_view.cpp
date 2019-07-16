@@ -303,9 +303,6 @@ void draw_track_view() {
         gui::min_item_size({ w, BUTTON_SMALL });
         uint8_t old_note = row.note;
 
-        if (row_nr == player_row) gui::highlight(gui::H_CURSOR);
-        else gui::no_highlight();
-
         if (gui::clavier(row.note, m_clavier_offset)) {
             if (row.note == 0) row = {};
             else if (old_note == 0) {

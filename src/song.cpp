@@ -9,6 +9,8 @@ void init_song(Song& song) {
     song.tempo = 8;
     song.track_length = 32;
     song.table_length = 1;
+    song.table[0][0] = 1;
+
 
     // preset some instruments/effects
 
@@ -20,20 +22,26 @@ void init_song(Song& song) {
     // lead
     {
         Instrument& i = song.instruments[0];
-        strcpy(i.name.data(), "lead");
+        strcpy(i.name.data(), "LEAD");
         i.adsr = { 0, 8, 12, 3 };
-        i.rows[0] = { Instrument::F_GATE | Instrument::F_PULSE, Instrument::OP_SET, 7 };
+        i.rows[0] = { Instrument::F_GATE | Instrument::F_NOISE, Instrument::OP_SET, 7 };
         i.rows[1] = { Instrument::F_GATE | Instrument::F_PULSE, Instrument::OP_INC, 3 };
         i.length = 2;
         i.loop = 1;
         i.hard_restart = true;
+        Effect& e = song.effects[0];
+        strcpy(e.name.data(), "LEAD");
+        e.rows[0] = { Effect::OP_ABSOLUTE, 70 };
+        e.rows[1] = { Effect::OP_RELATIVE, 0x30 };
+        e.length = 2;
+        e.loop = 1;
     }
 
 
     // glide up
     {
         Effect& e = song.effects[GLIDE_UP];
-        strcpy(e.name.data(), "glide up");
+        strcpy(e.name.data(), "GLIDE UP");
         e.rows[0] = { Effect::OP_DETUNE, 0x2c };
         e.rows[1] = { Effect::OP_DETUNE, 0x2d };
         e.rows[2] = { Effect::OP_DETUNE, 0x2e };
@@ -46,7 +54,7 @@ void init_song(Song& song) {
     // vibrato
     {
         Effect& e = song.effects[VIBRATO];
-        strcpy(e.name.data(), "vibrato");
+        strcpy(e.name.data(), "VIBRATO");
         e.rows[0] = { Effect::OP_DETUNE, 0x30 };
         e.rows[1] = { Effect::OP_DETUNE, 0x31 };
         e.rows[2] = { Effect::OP_DETUNE, 0x32 };
