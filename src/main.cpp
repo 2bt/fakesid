@@ -35,6 +35,12 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_key(JNIEnv * env, jobject obj, jint key, jint unicode) {
         app::key(key, unicode);
     }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_startAudio(JNIEnv * env, jobject obj) {
+        android::start_audio();
+    }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_stopAudio(JNIEnv * env, jobject obj) {
+        android::stop_audio();
+    }
 }
 
 #else
@@ -82,6 +88,7 @@ int main(int argc, char** argv) {
     glewExperimental = true;
     glewInit();
 
+    android::start_audio();
     app::init();
 
     while (s_running) {
@@ -140,6 +147,7 @@ int main(int argc, char** argv) {
     }
 
     app::exit();
+    android::stop_audio();
     free();
     return 0;
 }

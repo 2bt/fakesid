@@ -16,6 +16,8 @@
 
 namespace android {
 
+bool start_audio();
+void stop_audio();
 
 bool load_asset(std::string const& name, std::vector<uint8_t>& buf);
 gfx::Texture2D* load_texture(char const*     name,

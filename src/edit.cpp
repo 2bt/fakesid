@@ -9,73 +9,6 @@
 #include "foo.hpp"
 
 
-#ifdef ANDROID
-
-#include <oboe/Oboe.h>
-
-class : public oboe::AudioStreamCallback {
-public:
-    oboe::DataCallbackResult onAudioReady(
-            oboe::AudioStream *oboeStream,
-            void              *audioData,
-            int32_t           numFrames) override
-    {
-        player::fill_buffer((short*) audioData, numFrames);
-        return oboe::DataCallbackResult::Continue;
-    }
-} audio_callback;
-
-
-bool start_audio() {
-
-    oboe::AudioStreamBuilder builder;
-    builder.setDirection(oboe::Direction::Output);
-    builder.setSampleRate(MIXRATE);
-    builder.setFormat(oboe::AudioFormat::I16);
-    builder.setChannelCount(oboe::ChannelCount::Mono);
-    builder.setCallback(&audio_callback);
-//    builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
-//    builder.setSharingMode(oboe::SharingMode::Exclusive);
-
-    oboe::AudioStream* stream = nullptr;
-    oboe::Result result = builder.openStream(&stream);
-    if (result != oboe::Result::OK) {
-        LOGE("openStream: %s", oboe::convertToText(result));
-        return false;
-    }
-
-//    LOGI("getFramesPerBurst: %d", stream->getFramesPerBurst());
-//    stream->setBufferSizeInFrames(stream->getFramesPerBurst() * 4);
-
-    auto rate = stream->getSampleRate();
-    if (rate != MIXRATE) {
-        LOGW("mixrate is %d but should be %d", rate, MIXRATE);
-    }
-
-    result = stream->requestStart();
-    if (result != oboe::Result::OK) {
-        LOGE("result is not okay: %s", oboe::convertToText(result));
-        return false;
-    }
-    return true;
-}
-
-#else
-
-#include <SDL2/SDL.h>
-static void audio_callback(void* userdata, Uint8* stream, int len) {
-    player::fill_buffer((short*) stream, len / 2);
-}
-
-bool start_audio() {
-    SDL_AudioSpec spec = { MIXRATE, AUDIO_S16, 1, 0, SAMPLES_PER_FRAME, 0, 0, audio_callback };
-    SDL_OpenAudio(&spec, nullptr);
-    SDL_PauseAudio(0);
-    return true;
-}
-
-#endif
-
 
 
 namespace edit {
@@ -115,16 +48,11 @@ void init() {
     else return;
 
     set_view(VIEW_PROJECT);
-
     init_song(player::song());
-
-    start_audio();
-
     return;
 }
 
 void free() {
-//    SDL_CloseAudio();
 }
 
 void draw() {

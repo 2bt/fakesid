@@ -51,14 +51,16 @@ public class MainActivity extends Activity {
         getWritePermission();
     }
 
-//    @Override protected void onPause() {
-//        super.onPause();
-//        mView.onPause();
-//    }
-//    @Override protected void onResume() {
-//        super.onResume();
-//        mView.onResume();
-//    }
+    @Override protected void onResume() {
+        super.onResume();
+        mView.onResume();
+        Lib.startAudio();
+    }
+    @Override protected void onPause() {
+        super.onPause();
+        mView.onPause();
+        Lib.stopAudio();
+    }
 //    @Override protected void onDestroy() {
 //        mView.queueEvent(new Runnable() { public void run() { Lib.exit(); }});
 //        super.onDestroy();

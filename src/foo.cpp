@@ -1,5 +1,6 @@
 #include "foo.hpp"
 #include "gfx.hpp"
+#include "player.hpp"
 #include <string>
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_FAILURE_STRINGS
@@ -10,7 +11,7 @@
 #ifdef ANDROID
 #include <android/asset_manager.h>
 #include <jni.h>
-//#include <sys/stat.h>
+#include <oboe/Oboe.h>
 
 
 extern AAssetManager* g_asset_manager;
@@ -18,6 +19,67 @@ extern JNIEnv*        g_env;
 
 
 namespace android {
+namespace {
+
+
+class : public oboe::AudioStreamCallback {
+public:
+    oboe::DataCallbackResult onAudioReady(
+            oboe::AudioStream *oboeStream,
+            void              *audioData,
+            int32_t           numFrames) override
+    {
+        player::fill_buffer((short*) audioData, numFrames);
+        return oboe::DataCallbackResult::Continue;
+    }
+} s_audio_callback;
+
+
+oboe::AudioStream* s_stream;
+
+
+} // namespace
+
+
+bool start_audio() {
+    if (s_stream) stop_audio();
+
+    oboe::AudioStreamBuilder builder;
+    builder.setDirection(oboe::Direction::Output);
+    builder.setSampleRate(MIXRATE);
+    builder.setFormat(oboe::AudioFormat::I16);
+    builder.setChannelCount(oboe::ChannelCount::Mono);
+    builder.setCallback(&s_audio_callback);
+//    builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
+//    builder.setSharingMode(oboe::SharingMode::Exclusive);
+
+    oboe::Result result = builder.openStream(&s_stream);
+    if (result != oboe::Result::OK) {
+        LOGE("openStream: %s", oboe::convertToText(result));
+        return false;
+    }
+
+//    s_stream->setBufferSizeInFrames(s_stream->getFramesPerBurst() * 2);
+
+    auto rate = s_stream->getSampleRate();
+    if (rate != MIXRATE) {
+        LOGW("mixrate is %d but should be %d", rate, MIXRATE);
+    }
+
+    result = s_stream->requestStart();
+    if (result != oboe::Result::OK) {
+        LOGE("result is not okay: %s", oboe::convertToText(result));
+        return false;
+    }
+    return true;
+}
+
+void stop_audio() {
+    if (!s_stream) return;
+    s_stream->close();
+    delete s_stream;
+    s_stream = nullptr;
+}
 
 bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
     AAsset* ad = AAssetManager_open(g_asset_manager, name.c_str(), AASSET_MODE_BUFFER);
@@ -70,9 +132,26 @@ void hide_keyboard() {
 
 #else
 #include <fstream>
+#include <SDL2/SDL.h>
 
 
 namespace android {
+
+
+static void audio_callback(void* userdata, Uint8* stream, int len) {
+    player::fill_buffer((short*) stream, len / 2);
+}
+
+bool start_audio() {
+    SDL_AudioSpec spec = { MIXRATE, AUDIO_S16, 1, 0, SAMPLES_PER_FRAME, 0, 0, audio_callback };
+    SDL_OpenAudio(&spec, nullptr);
+    SDL_PauseAudio(0);
+    return true;
+}
+
+void stop_audio() {
+    SDL_CloseAudio();
+}
 
 
 bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {

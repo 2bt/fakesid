@@ -404,7 +404,6 @@ void reset() {
     m_block = 0;
     m_filter = {};
     for (Channel& chan : m_channels) {
-        // i'm lazy
         bool a = chan.active;
         chan = {};
         chan.active = a;
