@@ -26,12 +26,15 @@ void draw_jam_view() {
 
     int prev_note = m_jam_note;
 
+    gui::button_theme(gui::BT_JAM);
     for (int y = 0; y < (int) heights.size(); ++y) {
         for (int x = 0; x < (int) widths.size(); ++x) {
             if (x) gui::same_line();
 
+            gui::min_item_size({ widths[x], heights[y] });
+            gui::Box box = gui::padding({});
             Vec c = gui::cursor();
-            gui::Box box = gui::padding({ widths[x], heights[y] });
+            gui::cursor(box.pos);
 
             int note = x + (7 - y) * 12 + 1;
             int index = 1;
@@ -41,12 +44,11 @@ void draw_jam_view() {
                 index = 2;
             }
 
+            gui::dumb_button(index);
             gui::cursor(c);
-            gui::min_item_size(box.size);
-            gui::jam(index);
         }
-        gui::cursor({ 0, gui::cursor().y });
     }
+    gui::button_theme(gui::BT_NORMAL);
 
     if (gui::touch().just_released()) {
         m_jam_note = 0;

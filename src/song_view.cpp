@@ -24,17 +24,28 @@ void draw_song_view() {
     gui::padding({ widths[0], BUTTON_SMALL });
     gui::same_line();
     gui::separator();
-    gui::same_line();
-    char str[] = "VOICE .";
     for (int c = 0; c < CHANNEL_COUNT; ++c) {
-        str[6] = '0' + c;
-        gui::min_item_size({ widths[c + 2], BUTTON_SMALL });
+        gui::same_line();
+        Vec c1 = gui::cursor();
+        int w = widths[c + 2];
+        gui::min_item_size({ w, BUTTON_SMALL });
         bool a = player::is_channel_active(c);
+        const char* str = a ? "" : "MUTED";
         if (gui::button(str, a)) {
             player::set_channel_active(c, !a);
         }
-        gui::same_line();
+        if (a) {
+
+            int ww = (w - 2) * player::channel_level(c) / 2;
+
+            Vec c2 = gui::cursor();
+            gui::cursor(c1 + Vec(w / 2 - ww, 1));
+            gui::min_item_size({ ww * 2, BUTTON_SMALL - 2 });
+            gui::dumb_button(2);
+            gui::cursor(c2);
+        }
     }
+    gui::same_line();
     gui::separator();
     gui::padding({ BUTTON_SMALL, 0 });
     gui::separator();
@@ -46,7 +57,7 @@ void draw_song_view() {
             gui::SEPARATOR_WIDTH - BUTTON_BIG - gui::SEPARATOR_WIDTH - BUTTON_BAR;
     int page_length = free_space / BUTTON_SMALL;
 
-    int max_scroll = std::max<int>(0, song.table_length + 1 - page_length);
+    int max_scroll = std::max<int>(0, song.table_length - page_length);
     m_song_scroll = std::min(m_song_scroll, max_scroll);
 
 
@@ -55,9 +66,10 @@ void draw_song_view() {
     int player_block = player::block();
     for (int i = 0; i < page_length; ++i) {
         int block_nr = m_song_scroll + i;
-        if (block_nr == player_block) gui::highlight(gui::H_CURSOR);
-        else gui::no_highlight();
+        if (block_nr == player_block) gui::button_theme(gui::BT_CURSOR);
+        else gui::button_theme(gui::BT_NORMAL);
 
+        char str[4];
         snprintf(str, 3, "%02X", block_nr);
         gui::min_item_size({ widths[0], BUTTON_SMALL });
         if (gui::button(str, block_nr == m_block)) {
@@ -78,7 +90,6 @@ void draw_song_view() {
             Song::Block& block = table[block_nr];
             for (int c = 0; c < CHANNEL_COUNT; ++c) {
                 gui::same_line();
-                char str[3];
                 sprint_track_id(str, block[c]);
                 gui::min_item_size({ widths[c + 2], BUTTON_SMALL });
                 if (gui::button(str)) {
@@ -96,13 +107,15 @@ void draw_song_view() {
         gui::next_line();
 
     }
-    gui::no_highlight();
+    gui::button_theme(gui::BT_NORMAL);
 
     // song scrollbar
     Vec c2 = gui::cursor();
     gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
     gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
+    gui::drag_theme(gui::DT_SCROLLBAR);
     gui::vertical_drag_int(m_song_scroll, 0, max_scroll, page_length);
+    gui::drag_theme(gui::DT_NORMAL);
     gui::cursor(c2);
 
     gui::min_item_size({ edit::screen_size().x, 0 });
@@ -135,6 +148,13 @@ void draw_song_view() {
     }
     gui::same_line();
     if (gui::button(gui::I_ADD_ROW_BELOW)) {
+        if (m_block < song.table_length && song.table_length < MAX_SONG_LENGTH) {
+            std::rotate(
+                table.begin() + m_block + 1,
+                table.begin() + song.table_length,
+                table.begin() + song.table_length + 1);
+            ++song.table_length;
+        }
     }
 
 

@@ -83,7 +83,7 @@ void draw() {
 
 
     // top bar
-    gui::button_style(gui::BS_TAB);
+    gui::button_theme(gui::BT_TAB);
     for (int i = 0; i < (int) views.size(); ++i) {
         if (i) gui::same_line();
         gui::min_item_size({ widths[i], BUTTON_BAR });
@@ -109,7 +109,7 @@ void draw() {
             }
         }
     }
-    gui::button_style(gui::BS_NORMAL);
+    gui::button_theme(gui::BT_NORMAL);
     gui::min_item_size();
     gui::separator();
 

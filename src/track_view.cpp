@@ -105,9 +105,8 @@ void draw_track_select() {
             char str[3] = "  ";
             sprint_track_id(str, n);
 
-            if (!m_empty_tracks[n - 1]) gui::highlight(gui::H_NORMAL);
-            else gui::no_highlight();
-
+            if (!m_empty_tracks[n - 1]) gui::button_theme(gui::BT_HIGHLIGHT);
+            else gui::button_theme(gui::BT_NORMAL);
             if (gui::button(str, n == track_nr)) {
                 *m_track_select_value = n;
                 edit::set_popup(nullptr);
@@ -227,6 +226,7 @@ void draw_track_view() {
 
 
     // clavier slider
+    gui::drag_theme(gui::DT_SCROLLBAR);
     gui::min_item_size({ edit::screen_size().x, SCROLLBAR_WIDTH });
     gui::drag_int("", "", m_clavier_offset, 0, 96 - gui::CLAVIER_WIDTH, gui::CLAVIER_WIDTH);
     gui::separator();
@@ -247,9 +247,9 @@ void draw_track_view() {
         }
 
         // hightlight
-        if (row_nr == player_row) gui::highlight(gui::H_CURSOR);
-        else if (row_nr % 4 == 0) gui::highlight(gui::H_NORMAL);
-        else gui::no_highlight();
+        if (row_nr == player_row) gui::button_theme(gui::BT_CURSOR);
+        else if (row_nr % 4 == 0) gui::button_theme(gui::BT_HIGHLIGHT);
+        else                      gui::button_theme(gui::BT_NORMAL);
 
         Track::Row& row = track.rows[row_nr];
 
@@ -315,13 +315,14 @@ void draw_track_view() {
         gui::separator();
         gui::next_line();
     }
-    gui::no_highlight();
+    gui::button_theme(gui::BT_NORMAL);
 
     // track pages
     Vec c2 = gui::cursor();
     gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
     gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
     gui::vertical_drag_int(m_track_scroll, 0, max_scroll, page_length);
+    gui::drag_theme(gui::DT_NORMAL);
     gui::cursor(c2);
     gui::separator();
 }

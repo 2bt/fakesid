@@ -26,9 +26,8 @@ void draw_instrument_select() {
 
             Vec c1 = gui::cursor();
             gui::min_item_size({ widths[x], BUTTON_SMALL });
-            if (inst.length > 0 || inst.filter.length > 0) gui::highlight(gui::H_NORMAL);
-            else gui::no_highlight();
-
+            if (inst.length > 0 || inst.filter.length > 0) gui::button_theme(gui::BT_HIGHLIGHT);
+            else gui::button_theme(gui::BT_NORMAL);
             if (gui::button("", nr == selected_instrument())) {
                 edit::set_popup(nullptr);
                 select_instrument(nr);
@@ -51,7 +50,7 @@ void draw_instrument_select() {
         }
         gui::next_line();
     }
-    gui::no_highlight();
+    gui::button_theme(gui::BT_NORMAL);
 }
 // XXX: this is a copy of instrument_select with s/instrument/effect/g :(
 void draw_effect_select() {
@@ -71,8 +70,8 @@ void draw_effect_select() {
 
             Vec c1 = gui::cursor();
             gui::min_item_size({ widths[x], BUTTON_SMALL });
-            if (effect.length > 0) gui::highlight(gui::H_NORMAL);
-            else gui::no_highlight();
+            if (effect.length > 0) gui::button_theme(gui::BT_HIGHLIGHT);
+            else gui::button_theme(gui::BT_NORMAL);
 
             if (gui::button("", nr == selected_effect())) {
                 edit::set_popup(nullptr);
@@ -96,7 +95,7 @@ void draw_effect_select() {
         }
         gui::next_line();
     }
-    gui::no_highlight();
+    gui::button_theme(gui::BT_NORMAL);
 }
 
 
@@ -145,17 +144,16 @@ void draw_instrument_view() {
     // wave/filter switch
     widths = calculate_column_widths({ -1, -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::button_style(gui::BS_TAB);
-    if (inst.length > 0) gui::highlight(gui::H_NORMAL);
+    if (inst.length > 0) gui::button_theme(gui::BT_TAB_HIGHLIGHT);
+    else gui::button_theme(gui::BT_TAB);
     if (gui::button("WAVE", !m_filter_mode)) m_filter_mode = false;
     gui::same_line();
     gui::min_item_size({ widths[1], BUTTON_BIG });
-    if (inst.filter.length > 0) gui::highlight(gui::H_NORMAL);
-    else gui::no_highlight();
+    if (inst.filter.length > 0) gui::button_theme(gui::BT_TAB_HIGHLIGHT);
+    else gui::button_theme(gui::BT_TAB);
     if (gui::button("FILTER", m_filter_mode)) m_filter_mode = true;
-    gui::no_highlight();
+    gui::button_theme(gui::BT_NORMAL);
     gui::separator();
-    gui::button_style(gui::BS_NORMAL);
 
 
     if (!m_filter_mode) {
@@ -193,10 +191,7 @@ void draw_instrument_view() {
             gui::same_line();
             gui::separator();
             if (i >= inst.length) {
-                gui::padding({ 467, 0 });
-                gui::same_line();
-                gui::separator();
-                gui::padding({});
+                gui::next_line();
                 continue;
             }
             auto& row = inst.rows[i];

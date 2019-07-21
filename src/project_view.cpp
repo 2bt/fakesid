@@ -454,7 +454,9 @@ void draw_project_view() {
     Vec c2 = gui::cursor();
     gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
     gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
+    gui::drag_theme(gui::DT_SCROLLBAR);
     gui::vertical_drag_int(m_file_scroll, 0, max_scroll, PAGE_LENGTH);
+    gui::drag_theme(gui::DT_NORMAL);
     gui::cursor(c2);
     gui::separator();
 

@@ -27,13 +27,6 @@ namespace gui {
 
 
     enum Align { A_CENTER, A_LEFT, A_RIGHT };
-    enum ButtonStyle {
-        BS_NORMAL,
-        BS_ROUND,
-        BS_TAB,
-        BS_FRAME,
-        BS_JAM,
-    };
 
     enum Icon {
         I_LOOP,
@@ -57,11 +50,19 @@ namespace gui {
         I_DELETE_ROW,
     };
 
-    enum Highlight {
-        H_NONE   = 0,
-        H_NORMAL = 1,
-        H_CURSOR = 2,
+    enum EDragTheme {
+        DT_NORMAL,
+        DT_SCROLLBAR,
     };
+    enum EButtonTheme {
+        BT_NORMAL,
+        BT_HIGHLIGHT,
+        BT_CURSOR,
+        BT_TAB,
+        BT_TAB_HIGHLIGHT,
+        BT_JAM,
+    };
+
 
     Vec  cursor();
     void cursor(Vec const& c);
@@ -69,14 +70,11 @@ namespace gui {
     void same_line();
     void next_line();
     void align(Align a);
-    void button_style(ButtonStyle s = BS_NORMAL);
     void min_item_size(Vec const& s = {});
     void begin_frame();
     Box  padding(Vec const& size);
     void separator();
     void text(char const* fmt, ...);
-    void highlight(Highlight highlight);
-    inline void no_highlight() { highlight(H_NONE); }
     bool button(char const* label, bool active = false);
     bool button(Icon icon, bool active = false);
     bool hold();
@@ -84,7 +82,7 @@ namespace gui {
     bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page = 0);
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
     bool clavier(uint8_t& n, int offset);
-    void jam(int index);
+    void dumb_button(int state);
 
     template<class T>
     bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 0) {
@@ -113,5 +111,7 @@ namespace gui {
     void free();
     void render(gfx::RenderTarget* rt);
 
+    void button_theme(EButtonTheme bt);
+    void drag_theme(EDragTheme bt);
 }
 

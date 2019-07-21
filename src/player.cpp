@@ -430,11 +430,11 @@ void  block(int b) {
 }
 bool  block_loop() { return m_block_loop; }
 void  block_loop(bool b) { m_block_loop = b; }
+float channel_level(int c) { return m_channels[c].level / float(0xffffff); }
 bool  is_channel_active(int c) { return m_channels[c].active; }
 void  set_channel_active(int c, bool a) { m_channels[c].active = a; }
 void  jam(Track::Row const& row) { m_jam_row = row; }
 Song& song() { return m_song; }
 bool  is_playing() { return m_is_playing; }
-
 
 } // namespace;

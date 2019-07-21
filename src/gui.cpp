@@ -22,36 +22,107 @@ namespace color {
         };
     }
 
-    const Color button_normal     = make(0x505050);
-    const Color button_active     = make(0x55a049);
-    const Color button_hover      = make(0x94e089);
-
     const Color input_text_background = make(0x222222);
-    const Color input_text_normal = make(0x505050);
-    const Color input_text_hover  = button_hover;
-    const Color input_text_active = button_active;
-
-    const Color drag              = make(0x222222);
-    const Color handle_normal     = button_active;
-    const Color handle_active     = button_hover;
-
-    const Color separator         = make(0x222222);
-
-    const Color highlight[] = {
-        {},
-        make(0x556688),
-        make(0x998855),
-    };
-
-
-    const Color note_normal       = handle_normal;
-    const Color note_active       = handle_active;
+    const Color input_text_normal     = make(0x505050);
+    const Color input_text_hover      = make(0x94e089);
+    const Color input_text_active     = make(0x55a049);
+    const Color separator             = make(0x222222);
 
 } // namespace
 
 
 namespace {
 
+
+enum ButtonStyle {
+    BS_NORMAL,
+    BS_ROUND,
+    BS_TAB,
+    BS_FRAME,
+    BS_JAM,
+};
+
+
+struct ButtonTheme {
+    ButtonStyle button_style;
+    Color       color_normal;
+    Color       color_active;
+    Color       color_hover;
+};
+
+
+struct DragTheme {
+    ButtonStyle handle_style;
+    Color       background_color;
+    Color       handle_normal_color;
+    Color       handle_active_color;
+};
+
+const ButtonTheme BUTTON_THEMES[] = {
+    // normal
+    {
+        BS_NORMAL,
+        color::make(0x505050),
+        color::make(0x55a049),
+        color::make(0x94e089),
+    },
+    // highlight
+    {
+        BS_NORMAL,
+        color::make(0x556688),
+        color::make(0x55a049),
+        color::make(0x94e089),
+    },
+    // cursor
+    {
+        BS_NORMAL,
+        color::make(0x998855),
+        color::make(0x55a049),
+        color::make(0x94e089),
+    },
+    // tab
+    {
+        BS_TAB,
+        color::make(0x505050),
+        color::make(0x55a049),
+        color::make(0x94e089),
+    },
+    // tab highlight
+    {
+        BS_TAB,
+        color::make(0x556688),
+        color::make(0x55a049),
+        color::make(0x94e089),
+    },
+    // jam
+    {
+        BS_JAM,
+        color::make(0x222222),
+        color::make(0x333333),
+        color::make(0x998855),
+    },
+};
+
+
+const DragTheme DRAG_THEMES[] = {
+    // normal
+    {
+        BS_ROUND,
+        color::make(0x222222),
+        color::make(0x55a049),
+        color::make(0x94e089),
+    },
+    // scrollbar
+    {
+        BS_ROUND,
+        color::make(0x222222),
+        color::make(0x505050),
+        color::make(0x94e089),
+    },
+};
+
+ButtonTheme const* m_button_theme = &BUTTON_THEMES[BT_NORMAL];
+DragTheme const*   m_drag_theme   = &DRAG_THEMES[DT_NORMAL];
 
 Vec text_size(char const* str) {
     Vec size = { 0, FONT_HEIGHT };
@@ -77,6 +148,10 @@ public:
         int o = 64;
         if (size.x < 16 || size.y < 16) {
             s = 4;
+            o += 16;
+        }
+        if (size.x < 8 || size.y < 8) {
+            s = 1;
             o += 16;
         }
 
@@ -147,16 +222,14 @@ Vec         m_min_item_size;
 
 int         m_hold_count;
 bool        m_hold;
-Highlight   m_highlight;
 bool        m_same_line;
 void const* m_id;
 void const* m_active_item;
 char*       m_input_text_str = nullptr;
 int         m_input_text_len;
 int         m_input_text_pos;
-int         m_input_cursor_blink = 0;
-Align       m_align        = A_CENTER;
-ButtonStyle m_button_style = BS_NORMAL;
+int         m_input_cursor_blink;
+Align       m_align = A_CENTER;
 
 
 DrawContext     m_dc;
@@ -258,14 +331,6 @@ void align(Align a) {
     m_align = a;
 }
 
-void highlight(Highlight highlight) {
-    m_highlight = highlight;
-}
-
-void button_style(ButtonStyle s) {
-    m_button_style = s;
-}
-
 void min_item_size(Vec const& s) {
     m_min_item_size = s;
 }
@@ -323,10 +388,10 @@ void text(char const* fmt, ...) {
 static bool button_helper(Box const& box, bool active) {
     enum { HOLD_TIME = 10 };
     m_hold = false;
-    Color color = color::button_normal;
+    Color c = m_button_theme->color_normal;
     bool clicked = false;
     if (m_active_item == nullptr && m_touch.box_touched(box)) {
-        color = color::button_hover;
+        c = m_button_theme->color_hover;
         if (box.contains(m_touch.prev_pos)) {
             if (++m_hold_count > HOLD_TIME) m_hold = true;
         }
@@ -334,10 +399,9 @@ static bool button_helper(Box const& box, bool active) {
         if (m_touch.just_released()) clicked = true;
     }
     else {
-        if (active) color = color::button_active;
-        else if (m_highlight) color = color::highlight[m_highlight];
+        if (active) c = m_button_theme->color_active;
     }
-    m_dc.rect(box.pos, box.size, color, m_button_style);
+    m_dc.rect(box.pos, box.size, c, m_button_theme->button_style);
     return clicked;
 }
 
@@ -422,6 +486,33 @@ void input_text(char* str, int len) {
 }
 
 
+template <int axis = 0>
+bool foo(Box const& box, int& value, int min, int max, int page) {
+    int size = axis == 0 ? box.size.x : box.size.y;
+    int range = max - min;
+
+    int handle_w = std::max(10, size * page / (range + page));
+    int w = size - handle_w;
+
+    void const* id = get_id(&value);
+    if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
+        m_active_item = id;
+    }
+    int old_value = value;
+    if (m_active_item == id && range > 0) {
+        Vec tp = m_touch.pos - box.pos;
+        int touch_pos = axis == 0 ? tp.x : tp.y;
+        int x = touch_pos - handle_w / 2 + w / range / 2;
+        value = glm::clamp(min + x * range / w, min, max);
+    }
+
+    int handle_pos = range == 0 ? 0 : (value - min) * w / range;
+
+    return value != old_value;
+}
+
+
+
 bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page) {
     Vec s1 = text_size(label);
     print_to_text_buffer(fmt, value);
@@ -433,7 +524,6 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
     int range = max - min;
     int handle_w = std::max(10, box.size.x * page / (range + page));
     int w = box.size.x - handle_w;
-    int handle_x = range == 0 ? 0 : (value - min) * w / range;
 
     void const* id = get_id(&value);
     if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
@@ -444,10 +534,12 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
         int x = m_touch.pos.x - box.pos.x - handle_w / 2 + w / range / 2;
         value = glm::clamp(min + x * range / w, min, max);
     }
+    int handle_x = range == 0 ? 0 : (value - min) * w / range;
 
-    m_dc.rect(box.pos, box.size, color::drag);
-    Color c = m_active_item == id ? color::handle_active : color::handle_normal;
-    m_dc.rect(box.pos + Vec(handle_x, 0), Vec(handle_w, box.size.y), c, BS_ROUND);
+    m_dc.rect(box.pos, box.size, m_drag_theme->background_color);
+    Color c = m_drag_theme->handle_normal_color;
+    if (m_active_item == id) c = m_drag_theme->handle_active_color;
+    m_dc.rect(box.pos + Vec(handle_x, 0), Vec(handle_w, box.size.y), c, m_drag_theme->handle_style);
 
     m_dc.text(box.pos + Vec(5, box.size.y / 2 - s1.y / 2), label);
     m_dc.text(box.pos + Vec(box.size.x - s2.x - 5, box.size.y / 2 - s2.y / 2), m_text_buffer.data());
@@ -458,9 +550,8 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
 bool vertical_drag_int(int& value, int min, int max, int page) {
     Box box = item_box({});
     int range = max - min;
-    int handle_h = box.size.y * page / (range + page);
-    int h = box.size.y - handle_h;
-    int handle_y = range == 0 ? 0 : (value - min) * (box.size.y - handle_h) / range;
+    int handle_w = box.size.y * page / (range + page);
+    int w = box.size.y - handle_w;
 
     void const* id = get_id(&value);
     if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
@@ -468,13 +559,15 @@ bool vertical_drag_int(int& value, int min, int max, int page) {
     }
     int old_value = value;
     if (m_active_item == id && range > 0) {
-        int y = m_touch.pos.y - box.pos.y - handle_h / 2 + h / range / 2;
-        value = glm::clamp(min + y * range / h, min, max);
+        int y = m_touch.pos.y - box.pos.y - handle_w / 2 + w / range / 2;
+        value = glm::clamp(min + y * range / w, min, max);
     }
+    int handle_y = range == 0 ? 0 : (value - min) * w / range;
 
-    m_dc.rect(box.pos, box.size, color::drag);
-    Color c = m_active_item == id ? color::handle_active : color::handle_normal;
-    m_dc.rect(box.pos + Vec(0, handle_y), Vec(box.size.x, handle_h), c, BS_ROUND);
+    m_dc.rect(box.pos, box.size, m_drag_theme->background_color);
+    Color c = m_drag_theme->handle_normal_color;
+    if (m_active_item == id) c = m_drag_theme->handle_active_color;
+    m_dc.rect(box.pos + Vec(0, handle_y), Vec(box.size.x, handle_w), c, m_drag_theme->handle_style);
 
     return value != old_value;
 }
@@ -511,12 +604,16 @@ bool clavier(uint8_t& n, int offset) {
         Color color = color::make(0x222222);
         if ((i + offset) % 12 == 0) color = color::make(0x333333);
         if ((1 << (i + offset) % 12) & 0b010101001010) color = color::make(0x111111);
-        if (m_highlight) color = color::mix(color, color::highlight[m_highlight], 0.1);
+
+        if (m_button_theme != &BUTTON_THEMES[BT_NORMAL]) {
+            color = color::mix(color, m_button_theme->color_normal, 0.1);
+        }
+
         m_dc.rect(b.pos, b.size, color);
 
         if (n == nn) {
-            if (m_active_item == id && touch) color = color::note_active;
-            else color = color::note_normal;
+            if (m_active_item == id && touch) color = DRAG_THEMES[DT_NORMAL].handle_active_color;
+            else color = DRAG_THEMES[DT_NORMAL].handle_normal_color;
             m_dc.rect(b.pos, b.size, color, BS_ROUND);
         }
 
@@ -525,15 +622,26 @@ bool clavier(uint8_t& n, int offset) {
     return n != old_n;
 }
 
-void jam(int index) {
-    static const Color colors[] = {
-        color::make(0x222222),
-        color::make(0x333333),
-        color::highlight[H_CURSOR],
-    };
-    Box box = item_box({});
-    m_dc.rect(box.pos, box.size, colors[index], BS_JAM);
+
+void dumb_button(int state) {
+    Vec size = m_min_item_size;
+    Vec pos;
+    if (m_same_line) {
+        pos = Vec(m_cursor_max.x, m_cursor_min.y);
+        if (m_cursor_max.y - m_cursor_min.y > size.y) {
+            pos.y += (m_cursor_max.y - m_cursor_min.y - size.y) / 2;
+        }
+    }
+    else {
+        pos = Vec(m_cursor_min.x, m_cursor_max.y);
+    }
+    Color c;
+    if (state == 0) c = m_button_theme->color_normal;
+    if (state == 1) c = m_button_theme->color_active;
+    if (state == 2) c = m_button_theme->color_hover;
+    m_dc.rect(pos, size, c, m_button_theme->button_style);
 }
+
 
 void init() {
     m_texture = android::load_texture("gui.png");
@@ -556,6 +664,15 @@ void render(gfx::RenderTarget* rt) {
     m_touch.prev_pos     = m_touch.pos;
     m_touch.prev_pressed = m_touch.pressed;
 }
+
+void button_theme(EButtonTheme bt) {
+    m_button_theme = &BUTTON_THEMES[bt];
+}
+
+void drag_theme(EDragTheme bt) {
+    m_drag_theme = &DRAG_THEMES[bt];
+}
+
 
 
 } // namespace
