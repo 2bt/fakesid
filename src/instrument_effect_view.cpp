@@ -26,7 +26,7 @@ void draw_instrument_select() {
 
             Vec c1 = gui::cursor();
             gui::min_item_size({ widths[x], BUTTON_SMALL });
-            if (inst.length > 0) gui::highlight(gui::H_NORMAL);
+            if (inst.length > 0 || inst.filter.length > 0) gui::highlight(gui::H_NORMAL);
             else gui::no_highlight();
 
             if (gui::button("", nr == selected_instrument())) {
@@ -146,10 +146,14 @@ void draw_instrument_view() {
     widths = calculate_column_widths({ -1, -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::button_style(gui::BS_TAB);
+    if (inst.length > 0) gui::highlight(gui::H_NORMAL);
     if (gui::button("WAVE", !m_filter_mode)) m_filter_mode = false;
     gui::same_line();
     gui::min_item_size({ widths[1], BUTTON_BIG });
+    if (inst.filter.length > 0) gui::highlight(gui::H_NORMAL);
+    else gui::no_highlight();
     if (gui::button("FILTER", m_filter_mode)) m_filter_mode = true;
+    gui::no_highlight();
     gui::separator();
     gui::button_style(gui::BS_NORMAL);
 
@@ -237,7 +241,7 @@ void draw_instrument_view() {
         gui::same_line();
         gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
         if (gui::button("+") && inst.length < MAX_INSTRUMENT_LENGTH) {
-            inst.rows[inst.length] = { Instrument::F_GATE, Instrument::OP_INC, 0 };
+            inst.rows[inst.length] = {};
             ++inst.length;
         }
     }
@@ -316,7 +320,7 @@ void draw_instrument_view() {
         gui::same_line();
         gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
         if (gui::button("+") && filter.length < MAX_FILTER_LENGTH) {
-            filter.rows[filter.length] = { 0, 0xf, Filter::OP_SET, 0 };
+            filter.rows[filter.length] = {};
             ++filter.length;
         }
     }

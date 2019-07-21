@@ -10,6 +10,8 @@ void init_song(Song& song) {
     song.track_length = 32;
     song.table_length = 1;
     song.table[0][0] = 1;
+    song.tracks[0].rows[0] = { 1, 1, 49 };
+    song.tracks[0].rows[1] = { 0, 0, 255 };
 
 
     // preset some instruments/effects
@@ -28,7 +30,6 @@ void init_song(Song& song) {
         i.rows[1] = { Instrument::F_GATE | Instrument::F_PULSE, Instrument::OP_INC, 3 };
         i.length = 2;
         i.loop = 1;
-        i.hard_restart = true;
         Effect& e = song.effects[0];
         strcpy(e.name.data(), "LEAD");
         e.rows[0] = { Effect::OP_ABSOLUTE, 70 };

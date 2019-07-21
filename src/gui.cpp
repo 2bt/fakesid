@@ -39,7 +39,7 @@ namespace color {
 
     const Color highlight[] = {
         {},
-        make(0x555577),
+        make(0x556688),
         make(0x998855),
     };
 
@@ -527,8 +527,8 @@ bool clavier(uint8_t& n, int offset) {
 
 void jam(int index) {
     static const Color colors[] = {
-        color::make(0x111111),
         color::make(0x222222),
+        color::make(0x333333),
         color::highlight[H_CURSOR],
     };
     Box box = item_box({});

@@ -40,10 +40,10 @@ struct Filter {
         OP_DEC,
     };
     struct Row {
-        uint8_t type;
-        uint8_t resonance;
-        uint8_t operation;
-        uint8_t value;
+        uint8_t type      = FILTER_LOW;
+        uint8_t resonance = 15;
+        uint8_t operation = OP_SET;
+        uint8_t value     = 10;
     };
 
     uint8_t                            routing;
@@ -68,14 +68,14 @@ struct Instrument {
         OP_SET,
     };
     struct Row {
-        uint8_t flags;
-        uint8_t operation;
-        uint8_t value;
+        uint8_t flags     = F_GATE | F_PULSE;
+        uint8_t operation = OP_SET;
+        uint8_t value     = 16;
     };
 
     std::array<char, MAX_NAME_LENGTH>      name;
-    std::array<uint8_t, 4>                 adsr;
-    uint8_t                                hard_restart;
+    std::array<uint8_t, 4>                 adsr         = { 0, 0, 12, 3 };
+    uint8_t                                hard_restart = true;
 
     uint8_t                                length;
     uint8_t                                loop;
