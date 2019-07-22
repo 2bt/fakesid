@@ -258,7 +258,7 @@ void const* get_id(void const* addr) {
 }
 
 
-Box item_box(Vec const& s) {
+Box item_box(Vec const& s = {}) {
     Vec pos;
     Vec size = glm::max(s, m_min_item_size);
     if (m_same_line) {
@@ -423,6 +423,22 @@ bool button(Icon icon, bool active) {
     return clicked;
 }
 
+bool channel_button(bool active, float level) {
+    Box box = item_box();
+    bool clicked = button_helper(box, active);
+    if (!active) {
+        char const* label = "MUTED";
+        Vec s = text_size(label);
+        m_dc.text(print_pos(box, s), label);
+    }
+    else {
+        int w = (box.size.x - 9) / 4 * level;
+        w = std::max(0, (w + 1) / 2 * 2 - 1) * 2;
+        m_dc.copy(box.pos + Vec(box.size.x / 2 - w + 1, 5), {w * 2, box.size.y - 11}, {0, 144}, {w, 1});
+    }
+    return clicked;
+}
+
 
 bool hold() {
     if (m_hold) m_active_item = (void const*) -1;
@@ -548,7 +564,7 @@ bool drag_int(char const* label, char const* fmt, int& value, int min, int max, 
 }
 
 bool vertical_drag_int(int& value, int min, int max, int page) {
-    Box box = item_box({});
+    Box box = item_box();
     int range = max - min;
     int handle_w = box.size.y * page / (range + page);
     int w = box.size.y - handle_w;

@@ -5,6 +5,7 @@
 #include "foo.hpp"
 #include <algorithm>
 
+
 namespace {
 
 int  m_song_scroll = 0;
@@ -26,23 +27,11 @@ void draw_song_view() {
     gui::separator();
     for (int c = 0; c < CHANNEL_COUNT; ++c) {
         gui::same_line();
-        Vec c1 = gui::cursor();
-        int w = widths[c + 2];
-        gui::min_item_size({ w, BUTTON_SMALL });
-        bool a = player::is_channel_active(c);
-        const char* str = a ? "" : "MUTED";
-        if (gui::button(str, a)) {
+        gui::min_item_size({ widths[c + 2], BUTTON_SMALL });
+        bool  a = player::is_channel_active(c);
+        float l = player::channel_level(c);
+        if (gui::channel_button(a, l)) {
             player::set_channel_active(c, !a);
-        }
-        if (a) {
-
-            int ww = (w - 2) * player::channel_level(c) / 2;
-
-            Vec c2 = gui::cursor();
-            gui::cursor(c1 + Vec(w / 2 - ww, 1));
-            gui::min_item_size({ ww * 2, BUTTON_SMALL - 2 });
-            gui::dumb_button(2);
-            gui::cursor(c2);
         }
     }
     gui::same_line();

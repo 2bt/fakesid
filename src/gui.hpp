@@ -83,6 +83,7 @@ namespace gui {
     bool vertical_drag_int(int& value, int min, int max, int page = 1);
     bool clavier(uint8_t& n, int offset);
     void dumb_button(int state);
+    bool channel_button(bool active, float level);
 
     template<class T>
     bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 0) {
