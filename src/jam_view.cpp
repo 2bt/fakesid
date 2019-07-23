@@ -6,6 +6,7 @@
 namespace {
 
 uint8_t m_jam_note;
+bool    m_jam_gate;
 
 } // namespace
 
@@ -24,7 +25,9 @@ void draw_jam_view() {
     auto heights = calculate_column_widths(std::vector<int>(8, -1), y2 - y1);
 
 
-    int prev_note = m_jam_note;
+    bool prev_gate = m_jam_gate;
+    int  prev_note = m_jam_note;
+    if (!gui::touch().pressed) m_jam_gate = false;
 
     gui::button_theme(gui::BT_JAM);
     for (int y = 0; y < (int) heights.size(); ++y) {
@@ -39,9 +42,14 @@ void draw_jam_view() {
             int note = x + (7 - y) * 12 + 1;
             int index = 1;
             if ((1 << x) & 0b010101001010) index = 0;
+
+
             if (gui::touch().pressed && box.contains(gui::touch().pos)) {
+                if (gui::touch().just_pressed()) {
+                    m_jam_gate = true;
+                }
                 m_jam_note = note;
-                index = 2;
+                if (m_jam_gate) index = 2;
             }
 
             gui::dumb_button(index);
@@ -50,14 +58,16 @@ void draw_jam_view() {
     }
     gui::button_theme(gui::BT_NORMAL);
 
-    if (gui::touch().just_released()) {
+    // release
+    if (prev_gate && !m_jam_gate) {
         m_jam_note = 0;
         player::jam({ 0, 0, 255 });
     }
-    else if (m_jam_note && m_jam_note != prev_note) {
-        Track::Row row = { 0, 0, m_jam_note };
 
-        if (gui::touch().just_pressed()) {
+    // new note
+    if (m_jam_gate && (!prev_gate || m_jam_note != prev_note)) {
+        Track::Row row = { 0, 0, m_jam_note };
+        if (!prev_gate) {
             row.instrument = selected_instrument();
             row.effect     = selected_effect();
         }
