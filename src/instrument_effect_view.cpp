@@ -231,7 +231,7 @@ void draw_instrument_view() {
 
         gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
         if (gui::button(gui::I_DELETE_ROW)) {
-            if (inst.loop < inst.rows.size()) {
+            if (inst.loop < inst.length) {
                 inst.rows[inst.loop] = {};
                 std::rotate(
                     inst.rows.begin() + inst.loop,
@@ -345,7 +345,7 @@ void draw_instrument_view() {
 
         gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
         if (gui::button(gui::I_DELETE_ROW)) {
-            if (filter.loop < filter.rows.size()) {
+            if (filter.loop < filter.length) {
                 std::rotate(
                     filter.rows.begin() + filter.loop,
                     filter.rows.begin() + filter.loop + 1,
@@ -473,7 +473,7 @@ void draw_effect_view() {
 
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
     if (gui::button(gui::I_DELETE_ROW)) {
-        if (effect.loop < effect.rows.size()) {
+        if (effect.loop < effect.length) {
             effect.rows[effect.loop] = {};
             std::rotate(
                 effect.rows.begin() + effect.loop,
