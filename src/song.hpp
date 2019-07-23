@@ -92,8 +92,8 @@ struct Effect {
         OP_DETUNE,
     };
     struct Row {
-        uint8_t operation;
-        uint8_t value;
+        uint8_t operation = OP_RELATIVE;
+        uint8_t value     = 0x30;
     };
     std::array<char, MAX_NAME_LENGTH>  name;
     uint8_t                            length;

@@ -1,6 +1,7 @@
 #include "track_view.hpp"
 #include "player.hpp"
 #include "edit.hpp"
+#include <algorithm>
 
 
 namespace {
@@ -187,7 +188,9 @@ void draw_instrument_view() {
             snprintf(str, 2, "%X", i);
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
 
-            if (gui::button(str, i == inst.loop)) inst.loop = i;
+            if (i >= inst.length) gui::text(str);
+            else if (gui::button(str, i == inst.loop)) inst.loop = i;
+
             gui::same_line();
             gui::separator();
             if (i >= inst.length) {
@@ -226,19 +229,52 @@ void draw_instrument_view() {
         gui::min_item_size({ edit::screen_size().x, 0 });
         gui::separator();
 
-
         gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-        if (gui::button("-")) {
-            if (inst.length > 0) {
+        if (gui::button(gui::I_DELETE_ROW)) {
+            if (inst.loop < inst.rows.size()) {
+                inst.rows[inst.loop] = {};
+                std::rotate(
+                    inst.rows.begin() + inst.loop,
+                    inst.rows.begin() + inst.loop + 1,
+                    inst.rows.begin() + inst.length);
                 --inst.length;
+                if (inst.loop > 0 && inst.loop == inst.length) --inst.loop;
             }
         }
         gui::same_line();
-        gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-        if (gui::button("+") && inst.length < MAX_INSTRUMENT_LENGTH) {
-            inst.rows[inst.length] = {};
-            ++inst.length;
+        if (gui::button(gui::I_ADD_ROW_ABOVE)) {
+            if (inst.length == 0) {
+                inst.rows[0] = {};
+                inst.length = 1;
+                inst.loop = 0;
+            }
+            else if (inst.loop <= inst.length && inst.length < inst.rows.size()) {
+                inst.rows[inst.length] = {};
+                std::rotate(
+                    inst.rows.begin() + inst.loop,
+                    inst.rows.begin() + inst.length,
+                    inst.rows.begin() + inst.length + 1);
+                ++inst.length;
+                ++inst.loop;
+            }
         }
+        gui::same_line();
+        if (gui::button(gui::I_ADD_ROW_BELOW)) {
+            if (inst.length == 0) {
+                inst.rows[0] = {};
+                inst.length = 1;
+                inst.loop = 0;
+            }
+            else if (inst.loop < inst.length && inst.length < inst.rows.size()) {
+                inst.rows[inst.length] = {};
+                std::rotate(
+                    inst.rows.begin() + inst.loop + 1,
+                    inst.rows.begin() + inst.length,
+                    inst.rows.begin() + inst.length + 1);
+                ++inst.length;
+            }
+        }
+
     }
     else {
         // filter table
@@ -259,7 +295,9 @@ void draw_instrument_view() {
             snprintf(str, 2, "%X", i);
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
 
-            if (gui::button(str, i == filter.loop)) filter.loop = i;
+            if (i >= filter.length) gui::text(str);
+            else if (gui::button(str, i == filter.loop)) filter.loop = i;
+
             gui::same_line();
             gui::separator();
             if (i >= filter.length) {
@@ -305,19 +343,51 @@ void draw_instrument_view() {
         gui::min_item_size({ edit::screen_size().x, 0 });
         gui::separator();
 
-
         gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-        if (gui::button("-")) {
-            if (filter.length > 0) {
+        if (gui::button(gui::I_DELETE_ROW)) {
+            if (filter.loop < filter.rows.size()) {
+                std::rotate(
+                    filter.rows.begin() + filter.loop,
+                    filter.rows.begin() + filter.loop + 1,
+                    filter.rows.begin() + filter.length);
                 --filter.length;
+                if (filter.loop > 0 && filter.loop == filter.length) --filter.loop;
             }
         }
         gui::same_line();
-        gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
-        if (gui::button("+") && filter.length < MAX_FILTER_LENGTH) {
-            filter.rows[filter.length] = {};
-            ++filter.length;
+        if (gui::button(gui::I_ADD_ROW_ABOVE)) {
+            if (filter.length == 0) {
+                filter.rows[0] = {};
+                filter.length = 1;
+                filter.loop = 0;
+            }
+            else if (filter.loop <= filter.length && filter.length < filter.rows.size()) {
+                filter.rows[filter.length] = {};
+                std::rotate(
+                    filter.rows.begin() + filter.loop,
+                    filter.rows.begin() + filter.length,
+                    filter.rows.begin() + filter.length + 1);
+                ++filter.length;
+                ++filter.loop;
+            }
         }
+        gui::same_line();
+        if (gui::button(gui::I_ADD_ROW_BELOW)) {
+            if (filter.length == 0) {
+                filter.rows[0] = {};
+                filter.length = 1;
+                filter.loop = 0;
+            }
+            else if (filter.loop < filter.length && filter.length < filter.rows.size()) {
+                filter.rows[filter.length] = {};
+                std::rotate(
+                    filter.rows.begin() + filter.loop + 1,
+                    filter.rows.begin() + filter.length,
+                    filter.rows.begin() + filter.length + 1);
+                ++filter.length;
+            }
+        }
+
     }
     gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
@@ -359,7 +429,9 @@ void draw_effect_view() {
         snprintf(str, 2, "%X", i);
         gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
 
-        if (gui::button(str, i == effect.loop)) effect.loop = i;
+        if (i >= effect.length) gui::text(str);
+        else if (gui::button(str, i == effect.loop)) effect.loop = i;
+
         gui::same_line();
         gui::separator();
         if (i >= effect.length) {
@@ -399,19 +471,53 @@ void draw_effect_view() {
     gui::separator();
 
 
-    widths = calculate_column_widths({ BUTTON_BIG, BUTTON_BIG, -1, -1 });
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    if (gui::button("-")) {
-        if (effect.length > 0) {
+    gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
+    if (gui::button(gui::I_DELETE_ROW)) {
+        if (effect.loop < effect.rows.size()) {
+            effect.rows[effect.loop] = {};
+            std::rotate(
+                effect.rows.begin() + effect.loop,
+                effect.rows.begin() + effect.loop + 1,
+                effect.rows.begin() + effect.length);
             --effect.length;
+            if (effect.loop > 0 && effect.loop == effect.length) --effect.loop;
         }
     }
     gui::same_line();
-    gui::min_item_size({ widths[1], BUTTON_BIG });
-    if (gui::button("+") && effect.length < MAX_EFFECT_LENGTH) {
-        effect.rows[effect.length] = { Effect::OP_RELATIVE, 0x30 };
-        ++effect.length;
+    if (gui::button(gui::I_ADD_ROW_ABOVE)) {
+        if (effect.length == 0) {
+            effect.rows[0] = {};
+            effect.length = 1;
+            effect.loop = 0;
+        }
+        else if (effect.loop <= effect.length && effect.length < effect.rows.size()) {
+            effect.rows[effect.length] = {};
+            std::rotate(
+                effect.rows.begin() + effect.loop,
+                effect.rows.begin() + effect.length,
+                effect.rows.begin() + effect.length + 1);
+            ++effect.length;
+            ++effect.loop;
+        }
     }
+    gui::same_line();
+    if (gui::button(gui::I_ADD_ROW_BELOW)) {
+        if (effect.length == 0) {
+            effect.rows[0] = {};
+            effect.length = 1;
+            effect.loop = 0;
+        }
+        else if (effect.loop < effect.length && effect.length < effect.rows.size()) {
+            effect.rows[effect.length] = {};
+            std::rotate(
+                effect.rows.begin() + effect.loop + 1,
+                effect.rows.begin() + effect.length,
+                effect.rows.begin() + effect.length + 1);
+            ++effect.length;
+        }
+    }
+
+
     gui::min_item_size({ edit::screen_size().x, 0 });
     gui::separator();
 }

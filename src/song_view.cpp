@@ -61,12 +61,16 @@ void draw_song_view() {
         char str[4];
         snprintf(str, 3, "%02X", block_nr);
         gui::min_item_size({ widths[0], BUTTON_SMALL });
-        if (gui::button(str, block_nr == m_block)) {
+
+        if (block_nr >= song.table_length) gui::text(str);
+        else if (gui::button(str, block_nr == m_block)) {
             m_block = block_nr;
             if (!player::is_playing()) player::block(m_block);
         }
         gui::same_line();
         gui::separator();
+
+
         if (block_nr >= song.table_length) {
             for (int c = 0; c < CHANNEL_COUNT; ++c) {
                 gui::same_line();
@@ -123,6 +127,7 @@ void draw_song_view() {
                 table.begin() + m_block + 1,
                 table.begin() + song.table_length);
             --song.table_length;
+            if (m_block == song.table_length) --m_block;
         }
     }
     gui::same_line();
@@ -133,6 +138,7 @@ void draw_song_view() {
                 table.begin() + song.table_length,
                 table.begin() + song.table_length + 1);
             ++song.table_length;
+            ++m_block;
         }
     }
     gui::same_line();
