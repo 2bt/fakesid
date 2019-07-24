@@ -192,8 +192,15 @@ void draw_effect_cache() {
 
 
 void draw_track_view() {
+    Song& song = player::song();
+    Track& track = song.tracks[m_track - 1];
 
-    auto widths = calculate_column_widths({ BUTTON_BIG, -1, BUTTON_BIG, BUTTON_BIG });
+
+    // cache
+    draw_instrument_cache();
+    gui::separator();
+    draw_effect_cache();
+    gui::separator();
 
     // track select
     char str[3];
@@ -202,12 +209,8 @@ void draw_track_view() {
     if (gui::button(str)) enter_track_select();
     gui::same_line();
 
-
-    assert(m_track > 0);
-    Song& song = player::song();
-    Track& track = song.tracks[m_track - 1];
-
     gui::same_line();
+    auto widths = calculate_column_widths({ BUTTON_BIG, -1, BUTTON_BIG, BUTTON_BIG });
     gui::padding({ widths[1], 0 });
 
     // copy & paste
@@ -217,13 +220,6 @@ void draw_track_view() {
     if (gui::button(gui::I_PASTE)) track = m_copy_track;
     gui::min_item_size();
     gui::separator();
-
-    // cache
-    draw_instrument_cache();
-    gui::separator();
-    draw_effect_cache();
-    gui::separator();
-
 
     // clavier slider
     gui::drag_theme(gui::DT_SCROLLBAR);
