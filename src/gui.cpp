@@ -22,11 +22,11 @@ namespace color {
         };
     }
 
-    const Color input_text_background = make(0x222222);
+    const Color input_text_background = make(0x333333);
     const Color input_text_normal     = make(0x505050);
     const Color input_text_hover      = make(0x94e089);
     const Color input_text_active     = make(0x55a049);
-    const Color separator             = make(0x222222);
+    const Color separator             = make(0x333333);
 
 } // namespace
 
@@ -108,14 +108,14 @@ const DragTheme DRAG_THEMES[] = {
     // normal
     {
         BS_ROUND,
-        color::make(0x222222),
+        color::make(0x333333),
         color::make(0x55a049),
         color::make(0x94e089),
     },
     // scrollbar
     {
         BS_ROUND,
-        color::make(0x222222),
+        color::make(0x333333),
         color::make(0x505050),
         color::make(0x94e089),
     },

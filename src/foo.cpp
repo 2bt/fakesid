@@ -59,7 +59,7 @@ bool start_audio() {
         return false;
     }
 
-//    s_stream->setBufferSizeInFrames(s_stream->getFramesPerBurst() * 2);
+    //s_stream->setBufferSizeInFrames(s_stream->getFramesPerBurst() * 2);
 
     auto rate = s_stream->getSampleRate();
     if (rate != MIXRATE) {
