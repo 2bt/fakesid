@@ -18,6 +18,8 @@ namespace {
 
 Vec   m_screen_size;
 EView m_view;
+int   m_tick;
+int   m_last_fast_backward_tick;
 void (*m_popup_func)(void);
 
 
@@ -121,11 +123,21 @@ void draw() {
 
     // bottom bar
     gui::cursor({ 0, m_screen_size.y  - BUTTON_BAR });
-    bool block_loop = player::block_loop();
-    widths = calculate_column_widths({ -1, -1, -1 });
+    widths = calculate_column_widths({ -1, -1, -1, BUTTON_BAR * 2 });
+
+
+    gui::min_item_size({ BUTTON_BAR , BUTTON_BAR });
+    ++m_tick;
+    if (gui::button(gui::I_FAST_BACKWARD)) {
+        int step = !player::is_playing() || (m_tick - m_last_fast_backward_tick < 30);
+        player::block(player::block() - step);
+        m_last_fast_backward_tick = m_tick;
+    }
 
     // loop
+    gui::same_line();
     gui::min_item_size({ widths[0], BUTTON_BAR });
+    bool block_loop = player::block_loop();
     if (gui::button(gui::I_LOOP, block_loop)) player::block_loop(!block_loop);
 
     // stop
@@ -133,7 +145,6 @@ void draw() {
     gui::min_item_size({ widths[1], BUTTON_BAR });
     if (gui::button(gui::I_STOP)) {
         player::set_playing(false);
-        player::reset();
         player::block(get_selected_block());
     }
 
@@ -142,6 +153,12 @@ void draw() {
     gui::min_item_size({ widths[2], BUTTON_BAR });
     if (gui::button(gui::I_PLAY, player::is_playing())) {
         player::set_playing(!player::is_playing());
+    }
+
+    gui::same_line();
+    gui::min_item_size({ BUTTON_BAR , BUTTON_BAR });
+    if (gui::button(gui::I_FAST_FORWARD)) {
+        player::block(player::block() + 1);
     }
 
 }

@@ -434,7 +434,7 @@ bool channel_button(bool active, float level) {
     else {
         int w = (box.size.x - 9) / 4 * level;
         w = std::max(0, (w + 1) / 2 * 2 - 1) * 2;
-        m_dc.copy(box.pos + Vec(box.size.x / 2 - w + 1, 5), {w * 2, box.size.y - 11}, {0, 144}, {w, 1});
+        m_dc.copy(box.pos + Vec(box.size.x / 2 - w + 1, 5), {w * 2, box.size.y - 11}, {0, 0}, {w, 1});
     }
     return clicked;
 }

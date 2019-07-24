@@ -11,7 +11,6 @@ enum {
 
 namespace player {
     void  fill_buffer(short* buffer, int length);
-    void  reset();
     void  set_playing(bool p);
     bool  is_playing();
     int   row();

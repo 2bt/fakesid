@@ -130,7 +130,9 @@ void tick() {
     // row_update
     if (m_is_playing && m_frame == 0) {
         int block_nr = m_block;
-        if (block_nr >= m_song.table_length) block_nr = 0;
+        if (block_nr >= m_song.table_length) {
+            m_block = block_nr = 0;
+        }
         Song::Block const& block = m_song.table[block_nr];
 
         for (int c = 0; c < CHANNEL_COUNT; ++c) {
@@ -396,21 +398,6 @@ void fill_buffer(short* buffer, int length) {
     }
 }
 
-
-void reset() {
-    m_sample = 0;
-    m_frame = 0;
-    m_row = 0;
-    m_block = 0;
-    m_filter = {};
-    for (Channel& chan : m_channels) {
-        bool a = chan.active;
-        chan = {};
-        chan.active = a;
-    }
-}
-
-
 void set_playing(bool p) {
     m_is_playing = p;
     if (!m_is_playing) {
@@ -426,7 +413,17 @@ void set_playing(bool p) {
 int   row() { return m_row; }
 int   block() { return m_block; }
 void  block(int b) {
-    m_block = std::min(b, (int) m_song.table_length - 1);
+    m_block = std::max(0, std::min(b, (int) m_song.table_length - 1));
+
+    m_sample = 0;
+    m_frame = 0;
+    m_row = 0;
+    m_filter = {};
+    for (Channel& chan : m_channels) {
+        bool a = chan.active;
+        chan = {};
+        chan.active = a;
+    }
 }
 bool  block_loop() { return m_block_loop; }
 void  block_loop(bool b) { m_block_loop = b; }

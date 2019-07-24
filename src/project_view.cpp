@@ -297,6 +297,10 @@ void draw_confirmation() {
             status("SONG WAS RESET");
             break;
         case CT_LOAD:
+            android::stop_audio();
+            player::set_playing(false);
+            player::block(0);
+            android::start_audio();
             if (!load_song(player::song(), path.c_str())) status("Load error: ?");
             else status("SONG WAS LOADED");
             break;
