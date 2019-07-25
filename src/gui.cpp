@@ -501,34 +501,6 @@ void input_text(char* str, int len) {
     }
 }
 
-
-template <int axis = 0>
-bool foo(Box const& box, int& value, int min, int max, int page) {
-    int size = axis == 0 ? box.size.x : box.size.y;
-    int range = max - min;
-
-    int handle_w = std::max(10, size * page / (range + page));
-    int w = size - handle_w;
-
-    void const* id = get_id(&value);
-    if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
-        m_active_item = id;
-    }
-    int old_value = value;
-    if (m_active_item == id && range > 0) {
-        Vec tp = m_touch.pos - box.pos;
-        int touch_pos = axis == 0 ? tp.x : tp.y;
-        int x = touch_pos - handle_w / 2 + w / range / 2;
-        value = glm::clamp(min + x * range / w, min, max);
-    }
-
-    int handle_pos = range == 0 ? 0 : (value - min) * w / range;
-
-    return value != old_value;
-}
-
-
-
 bool drag_int(char const* label, char const* fmt, int& value, int min, int max, int page) {
     Vec s1 = text_size(label);
     print_to_text_buffer(fmt, value);

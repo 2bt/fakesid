@@ -7,40 +7,14 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
-//#include <sndfile.h>
+#include <sndfile.h>
+#include <pthread.h>
 
 
 #define FILE_SUFFIX ".sng"
 
 
-
 namespace {
-
-/*
-sf_count_t get_filelen(void* user_data) {
-    return SDL_RWsize((SDL_RWops*) user_data);
-}
-
-sf_count_t seek(sf_count_t offset, int whence, void* user_data) {
-    int w = whence == SEEK_CUR ? RW_SEEK_CUR
-          : whence == SEEK_SET ? RW_SEEK_SET
-                               : RW_SEEK_END;
-    return SDL_RWseek((SDL_RWops*) user_data, offset, w);
-}
-
-sf_count_t read(void* ptr, sf_count_t count, void* user_data) {
-    return SDL_RWread((SDL_RWops*) user_data, ptr, 1, count);
-}
-
-sf_count_t write(const void* ptr, sf_count_t count, void* user_data) {
-    return SDL_RWwrite((SDL_RWops*) user_data, ptr, 1, count);
-}
-
-sf_count_t tell(void* user_data) {
-    return SDL_RWtell((SDL_RWops*) user_data);
-}
-*/
-
 
 int                      m_file_scroll;
 std::array<char, 28>     m_file_name;
@@ -106,43 +80,39 @@ ExportFormat m_export_format = EF_OGG;
 bool         m_export_canceled;
 bool         m_export_done;
 float        m_export_progress;
-//SDL_Thread*  m_export_thread;
-//SDL_RWops*   m_export_file;
-//SNDFILE*     m_export_sndfile;
+pthread_t    m_export_thread;
+SNDFILE*     m_export_sndfile;
 
 
-int export_thread_func(void*) {
+void* export_thread_func(void*) {
 
-//    Song& song = player::song();
-//    static std::array<short, 1024> buffer;
+    Song& song = player::song();
+    static std::array<short, 1024> buffer;
 
-//    int frames = (song.track_length * song.tempo + song.track_length / 2 * song.swing) * song.table_length;
-//    const int samples = frames * SAMPLES_PER_FRAME;
-//    int samples_left = samples;
+    int frames = (song.track_length * song.tempo + song.track_length / 2 * song.swing) * song.table_length;
+    const int samples = frames * SAMPLES_PER_FRAME;
+    int samples_left = samples;
 
-//    player::block_loop(false);
-//    player::set_playing(true);
-//    player::reset();
+    player::block(0);
+    player::block_loop(false);
+    player::set_playing(true);
 
-//    while (samples_left > 0 && !m_export_canceled) {
-//        int len = std::min<int>(samples_left, buffer.size());
-//        samples_left -= len;
-//        player::fill_buffer(buffer.data(), len);
-//        sf_writef_short(m_export_sndfile, buffer.data(), len);
-//        m_export_progress = float(samples - samples_left) / samples;
-//    }
+    while (samples_left > 0 && !m_export_canceled) {
+        int len = std::min<int>(samples_left, buffer.size());
+        samples_left -= len;
+        player::fill_buffer(buffer.data(), len);
+        sf_writef_short(m_export_sndfile, buffer.data(), len);
+        m_export_progress = float(samples - samples_left) / samples;
+    }
 
-//    sf_close(m_export_sndfile);
-//    SDL_RWclose(m_export_file);
-//    m_export_sndfile = nullptr;
-//    m_export_file    = nullptr;
+    sf_close(m_export_sndfile);
+    m_export_sndfile = nullptr;
 
-//    player::set_playing(false);
-//    player::reset();
+    player::set_playing(false);
+    player::block(0);
 
-//    m_export_done = true;
-
-    return 0;
+    m_export_done = true;
+    return nullptr;
 }
 
 
@@ -155,10 +125,10 @@ void draw_export_progress() {
     gui::text("%3d %%", int(m_export_progress * 100));
 
     if (m_export_done) {
-        int ret;
-//        SDL_WaitThread(m_export_thread, &ret);
+        pthread_join(m_export_thread, nullptr);
         edit::set_popup(nullptr);
-//        SDL_PauseAudio(0);
+        android::start_audio();
+
         if (m_export_canceled) status("SONG EXPORT WAS CANCELED");
         else status("SONG WAS EXPORTED");
     }
@@ -167,75 +137,67 @@ void draw_export_progress() {
 
 bool open_export_file(std::string const& name) {
 
-//    SF_INFO info = { 0, MIXRATE, 1 };
-//    std::string path = m_exports_dir + name;
-//    if (m_export_format == EF_OGG) {
-//        info.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
-//        path += ".ogg";
-//    }
-//    else {
-//        info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-//        path += ".wav";
-//    }
+    SF_INFO info = { 0, MIXRATE, 1 };
+    std::string path = m_exports_dir + name;
+    if (m_export_format == EF_OGG) {
+        info.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
+        path += ".ogg";
+    }
+    else {
+        info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+        path += ".wav";
+    }
 
-//    m_export_file = SDL_RWFromFile(path.c_str(), "wb");
-//    if (!m_export_file) return false;
-
-//    SF_VIRTUAL_IO vio = {
-//        get_filelen,
-//        seek,
-//        read,
-//        write,
-//        tell,
-//    };
-
-//    m_export_sndfile = sf_open_virtual(&vio, SFM_WRITE, &info, m_export_file);
-//    if (!m_export_sndfile) {
-//        SDL_RWclose(m_export_file);
-//        m_export_file = nullptr;
-//        return false;
-//    }
+    m_export_sndfile = sf_open(path.c_str(), SFM_WRITE, &info);
+    if (!m_export_sndfile) {
+        return false;
+    }
 
     // TODO: set quality
     //double quality = 0.8;
     //sf_command(m_export_sndfile, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof(quality));
 
-//    return m_export_sndfile != nullptr;
+    return true;
 }
 
 
 void init_export() {
+    std::string name = m_file_name.data();
+    if (name.empty()) {
+        status("EXPORT ERROR: EMPTY SONG NAME");
+        return;
+    }
 
-//    std::string name = m_file_name.data();
+    if (!open_export_file(name)) {
+        status("EXPORT ERROR: COULDN'T OPEN FILE");
+        return;
+    }
 
-//    if (name.empty()) {
-//        status("Export error: empty song name");
-//        return;
-//    }
-
-//    if (!open_export_file(name)) {
-//        status("Export error: couldn't open file");
-//        return;
-//    }
 
     // stop
-    //TODO: ensure that the callback has exited
-//    SDL_PauseAudio(1);
+    android::stop_audio();
 
-//    // set meta info
-//    Song& song = player::song();
-//    sf_set_string(m_export_sndfile, SF_STR_TITLE, song.title.data());
-//    sf_set_string(m_export_sndfile, SF_STR_ARTIST, song.author.data());
+    // set meta info
+    Song& song = player::song();
+    sf_set_string(m_export_sndfile, SF_STR_TITLE, song.title.data());
+    sf_set_string(m_export_sndfile, SF_STR_ARTIST, song.author.data());
 
-//    // start thread
-//    m_export_canceled = false;
-//    m_export_done     = false;
-//    m_export_progress = 0;
-//    m_export_thread   = SDL_CreateThread(export_thread_func, "song export", nullptr);
+    // start thread
+    m_export_canceled = false;
+    m_export_done     = false;
+    m_export_progress = 0;
+    int res = pthread_create(&m_export_thread, nullptr, export_thread_func, nullptr);
+    if (res != 0) {
+        status("EXPORT ERROR: PTHREAD");
+        // cleanup
+        sf_close(m_export_sndfile);
+        m_export_sndfile = nullptr;
+        android::start_audio();
+        return;
+    }
 
-
-//    // popup
-//    edit::set_popup(draw_export_progress);
+    // popup
+    edit::set_popup(draw_export_progress);
 }
 
 
@@ -301,7 +263,7 @@ void draw_confirmation() {
             player::set_playing(false);
             player::block(0);
             android::start_audio();
-            if (!load_song(player::song(), path.c_str())) status("Load error: ?");
+            if (!load_song(player::song(), path.c_str())) status("LOAD ERROR: ?");
             else status("SONG WAS LOADED");
             break;
         }
@@ -381,12 +343,12 @@ void draw_project_view() {
     gui::text("TITLE");
     gui::same_line();
     gui::min_item_size({ widths[1], BUTTON_BIG });
-    gui::input_text(song.title.data(), song.title.size() - 1);
+    gui::input_text(song.title);
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::text("AUTHOR");
     gui::same_line();
     gui::min_item_size({ widths[1], BUTTON_BIG });
-    gui::input_text(song.author.data(), song.author.size() - 1);
+    gui::input_text(song.author);
 
     // track length
     auto widths2 = calculate_column_widths({ widths[0], -1, -1, -1 });
@@ -426,7 +388,7 @@ void draw_project_view() {
     // name
     widths = calculate_column_widths({ -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::input_text(m_file_name.data(), m_file_name.size() - 1);
+    gui::input_text(m_file_name);
     gui::separator();
 
     // file select

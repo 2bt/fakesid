@@ -87,6 +87,9 @@ namespace gui {
     bool channel_button(bool active, float level);
 
     template<class T>
+    void input_text(T& t) { input_text(t.data(), t.size() - 1); }
+
+    template<class T>
     bool drag_int(char const* label, char const* fmt, T& value, int min, int max, int page = 0) {
         int v = value;
         id(&value);

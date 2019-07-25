@@ -45,7 +45,7 @@ Vec const& screen_size() {
 }
 
 void init() {
-    bool first = true;
+    static bool first = true;
     if (first) first = false;
     else return;
 

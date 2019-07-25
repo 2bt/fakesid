@@ -130,7 +130,7 @@ void draw_instrument_view() {
     auto widths = calculate_column_widths({ -1, BUTTON_BIG, BUTTON_BIG });
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::align(gui::A_LEFT);
-    gui::input_text(inst.name.data(), inst.name.size() - 1);
+    gui::input_text(inst.name);
     gui::align(gui::A_CENTER);
 
     // copy & paste
@@ -408,7 +408,7 @@ void draw_effect_view() {
     auto widths = calculate_column_widths({ -1, BUTTON_BIG, BUTTON_BIG });
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::align(gui::A_LEFT);
-    gui::input_text(effect.name.data(), effect.name.size() - 1);
+    gui::input_text(effect.name);
     gui::align(gui::A_CENTER);
 
     // copy & paste
