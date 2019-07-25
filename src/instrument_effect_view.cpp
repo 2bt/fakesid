@@ -14,6 +14,9 @@ void draw_instrument_select() {
 
     auto widths = calculate_column_widths({ -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::text("SELECT INSTRUMENT");
+
+    gui::min_item_size({ widths[0], BUTTON_BIG });
     if (gui::button("CANCEL")) edit::set_popup(nullptr);
     gui::separator();
 
@@ -57,6 +60,9 @@ void draw_instrument_select() {
 void draw_effect_select() {
 
     auto widths = calculate_column_widths({ -1 });
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::text("SELECT EFFECT");
+
     gui::min_item_size({ widths[0], BUTTON_BIG });
     if (gui::button("CANCEL")) edit::set_popup(nullptr);
     gui::separator();

@@ -73,22 +73,21 @@ uint8_t*                      m_track_select_value;
 
 
 void draw_track_select() {
+    gui::min_item_size({ edit::screen_size().x, BUTTON_BIG });
+    gui::text("SELECT TRACK");
 
     auto widths = m_track_select_allow_nil ? calculate_column_widths({ -1, -1 }) : calculate_column_widths({ -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
     if (gui::button("CANCEL")) {
         edit::set_popup(nullptr);
     }
-    gui::same_line();
     if (m_track_select_allow_nil) {
+        gui::same_line();
         gui::min_item_size({ widths[1], BUTTON_BIG });
         if (gui::button("CLEAR")) {
             edit::set_popup(nullptr);
             *m_track_select_value = 0;
         }
-    }
-    else {
-        gui::padding({});
     }
 
     gui::separator();

@@ -117,11 +117,12 @@ void* export_thread_func(void*) {
 
 
 void draw_export_progress() {
-    auto widths = calculate_column_widths({ -1 });
-    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::min_item_size({ edit::screen_size().x, BUTTON_BIG });
+    gui::text("EXPORTING SONG");
+    gui::min_item_size({ edit::screen_size().x, BUTTON_BIG });
     if (gui::button("CANCEL")) m_export_canceled = true;
 
-    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::min_item_size({ edit::screen_size().x, BUTTON_BIG });
     gui::text("%3d %%", int(m_export_progress * 100));
 
     if (m_export_done) {
