@@ -345,7 +345,7 @@ void draw_project_view() {
     Song& song = player::song();
 
     // title and author
-    auto widths = calculate_column_widths({ 120, -1 });
+    auto widths = calculate_column_widths({ -1, -3 });
     gui::align(gui::A_LEFT);
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::text("TITLE");
@@ -360,28 +360,6 @@ void draw_project_view() {
 
 //    // track length
     auto widths2 = calculate_column_widths({ widths[0], -1, -1, -1 });
-//    gui::min_item_size({ widths[0], BUTTON_BIG });
-//    gui::text("TRACK LENGTH");
-//    gui::same_line();
-//    gui::align(gui::A_CENTER);
-//    gui::min_item_size({ widths2[1], BUTTON_BIG });
-//    if (gui::button("16", song.track_length == 16)) song.track_length = 16;
-//    gui::same_line();
-//    gui::min_item_size({ widths2[2], BUTTON_BIG });
-//    if (gui::button("24", song.track_length == 24)) song.track_length = 24;
-//    gui::same_line();
-//    gui::min_item_size({ widths2[3], BUTTON_BIG });
-//    if (gui::button("32", song.track_length == 32)) song.track_length = 32;
-//    gui::align(gui::A_LEFT);
-
-//    // length
-//    gui::min_item_size({ widths[0], BUTTON_BIG });
-//    gui::text("SONG LENGTH");
-//    gui::same_line();
-//    gui::min_item_size({ widths[1], BUTTON_BIG });
-//    int frames = (song.track_length * song.tempo + song.track_length / 2 * song.swing) * song.table_length;
-//    int seconds = frames / FRAMES_PER_SECOND;
-//    gui::text("%02d:%02d", seconds / 60, seconds % 60);
 
 //    // tempo and swing
 //    widths = calculate_column_widths({ -13, -9 });

@@ -100,7 +100,7 @@ void draw_track_select() {
             if (x > 0) gui::same_line();
             int n = x * 21 + y + 1;
 
-            gui::min_item_size({ widths[x], BUTTON_SMALL });
+            gui::min_item_size({ widths[x], BUTTON_SMALL + 5 });
             char str[3] = "  ";
             sprint_track_id(str, n);
 
@@ -202,18 +202,25 @@ void draw_track_view() {
     gui::separator();
 
     // track select
+    auto widths = calculate_column_widths({ -1, BUTTON_BIG * 5 + gui::SEPARATOR_WIDTH * 2});
     char str[3];
     sprint_track_id(str, m_track);
-    gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
+    gui::min_item_size({ widths[0], BUTTON_BIG });
     if (gui::button(str)) enter_track_select();
     gui::same_line();
+    gui::separator();
 
+    gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
+    if (gui::button("<")) track.length = std::max(1, track.length - 1);
     gui::same_line();
-    auto widths = calculate_column_widths({ BUTTON_BIG, -1, BUTTON_BIG, BUTTON_BIG });
-    gui::padding({ widths[1], 0 });
+    gui::text("%d", track.length);
+    gui::same_line();
+    if (gui::button(">")) track.length = std::min<int>(MAX_TRACK_LENGTH, track.length + 1);
+    gui::same_line();
+    gui::separator();
 
     // copy & paste
-    gui::same_line();
+    gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
     if (gui::button(gui::I_COPY)) m_copy_track = track;
     gui::same_line();
     if (gui::button(gui::I_PASTE)) track = m_copy_track;

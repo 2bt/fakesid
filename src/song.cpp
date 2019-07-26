@@ -4,7 +4,6 @@
 
 
 void init_song(Song& song) {
-    //memset(&song, 0, sizeof(song));
     song = {};
 
     song.table[0].tempo = 8;
@@ -15,7 +14,6 @@ void init_song(Song& song) {
 
 
     // preset some instruments/effects
-
     enum {
         GLIDE_UP = 46,
         VIBRATO  = 47,

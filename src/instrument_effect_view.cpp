@@ -22,6 +22,8 @@ void draw_instrument_select() {
 
     Song& song = player::song();
 
+    const int H = BUTTON_SMALL + 2;
+
     widths = calculate_column_widths({ -1, -1 });
     for (int y = 0; y < INSTRUMENT_COUNT / 2; ++y) {
         for (int x = 0; x < 2; ++x) {
@@ -29,7 +31,7 @@ void draw_instrument_select() {
             Instrument const& inst = song.instruments[nr - 1];
 
             Vec c1 = gui::cursor();
-            gui::min_item_size({ widths[x], BUTTON_SMALL });
+            gui::min_item_size({ widths[x], H });
             if (inst.length > 0 || inst.filter.length > 0) gui::button_theme(gui::BT_HIGHLIGHT);
             else gui::button_theme(gui::BT_NORMAL);
             if (gui::button("", nr == selected_instrument())) {
@@ -40,12 +42,12 @@ void draw_instrument_select() {
             gui::same_line();
             Vec c2 = gui::cursor();
             gui::cursor(c1);
-            gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
+            gui::min_item_size({ BUTTON_SMALL, H });
             char str[2];
             sprint_inst_effect_id(str, nr);
             gui::text(str);
             gui::same_line();
-            gui::min_item_size({ widths[x] - BUTTON_SMALL, BUTTON_SMALL });
+            gui::min_item_size({ widths[x] - BUTTON_SMALL, H });
             gui::align(gui::A_LEFT);
             gui::text(inst.name.data());
             gui::align(gui::A_CENTER);
@@ -69,6 +71,8 @@ void draw_effect_select() {
 
     Song& song = player::song();
 
+    const int H = BUTTON_SMALL + 2;
+
     widths = calculate_column_widths({ -1, -1 });
     for (int y = 0; y < EFFECT_COUNT / 2; ++y) {
         for (int x = 0; x < 2; ++x) {
@@ -76,7 +80,7 @@ void draw_effect_select() {
             Effect const& effect = song.effects[nr - 1];
 
             Vec c1 = gui::cursor();
-            gui::min_item_size({ widths[x], BUTTON_SMALL });
+            gui::min_item_size({ widths[x], H });
             if (effect.length > 0) gui::button_theme(gui::BT_HIGHLIGHT);
             else gui::button_theme(gui::BT_NORMAL);
 
@@ -88,12 +92,12 @@ void draw_effect_select() {
             gui::same_line();
             Vec c2 = gui::cursor();
             gui::cursor(c1);
-            gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
+            gui::min_item_size({ BUTTON_SMALL, H });
             char str[2];
             sprint_inst_effect_id(str, nr);
             gui::text(str);
             gui::same_line();
-            gui::min_item_size({ widths[x] - BUTTON_SMALL, BUTTON_SMALL });
+            gui::min_item_size({ widths[x] - BUTTON_SMALL, H });
             gui::align(gui::A_LEFT);
             gui::text(effect.name.data());
             gui::align(gui::A_CENTER);
@@ -133,7 +137,7 @@ void draw_instrument_view() {
     Instrument& inst = song.instruments[selected_instrument() - 1];
 
     // name
-    auto widths = calculate_column_widths({ -1, BUTTON_BIG, BUTTON_BIG });
+    auto widths = calculate_column_widths({ -1, BUTTON_BIG * 2 + gui::SEPARATOR_WIDTH });
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::align(gui::A_LEFT);
     gui::input_text(inst.name);
@@ -141,6 +145,7 @@ void draw_instrument_view() {
 
     // copy & paste
     gui::same_line();
+    gui::separator();
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
     if (gui::button(gui::I_COPY)) m_copy_inst = inst;
     gui::same_line();
@@ -411,7 +416,7 @@ void draw_effect_view() {
     Effect& effect = song.effects[selected_effect() - 1];
 
     // name
-    auto widths = calculate_column_widths({ -1, BUTTON_BIG, BUTTON_BIG });
+    auto widths = calculate_column_widths({ -1, BUTTON_BIG * 2 + gui::SEPARATOR_WIDTH });
     gui::min_item_size({ widths[0], BUTTON_BIG });
     gui::align(gui::A_LEFT);
     gui::input_text(effect.name);
@@ -419,6 +424,7 @@ void draw_effect_view() {
 
     // copy & paste
     gui::same_line();
+    gui::separator();
     gui::min_item_size({ BUTTON_BIG, BUTTON_BIG });
     if (gui::button(gui::I_COPY)) m_copy_effect = effect;
     gui::same_line();
