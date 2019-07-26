@@ -405,8 +405,12 @@ void fill_buffer(short* buffer, int length) {
 }
 
 void set_playing(bool p) {
-    m_is_playing = p;
-    if (!m_is_playing) {
+    if (p) {
+        m_song.get_block_tempo_and_swing(m_block, m_tempo, m_swing);
+        m_is_playing = true;
+    }
+    else {
+        m_is_playing = false;
         m_filter = {};
         for (Channel& chan : m_channels) {
             chan.gate = false;
