@@ -361,15 +361,6 @@ void draw_project_view() {
 //    // track length
     auto widths2 = calculate_column_widths({ widths[0], -1, -1, -1 });
 
-//    // tempo and swing
-//    widths = calculate_column_widths({ -13, -9 });
-//    gui::min_item_size({ widths[0], BUTTON_SMALL });
-//    gui::drag_int("TEMPO", "%d", song.tempo, 4, 16);
-//    gui::same_line();
-//    gui::min_item_size({ widths[1], BUTTON_SMALL });
-//    gui::drag_int("SWING", "%d", song.swing, 0, 8);
-
-
     gui::separator();
 
     // name

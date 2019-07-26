@@ -118,7 +118,7 @@ struct Song {
 
     void get_block_tempo_and_swing(int block, uint8_t& tempo, uint8_t& swing) const {
         while (block >= 0) {
-            Block const& b = table[block];
+            Block const& b = table[block--];
             if (b.tempo > 0) {
                 tempo = b.tempo;
                 swing = b.swing;

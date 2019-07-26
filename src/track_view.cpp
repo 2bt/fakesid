@@ -203,7 +203,7 @@ void draw_track_view() {
 
     // track select
     auto widths = calculate_column_widths({ -1, BUTTON_BIG * 5 + gui::SEPARATOR_WIDTH * 2});
-    char str[3];
+    char str[16];
     sprint_track_id(str, m_track);
     gui::min_item_size({ widths[0], BUTTON_BIG });
     if (gui::button(str)) enter_track_select();
@@ -254,8 +254,6 @@ void draw_track_view() {
         else                      gui::button_theme(gui::BT_NORMAL);
 
         Track::Row& row = track.rows[row_nr];
-
-        char str[4];
 
         // instrument
         sprint_inst_effect_id(str, row.instrument);
