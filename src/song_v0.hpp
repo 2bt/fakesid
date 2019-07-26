@@ -119,7 +119,4 @@ namespace v0 {
         uint16_t                                 table_length;
     };
 
-    bool load_song(Song& song, char const* name);
-
 } // namespace
-

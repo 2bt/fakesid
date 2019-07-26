@@ -3,6 +3,88 @@
 #include <cstring>
 
 
+namespace  {
+
+
+size_t fread(uint8_t& b, FILE *stream) {
+    return fread(&b, sizeof(uint8_t), 1, stream);
+}
+
+size_t fread(uint16_t& b, FILE *stream) {
+    return fread(&b, sizeof(uint16_t), 1, stream);
+}
+
+template<class T>
+size_t fread(T& t, FILE *stream) {
+    return fread(t.data(), sizeof(t[0]), t.size(), stream);
+}
+
+size_t fwrite(uint8_t const& b, FILE *stream) {
+    return fwrite(&b, sizeof(uint8_t), 1, stream);
+}
+
+size_t fwrite(uint16_t const& b, FILE *stream) {
+    return fwrite(&b, sizeof(uint16_t), 1, stream);
+}
+
+template<class T>
+size_t fwrite(T const& t, FILE *stream) {
+    return fwrite(t.data(), sizeof(t[0]), t.size(), stream);
+}
+
+
+void convert_song(Song& song, v0::Song const& song_v0) {
+    song.title        = song_v0.title;
+    song.author       = song_v0.author;
+    song.table_length = song_v0.table_length;
+    song.instruments  = *(decltype(&song.instruments)) &song_v0.instruments;
+    song.effects      = *(decltype(&song.effects)) &song_v0.effects;
+    for (int i = 0; i < (int) song.tracks.size(); ++i) {
+        song.tracks[i].length = song_v0.track_length;
+        song.tracks[i].rows   = *(decltype(&song.tracks[i].rows)) &song_v0.tracks[i].rows;
+    }
+    for (int i = 0; i < song.table_length; ++i) {
+        song.table[i].tracks = song_v0.table[i];
+        if (i == 0) {
+            song.table[i].tempo = song_v0.tempo;
+            song.table[i].swing = song_v0.swing;
+        }
+        else {
+            song.table[i].tempo = 0;
+            song.table[i].swing = 0;
+        }
+    }
+}
+
+
+} // namespace
+
+
+namespace v0 {
+    bool load_song(Song& song, char const* name) {
+        FILE* file = fopen(name, "rb");
+        if (!file) return false;
+        fread(song.title, file);
+        fread(song.author, file);
+        fread(song.tempo, file);
+        fread(song.swing, file);
+        fread(song.track_length, file);
+        fread(song.tracks, file);
+        fread(song.instruments, file);
+        fread(song.effects, file);
+        fread(song.table_length, file);
+        song.table = {};
+        fread(song.table.data(), sizeof(Song::Block), song.table_length, file);
+        fclose(file);
+        return true;
+    }
+
+} // namespace
+
+
+
+
+
 void init_song(Song& song) {
     song = {};
 
@@ -70,45 +152,52 @@ void init_song(Song& song) {
 }
 
 
-namespace v0 {
-    bool load_song(Song& song, char const* name) {
-        FILE* file = fopen(name, "rb");
-        if (!file) return false;
-        fread(song.title.data(), sizeof(char), song.title.size(), file);
-        fread(song.author.data(), sizeof(char), song.author.size(), file);
-        fread(&song.tempo, sizeof(uint8_t), 1, file);
-        fread(&song.swing, sizeof(uint8_t), 1, file);
-        fread(&song.track_length, sizeof(uint8_t), 1, file);
-        fread(song.tracks.data(), sizeof(Track), song.tracks.size(), file);
-        fread(song.instruments.data(), sizeof(Instrument), song.instruments.size(), file);
-        fread(song.effects.data(), sizeof(Effect), song.effects.size(), file);
-        fread(&song.table_length , sizeof(uint16_t), 1, file);
-        song.table = {};
-        fread(song.table.data(), sizeof(Song::Block), song.table_length, file);
+
+bool load_song(Song& song, char const* name) {
+    FILE* file = fopen(name, "rb");
+    if (!file) return false;
+
+    std::array<char, 4> magic;
+    fread(magic, file);
+    if (magic != std::array<char, 4>{ 'S', 'N', 'G', '\x17' }) {
         fclose(file);
+        // try loading song version 0
+        v0::Song song_v0;
+        if (!v0::load_song(song_v0, name)) return false;
+        convert_song(song, song_v0);
         return true;
     }
 
-} // namespace
+    uint8_t version;
+    fread(version, file);
+    if (version != 1) {
+        fclose(file);
+        return false;
+    }
 
-bool load_song(Song& song, char const* name) {
-    return false;
+    fread(song.title, file);
+    fread(song.author, file);
+    fread(song.tracks, file);
+    fread(song.instruments, file);
+    fread(song.effects, file);
+    fread(song.table_length, file);
+    song.table = {};
+    fread(song.table.data(), sizeof(Song::Block), song.table_length, file);
+    fclose(file);
+    return true;
 }
 
 bool save_song(Song const& song, char const* name) {
-//    FILE* file = fopen(name, "wb");
-//    if (!file) return false;
-//    fwrite(song.title.data(), sizeof(char), song.title.size(), file);
-//    fwrite(song.author.data(), sizeof(char), song.author.size(), file);
-//    fwrite(&song.tempo, sizeof(uint8_t), 1, file);
-//    fwrite(&song.swing, sizeof(uint8_t), 1, file);
-//    fwrite(&song.track_length, sizeof(uint8_t), 1, file);
-//    fwrite(song.tracks.data(), sizeof(Track), song.tracks.size(), file);
-//    fwrite(song.instruments.data(), sizeof(Instrument), song.instruments.size(), file);
-//    fwrite(song.effects.data(), sizeof(Effect), song.effects.size(), file);
-//    fwrite(&song.table_length, sizeof(uint16_t), 1, file);
-//    fwrite(song.table.data(), sizeof(Song::Block), song.table_length, file);
-//    fclose(file);
-//    return true;
-    return false;
+    FILE* file = fopen(name, "wb");
+    if (!file) return false;
+    fwrite("SNG\x17\x01", sizeof(char), 5, file);
+    fwrite(song.title, file);
+    fwrite(song.author, file);
+    fwrite(song.tracks, file);
+    fwrite(song.instruments, file);
+    fwrite(song.effects, file);
+    fwrite(song.table_length, file);
+    fwrite(song.table.data(), sizeof(Song::Block), song.table_length, file);
+    fclose(file);
+    return true;
 }
