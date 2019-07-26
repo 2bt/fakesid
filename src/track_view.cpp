@@ -230,13 +230,13 @@ void draw_track_view() {
     int free_space = edit::screen_size().y - gui::cursor().y - gui::SEPARATOR_WIDTH - BUTTON_BAR;
     int page_length = free_space / BUTTON_SMALL;
 
-    int max_scroll = std::max(0, song.track_length - page_length);
+    int max_scroll = std::max(0, track.length - page_length);
     m_track_scroll = std::min(m_track_scroll, max_scroll);
 
     int player_row = player::row();
     for (int i = 0; i < page_length; ++i) {
         int row_nr = m_track_scroll + i;
-        if (row_nr >= song.track_length) {
+        if (row_nr >= track.length) {
             gui::padding({ 0, BUTTON_SMALL });
             continue;
         }

@@ -83,13 +83,13 @@ void draw_song_view() {
             Song::Block& block = table[block_nr];
             for (int c = 0; c < CHANNEL_COUNT; ++c) {
                 gui::same_line();
-                sprint_track_id(str, block[c]);
+                sprint_track_id(str, block.tracks[c]);
                 gui::min_item_size({ widths[c + 2], BUTTON_SMALL });
                 if (gui::button(str)) {
-                    enter_track_select(block[c]);
+                    enter_track_select(block.tracks[c]);
                 }
-                if (block[c] > 0 && gui::hold()) {
-                    select_track(block[c]);
+                if (block.tracks[c] > 0 && gui::hold()) {
+                    select_track(block.tracks[c]);
                     edit::set_view(VIEW_TRACK);
                 }
             }

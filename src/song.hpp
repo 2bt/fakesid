@@ -16,31 +16,37 @@ enum {
 };
 
 
+
+
+
+
 struct Track {
     struct Row {
         uint8_t instrument;
         uint8_t effect;
         uint8_t note;
     };
+    uint8_t                           length = MAX_TRACK_LENGTH;
     std::array<Row, MAX_TRACK_LENGTH> rows;
 };
 
 
-enum {
-    FILTER_LOW  = 1,
-    FILTER_BAND = 2,
-    FILTER_HIGH = 4,
-};
 
 
 struct Filter {
+    enum {
+        T_LOW  = 1,
+        T_BAND = 2,
+        T_HIGH = 4,
+    };
+
     enum {
         OP_INC,
         OP_SET,
         OP_DEC,
     };
     struct Row {
-        uint8_t type      = FILTER_LOW;
+        uint8_t type      = T_LOW;
         uint8_t resonance = 15;
         uint8_t operation = OP_SET;
         uint8_t value     = 10;
@@ -103,14 +109,35 @@ struct Effect {
 
 
 struct Song {
-    using Block = std::array<uint8_t, CHANNEL_COUNT>;
+
+    uint8_t block_length(int block) const {
+        uint8_t t = table[block].tracks[0];
+        if (t == 0) return MAX_TRACK_LENGTH;
+        return tracks[t - 1].length;
+    }
+
+    void get_block_tempo_and_swing(int block, uint8_t& tempo, uint8_t& swing) const {
+        while (block >= 0) {
+            Block const& b = table[block];
+            if (b.tempo > 0) {
+                tempo = b.tempo;
+                swing = b.swing;
+                return;
+            }
+            tempo = 8;
+            swing = 0;
+        }
+    }
+
+
+    struct Block {
+        std::array<uint8_t, CHANNEL_COUNT> tracks;
+        uint8_t                            tempo;
+        uint8_t                            swing;
+    };
 
     std::array<char, 32>                     title;
     std::array<char, 32>                     author;
-
-    uint8_t tempo; // 4 to F
-    uint8_t swing; // 0 to 4
-    uint8_t track_length;
 
     std::array<Track, TRACK_COUNT>           tracks;
     std::array<Instrument, INSTRUMENT_COUNT> instruments;
@@ -118,6 +145,7 @@ struct Song {
     std::array<Block, MAX_SONG_LENGTH>       table;
     uint16_t                                 table_length;
 };
+
 
 void init_song(Song& song);
 bool load_song(Song& song, char const* name);

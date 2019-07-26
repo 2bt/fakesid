@@ -69,13 +69,16 @@ struct {
 } m_filter;
 
 
-Song m_song;
-bool m_is_playing;
-int  m_sample;
-int  m_frame;
-int  m_row;
-int  m_block;
-bool m_block_loop;
+Song    m_song;
+bool    m_is_playing;
+int     m_sample;
+int     m_frame;
+int     m_row;
+int     m_block;
+bool    m_block_loop;
+uint8_t m_tempo;
+uint8_t m_swing;
+
 std::array<Channel, CHANNEL_COUNT> m_channels;
 Track::Row m_jam_row;
 
@@ -127,17 +130,18 @@ void tick() {
     apply_track_row(m_channels.back(), m_jam_row);
     m_jam_row = {};
 
+    int block_nr = m_block;
+    if (block_nr >= m_song.table_length) {
+        m_block = block_nr = 0;
+    }
+    Song::Block const& block = m_song.table[block_nr];
+
     // row_update
     if (m_is_playing && m_frame == 0) {
-        int block_nr = m_block;
-        if (block_nr >= m_song.table_length) {
-            m_block = block_nr = 0;
-        }
-        Song::Block const& block = m_song.table[block_nr];
 
         for (int c = 0; c < CHANNEL_COUNT; ++c) {
             Channel& chan = m_channels[c];
-            int track_nr = block[c];
+            int track_nr = block.tracks[c];
             if (track_nr == 0) continue;
             Track const& track = m_song.tracks[track_nr - 1];
             apply_track_row(chan, track.rows[m_row]);
@@ -225,16 +229,18 @@ void tick() {
 
     if (!m_is_playing) return;
 
-
-    int frames_per_row = m_song.tempo;
-    if (m_row % 2 == 0) frames_per_row += m_song.swing;
+    if (block.tempo > 0) {
+        m_tempo = block.tempo;
+        m_swing = block.swing;
+    }
+    int frames_per_row = m_tempo + (m_row % 2 == 0 ? m_swing : 0);
 
     // hard restart
     // look two frames into the future
     if (m_frame == frames_per_row - 2) {
         int block_nr = m_block;
         int row_nr   = m_row + 1;
-        if (row_nr >= m_song.track_length) {
+        if (row_nr >= m_song.block_length(block_nr)) {
             row_nr = 0;
             if (!m_block_loop && ++block_nr >= m_song.table_length) {
                 block_nr = 0;
@@ -245,7 +251,7 @@ void tick() {
 
         for (int c = 0; c < CHANNEL_COUNT; ++c) {
             Channel& chan = m_channels[c];
-            int track_nr = block[c];
+            int track_nr = block.tracks[c];
             if (track_nr == 0) continue;
             Track const& track = m_song.tracks[track_nr - 1];
             Track::Row const& row = track.rows[row_nr];
@@ -265,7 +271,7 @@ void tick() {
     // advance
     if (++m_frame >= frames_per_row) {
         m_frame = 0;
-        if (++m_row >= m_song.track_length) {
+        if (++m_row >= m_song.block_length(m_block)) {
             m_row = 0;
             if (!m_block_loop && ++m_block >= m_song.table_length) {
                 m_block = 0;
@@ -373,9 +379,9 @@ void mix(short* buffer, int length) {
         m_filter.band += m_filter.freq * m_filter.high;
         m_filter.low  += m_filter.freq * m_filter.band;
         int f = 0;
-        if (m_filter.type & FILTER_LOW)  f += m_filter.low;
-        if (m_filter.type & FILTER_BAND) f += m_filter.band;
-        if (m_filter.type & FILTER_HIGH) f += m_filter.high;
+        if (m_filter.type & Filter::T_LOW)  f += m_filter.low;
+        if (m_filter.type & Filter::T_BAND) f += m_filter.band;
+        if (m_filter.type & Filter::T_HIGH) f += m_filter.high;
 
         int sample = out[0] + f;
         buffer[i] = std::max(-32768, std::min<int>(sample, 32767));
@@ -414,6 +420,7 @@ int   row() { return m_row; }
 int   block() { return m_block; }
 void  block(int b) {
     m_block = std::max(0, std::min(b, (int) m_song.table_length - 1));
+    m_song.get_block_tempo_and_swing(m_block, m_tempo, m_swing);
 
     m_sample = 0;
     m_frame = 0;

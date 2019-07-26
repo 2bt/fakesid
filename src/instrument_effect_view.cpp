@@ -316,13 +316,13 @@ void draw_instrument_view() {
             // type
             gui::same_line();
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-            if (gui::button(gui::I_LOWPASS, row.type & FILTER_LOW)) row.type ^= FILTER_LOW;
+            if (gui::button(gui::I_LOWPASS, row.type & Filter::T_LOW)) row.type ^= Filter::T_LOW;
             gui::same_line();
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-            if (gui::button(gui::I_BANDPASS, row.type & FILTER_BAND)) row.type ^= FILTER_BAND;
+            if (gui::button(gui::I_BANDPASS, row.type & Filter::T_BAND)) row.type ^= Filter::T_BAND;
             gui::same_line();
             gui::min_item_size({ BUTTON_SMALL, BUTTON_SMALL });
-            if (gui::button(gui::I_HIGHPASS, row.type & FILTER_HIGH)) row.type ^= FILTER_HIGH;
+            if (gui::button(gui::I_HIGHPASS, row.type & Filter::T_HIGH)) row.type ^= Filter::T_HIGH;
 
             // resonance
             gui::same_line();

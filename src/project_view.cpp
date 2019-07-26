@@ -89,7 +89,14 @@ void* export_thread_func(void*) {
     Song& song = player::song();
     static std::array<short, 1024> buffer;
 
-    int frames = (song.track_length * song.tempo + song.track_length / 2 * song.swing) * song.table_length;
+    // count frames of whole song
+    int frames = 0;
+    for (int i = 0; i < song.table_length; ++i) {
+        uint8_t t, s, l = song.block_length(i);
+        song.get_block_tempo_and_swing(i, t, s);
+        frames += l * t + l / 2 * s;
+    }
+
     const int samples = frames * SAMPLES_PER_FRAME;
     int samples_left = samples;
 
@@ -351,40 +358,41 @@ void draw_project_view() {
     gui::min_item_size({ widths[1], BUTTON_BIG });
     gui::input_text(song.author);
 
-    // track length
+//    // track length
     auto widths2 = calculate_column_widths({ widths[0], -1, -1, -1 });
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::text("TRACK LENGTH");
-    gui::same_line();
-    gui::align(gui::A_CENTER);
-    gui::min_item_size({ widths2[1], BUTTON_BIG });
-    if (gui::button("16", song.track_length == 16)) song.track_length = 16;
-    gui::same_line();
-    gui::min_item_size({ widths2[2], BUTTON_BIG });
-    if (gui::button("24", song.track_length == 24)) song.track_length = 24;
-    gui::same_line();
-    gui::min_item_size({ widths2[3], BUTTON_BIG });
-    if (gui::button("32", song.track_length == 32)) song.track_length = 32;
-    gui::align(gui::A_LEFT);
+//    gui::min_item_size({ widths[0], BUTTON_BIG });
+//    gui::text("TRACK LENGTH");
+//    gui::same_line();
+//    gui::align(gui::A_CENTER);
+//    gui::min_item_size({ widths2[1], BUTTON_BIG });
+//    if (gui::button("16", song.track_length == 16)) song.track_length = 16;
+//    gui::same_line();
+//    gui::min_item_size({ widths2[2], BUTTON_BIG });
+//    if (gui::button("24", song.track_length == 24)) song.track_length = 24;
+//    gui::same_line();
+//    gui::min_item_size({ widths2[3], BUTTON_BIG });
+//    if (gui::button("32", song.track_length == 32)) song.track_length = 32;
+//    gui::align(gui::A_LEFT);
 
-    // length
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::text("SONG LENGTH");
-    gui::same_line();
-    gui::min_item_size({ widths[1], BUTTON_BIG });
-    int frames = (song.track_length * song.tempo + song.track_length / 2 * song.swing) * song.table_length;
-    int seconds = frames / FRAMES_PER_SECOND;
-    gui::text("%02d:%02d", seconds / 60, seconds % 60);
+//    // length
+//    gui::min_item_size({ widths[0], BUTTON_BIG });
+//    gui::text("SONG LENGTH");
+//    gui::same_line();
+//    gui::min_item_size({ widths[1], BUTTON_BIG });
+//    int frames = (song.track_length * song.tempo + song.track_length / 2 * song.swing) * song.table_length;
+//    int seconds = frames / FRAMES_PER_SECOND;
+//    gui::text("%02d:%02d", seconds / 60, seconds % 60);
 
-    // tempo and swing
-    widths = calculate_column_widths({ -13, -9 });
-    gui::min_item_size({ widths[0], BUTTON_SMALL });
-    gui::drag_int("TEMPO", "%d", song.tempo, 4, 16);
-    gui::same_line();
-    gui::min_item_size({ widths[1], BUTTON_SMALL });
-    gui::drag_int("SWING", "%d", song.swing, 0, 8);
+//    // tempo and swing
+//    widths = calculate_column_widths({ -13, -9 });
+//    gui::min_item_size({ widths[0], BUTTON_SMALL });
+//    gui::drag_int("TEMPO", "%d", song.tempo, 4, 16);
+//    gui::same_line();
+//    gui::min_item_size({ widths[1], BUTTON_SMALL });
+//    gui::drag_int("SWING", "%d", song.swing, 0, 8);
+
+
     gui::separator();
-
 
     // name
     widths = calculate_column_widths({ -1 });
