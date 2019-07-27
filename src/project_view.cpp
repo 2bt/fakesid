@@ -16,6 +16,13 @@
 
 namespace {
 
+enum SubTab {
+    ST_PROJECT,
+    ST_SETTINGS
+};
+
+SubTab                   m_sub_tab = ST_PROJECT;
+
 int                      m_file_scroll;
 std::array<char, 28>     m_file_name;
 std::vector<std::string> m_file_names;
@@ -314,6 +321,123 @@ void init_confirmation(ConfirmationType t) {
 }
 
 
+void draw_project_tab() {
+    Song& song = player::song();
+
+    // title and author
+    auto widths = calculate_column_widths({ -1, -3 });
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::text("TITLE");
+    gui::same_line();
+    gui::min_item_size({ widths[1], BUTTON_BIG });
+    gui::input_text(song.title);
+
+    gui::separator();
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::text("AUTHOR");
+    gui::same_line();
+    gui::min_item_size({ widths[1], BUTTON_BIG });
+    gui::input_text(song.author);
+
+    gui::separator();
+
+    // file name
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::text("FILE");
+    gui::same_line();
+    gui::min_item_size({ widths[1], BUTTON_BIG });
+    gui::input_text(m_file_name);
+    gui::separator();
+
+    Vec c1 = gui::cursor();
+
+    // file buttons
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    if (gui::button("LOAD")) init_confirmation(CT_LOAD);
+    if (gui::button("SAVE")) init_confirmation(CT_SAVE);
+    if (gui::button("DELETE")) init_confirmation(CT_DELETE);
+    if (gui::button("RESET")) init_confirmation(CT_RESET);
+
+
+    // file select
+    gui::cursor({ widths[0], c1.y });
+    int free_space = edit::screen_size().y - gui::cursor().y - gui::SEPARATOR_WIDTH * 2 - BUTTON_BAR - BUTTON_BIG * 2;
+    int page_length = free_space / BUTTON_SMALL;
+
+
+    int max_scroll = std::max<int>(0, m_file_names.size() - page_length);
+    if (m_file_scroll > max_scroll) m_file_scroll = max_scroll;
+    widths = calculate_column_widths({ widths[0], -1, gui::SEPARATOR_WIDTH + SCROLLBAR_WIDTH });
+
+    gui::align(gui::A_LEFT);
+    for (int i = 0; i < page_length; ++i) {
+        int nr = i + m_file_scroll;
+        gui::min_item_size({});
+        gui::padding({0, BUTTON_SMALL});
+        gui::same_line();
+        gui::separator();
+        gui::min_item_size({ widths[1] - gui::SEPARATOR_WIDTH, BUTTON_SMALL });
+        if (nr < (int) m_file_names.size()) {
+            bool select = strcmp(m_file_names[nr].c_str(), m_file_name.data()) == 0;
+            if (gui::button(m_file_names[nr].c_str(), select)) {
+                strncpy(m_file_name.data(), m_file_names[nr].c_str(), m_file_name.size());
+            }
+        }
+        else {
+            gui::padding({});
+        }
+        gui::same_line();
+        gui::separator();
+        gui::next_line();
+    }
+    gui::align(gui::A_CENTER);
+
+    // scrollbar
+    Vec c2 = gui::cursor();
+    gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
+    gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
+    gui::drag_theme(gui::DT_SCROLLBAR);
+    gui::vertical_drag_int(m_file_scroll, 0, max_scroll, page_length);
+    gui::drag_theme(gui::DT_NORMAL);
+
+    gui::cursor({0, c2.y});
+    gui::separator();
+
+
+    widths = calculate_column_widths({ widths[0], -1, -1, gui::SEPARATOR_WIDTH, -1 });
+
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::text("FORMAT");
+    gui::same_line();
+
+    gui::min_item_size({ widths[1], BUTTON_BIG });
+    if (gui::button("OGG", m_export_format == EF_OGG)) m_export_format = EF_OGG;
+    gui::same_line();
+    gui::min_item_size({ widths[2], BUTTON_BIG });
+    if (gui::button("WAV", m_export_format == EF_WAV)) m_export_format = EF_WAV;
+    gui::same_line();
+    gui::separator();
+
+    gui::min_item_size({ widths[4], BUTTON_BIG });
+    if (gui::button("EXPORT")) init_export();
+    gui::separator();
+
+    // status
+    widths = calculate_column_widths({ -1 });
+    gui::min_item_size({ widths[0], BUTTON_BIG });
+    gui::align(gui::A_LEFT);
+    gui::text(m_status_msg.c_str());
+    gui::align(gui::A_CENTER);
+    if (++m_status_age > 100) m_status_msg = "";
+}
+
+
+void draw_settings_tab() {
+
+
+}
+
+
 } // namespace
 
 
@@ -344,122 +468,24 @@ void init_project_view() {
 }
 
 
+
 void draw_project_view() {
 
-    Song& song = player::song();
-
-    // title and author
-    auto widths = calculate_column_widths({ -1, -3 });
+    // tabs
+    auto widths = calculate_column_widths({ -1, -1 });
     gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::text("TITLE");
+    gui::button_theme(gui::BT_TAB);
+    if (gui::button("PROJECT", m_sub_tab == ST_PROJECT)) m_sub_tab = ST_PROJECT;
     gui::same_line();
     gui::min_item_size({ widths[1], BUTTON_BIG });
-    gui::input_text(song.title);
-
-    gui::separator();
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::text("AUTHOR");
-    gui::same_line();
-    gui::min_item_size({ widths[1], BUTTON_BIG });
-    gui::input_text(song.author);
-
-//    // track length
-    auto widths2 = calculate_column_widths({ widths[0], -1, -1, -1 });
-
+    if (gui::button("SETTINGS", m_sub_tab == ST_SETTINGS)) m_sub_tab = ST_SETTINGS;
+    gui::button_theme(gui::BT_NORMAL);
     gui::separator();
 
-    // file name
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::text("FILE");
-    gui::same_line();
-    gui::min_item_size({ widths[1], BUTTON_BIG });
-    gui::input_text(m_file_name);
-    gui::separator();
-
-    Vec c1 = gui::cursor();
-
-    // file buttons
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    if (gui::button("LOAD")) init_confirmation(CT_LOAD);
-    if (gui::button("SAVE")) init_confirmation(CT_SAVE);
-    if (gui::button("DELETE")) init_confirmation(CT_DELETE);
-    if (gui::button("RESET")) init_confirmation(CT_RESET);
-
-
-
-
-
-    // file select
-    gui::cursor({ widths[0], c1.y });
-    int free_space = edit::screen_size().y - gui::cursor().y - gui::SEPARATOR_WIDTH * 2 - BUTTON_BAR - BUTTON_BIG * 2;
-    int page_length = free_space / BUTTON_SMALL;
-
-
-
-
-    int max_scroll = std::max<int>(0, m_file_names.size() - page_length);
-    if (m_file_scroll > max_scroll) m_file_scroll = max_scroll;
-    widths = calculate_column_widths({ -1, widths[0] + gui::SEPARATOR_WIDTH + SCROLLBAR_WIDTH });
-
-    gui::align(gui::A_LEFT);
-    for (int i = 0; i < page_length; ++i) {
-        int nr = i + m_file_scroll;
-        gui::min_item_size({});
-        gui::padding({0, BUTTON_SMALL});
-        gui::same_line();
-        gui::separator();
-        gui::min_item_size({ widths[0] - gui::SEPARATOR_WIDTH, BUTTON_SMALL });
-        if (nr < (int) m_file_names.size()) {
-            bool select = strcmp(m_file_names[nr].c_str(), m_file_name.data()) == 0;
-            if (gui::button(m_file_names[nr].c_str(), select)) {
-                strncpy(m_file_name.data(), m_file_names[nr].c_str(), m_file_name.size());
-            }
-        }
-        else {
-            gui::padding({});
-        }
-        gui::same_line();
-        gui::separator();
-        gui::next_line();
+    switch (m_sub_tab) {
+    case ST_PROJECT: draw_project_tab(); break;
+    case ST_SETTINGS: draw_settings_tab(); break;
+    default: break;
     }
-    gui::align(gui::A_CENTER);
-
-    // scrollbar
-    Vec c2 = gui::cursor();
-    gui::cursor({ edit::screen_size().x - SCROLLBAR_WIDTH, c1.y });
-    gui::min_item_size({ SCROLLBAR_WIDTH, c2.y - c1.y });
-    gui::drag_theme(gui::DT_SCROLLBAR);
-    gui::vertical_drag_int(m_file_scroll, 0, max_scroll, page_length);
-    gui::drag_theme(gui::DT_NORMAL);
-
-    gui::cursor({0, c2.y});
-    gui::separator();
-
-
-    widths = calculate_column_widths({ widths2[0], -1, -1, gui::SEPARATOR_WIDTH, -1 });
-
-    gui::min_item_size({ widths2[0], BUTTON_BIG });
-    gui::text("FORMAT");
-    gui::same_line();
-
-    gui::min_item_size({ widths[1], BUTTON_BIG });
-    if (gui::button("OGG", m_export_format == EF_OGG)) m_export_format = EF_OGG;
-    gui::same_line();
-    gui::min_item_size({ widths[2], BUTTON_BIG });
-    if (gui::button("WAV", m_export_format == EF_WAV)) m_export_format = EF_WAV;
-    gui::same_line();
-    gui::separator();
-
-    gui::min_item_size({ widths[4], BUTTON_BIG });
-    if (gui::button("EXPORT")) init_export();
-    gui::separator();
-
-    // status
-    widths = calculate_column_widths({ -1 });
-    gui::min_item_size({ widths[0], BUTTON_BIG });
-    gui::align(gui::A_LEFT);
-    gui::text(m_status_msg.c_str());
-    gui::align(gui::A_CENTER);
-    if (++m_status_age > 100) m_status_msg = "";
 }
 
