@@ -4,16 +4,12 @@
 #include "track_view.hpp"
 #include "instrument_effect_view.hpp"
 #include "jam_view.hpp"
-//#include "help_view.hpp"
 #include "player.hpp"
 #include "foo.hpp"
 
 
-
-
 namespace edit {
 namespace {
-
 
 
 Vec   m_screen_size;
@@ -69,17 +65,15 @@ void draw() {
         char const* name;
         void (*draw)(void);
     };
-    constexpr std::array<View, 7> views = {
-        View{ "PROJ",   draw_project_view },
+    constexpr std::array<View, 6> views = {
+        View{ "MAIN",   draw_project_view },
         View{ "SONG",   draw_song_view },
         View{ "TRACK",  draw_track_view },
         View{ "INSTR",  draw_instrument_view },
         View{ "EFFECT", draw_effect_view },
         View{ "JAM",    draw_jam_view },
-        View{ "?",      0 },
     };
-    std::vector<int> weights = std::vector<int>(views.size() - 1, -1);
-    weights.push_back(BUTTON_BIG);
+    std::vector<int> weights = std::vector<int>(views.size(), -1);
 
     auto widths = calculate_column_widths(weights);
 
@@ -115,10 +109,7 @@ void draw() {
     gui::min_item_size();
     gui::separator();
 
-    // XXX
-    if (views[m_view].draw)
     views[m_view].draw();
-
 
 
     // bottom bar

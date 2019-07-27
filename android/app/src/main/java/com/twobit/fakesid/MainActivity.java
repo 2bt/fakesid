@@ -1,6 +1,7 @@
 package com.twobit.fakesid;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.Manifest;
 import android.os.Bundle;
@@ -11,10 +12,15 @@ import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 
+import java.util.prefs.Preferences;
+
 public class MainActivity extends Activity {
     static String TAG = "FOOBAR";
-    static MainActivity sInstance;
+    static MainActivity             sInstance;
+    static SharedPreferences        sPrefs;
+    static SharedPreferences.Editor sPrefEdit;
     MainView mView;
+
 
     static public void showKeyboard() {
         sInstance.runOnUiThread(new Runnable() {
@@ -35,6 +41,26 @@ public class MainActivity extends Activity {
         });
     }
 
+
+    static public boolean loadPrefBool(String name, boolean value) {
+        return sPrefs.getBoolean(name, value);
+    }
+    static public int loadPrefInt(String name, int value) {
+        return sPrefs.getInt(name, value);
+    }
+
+    static public void storePrefBool(String name, boolean value) {
+        sPrefEdit.putBoolean(name, value);
+    }
+    static public void storePrefInt(String name, int value) {
+        sPrefEdit.putInt(name, value);
+    }
+    static public void storePrefApply() {
+        sPrefEdit.apply();
+    }
+
+
+
     @Override
     public boolean onKeyDown(final int code, final KeyEvent e) {
         mView.queueEvent(new Runnable() { public void run() {
@@ -43,12 +69,15 @@ public class MainActivity extends Activity {
         return false;
     }
 
-    @Override protected void onCreate(Bundle b) {
-        super.onCreate(b);
+    @Override protected void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         sInstance = this;
         mView = new MainView(getApplication());
         setContentView(mView);
         getWritePermission();
+
+        sPrefs    = getPreferences(MODE_PRIVATE);
+        sPrefEdit = sPrefs.edit();
     }
     @Override protected void onResume() {
         super.onResume();
