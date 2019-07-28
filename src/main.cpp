@@ -1,5 +1,6 @@
 #include "app.hpp"
 #include "foo.hpp"
+#include "project_view.hpp"
 
 #ifdef ANDROID
 
@@ -19,6 +20,9 @@ extern "C" {
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
+    }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_storePrefs(JNIEnv * env, jobject obj) {
+        store_prefs();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
         app::resize(width, height);

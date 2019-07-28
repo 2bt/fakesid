@@ -45,6 +45,7 @@ void init() {
     if (first) first = false;
     else return;
 
+    load_prefs();
     set_view(VIEW_PROJECT);
     init_song(player::song());
     return;

@@ -1,4 +1,5 @@
 #include "track_view.hpp"
+#include "project_view.hpp"
 #include "edit.hpp"
 #include "player.hpp"
 #include <algorithm>
@@ -240,6 +241,8 @@ void draw_track_view() {
     int max_scroll = std::max(0, track.length - page_length);
     m_track_scroll = std::min(m_track_scroll, max_scroll);
 
+    int highlight = track_row_highlight();
+
     int player_row = player::row();
     for (int i = 0; i < page_length; ++i) {
         int row_nr = m_track_scroll + i;
@@ -249,9 +252,9 @@ void draw_track_view() {
         }
 
         // hightlight
-        if (row_nr == player_row) gui::button_theme(gui::BT_CURSOR);
-        else if (row_nr % 4 == 0) gui::button_theme(gui::BT_HIGHLIGHT);
-        else                      gui::button_theme(gui::BT_NORMAL);
+        gui::button_theme(row_nr == player_row    ? gui::BT_CURSOR
+                        : row_nr % highlight == 0 ? gui::BT_HIGHLIGHT
+                                                  : gui::BT_NORMAL);
 
         Track::Row& row = track.rows[row_nr];
 

@@ -88,6 +88,9 @@ public class MainActivity extends Activity {
         super.onPause();
         mView.onPause();
         Lib.stopAudio();
+        mView.queueEvent(new Runnable() { public void run() {
+            Lib.storePrefs();
+        }});
     }
 
     static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;

@@ -130,6 +130,36 @@ void hide_keyboard() {
     g_env->CallStaticVoidMethod(clazz, method);
 }
 
+bool load_pref(char const* name, bool value) {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "loadPrefBool", "(Ljava/lang/String;Z)Z");
+    return g_env->CallStaticBooleanMethod(clazz, method, g_env->NewStringUTF(name), value);
+}
+
+int load_pref(char const* name, int value) {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "loadPrefInt", "(Ljava/lang/String;I)I");
+    return g_env->CallStaticIntMethod(clazz, method, g_env->NewStringUTF(name), value);
+}
+
+void store_pref(char const* name, bool value) {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "storePrefBool", "(Ljava/lang/String;Z)V");
+    g_env->CallStaticVoidMethod(clazz, method, g_env->NewStringUTF(name), value);
+}
+
+void store_pref(char const* name, int value) {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "storePrefInt", "(Ljava/lang/String;I)V");
+    g_env->CallStaticVoidMethod(clazz, method, g_env->NewStringUTF(name), value);
+}
+
+void store_pref_apply() {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "storePrefApply", "()V");
+    g_env->CallStaticVoidMethod(clazz, method);
+}
+
 #else
 #include <fstream>
 #include <SDL2/SDL.h>
@@ -171,10 +201,13 @@ std::string get_storage_dir() { return "."; }
 
 
 void show_keyboard() {}
-
-
 void hide_keyboard() {}
 
+bool load_pref(char const* name, bool value) { return value; }
+int  load_pref(char const* name, int value)  { return value; }
+void store_pref(char const* name, bool value) {}
+void store_pref(char const* name, int value) {}
+void store_pref_apply() {}
 
 #endif
 
