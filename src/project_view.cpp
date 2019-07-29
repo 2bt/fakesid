@@ -1,6 +1,7 @@
 #include "project_view.hpp"
 #include "edit.hpp"
 #include "player.hpp"
+#include "settings.hpp"
 #include "foo.hpp"
 #include <algorithm>
 #include <string>
@@ -432,34 +433,14 @@ void draw_project_tab() {
 }
 
 
-int  m_track_row_highlight = 4;
-bool m_play_in_background  = false;
-
-
 void draw_settings_tab() {
     gui::min_item_size({ edit::screen_size().x, BUTTON_BIG });
-    if (gui::button("PLAY IN BACKGROUND", m_play_in_background)) m_play_in_background ^= 1;
-    gui::drag_int("TRACK ROW HIGHLIGHT", "%d", m_track_row_highlight, 3, 9, 1);
+    if (gui::button("PLAY IN BACKGROUND", settings().play_in_background)) settings().play_in_background ^= 1;
+    gui::drag_int("TRACK ROW HIGHLIGHT", "%d", settings().track_row_highlight, 3, 9, 1);
 }
 
 
 } // namespace
-
-
-int track_row_highlight() {
-    return m_track_row_highlight;
-}
-
-void load_prefs() {
-    m_play_in_background  = android::load_pref("playInBackground", m_play_in_background);
-    m_track_row_highlight = android::load_pref("trackRowHighlight", m_track_row_highlight);
-}
-
-void store_prefs() {
-    android::store_pref("playInBackground", m_play_in_background);
-    android::store_pref("trackRowHighlight", m_track_row_highlight);
-    android::store_pref_apply();
-}
 
 
 void init_project_view() {

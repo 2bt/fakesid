@@ -1,4 +1,5 @@
 #include "edit.hpp"
+#include "settings.hpp"
 #include "project_view.hpp"
 #include "song_view.hpp"
 #include "track_view.hpp"
@@ -45,7 +46,7 @@ void init() {
     if (first) first = false;
     else return;
 
-    load_prefs();
+    load_settings();
     set_view(VIEW_PROJECT);
     init_song(player::song());
     return;

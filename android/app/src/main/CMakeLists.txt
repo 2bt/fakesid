@@ -8,7 +8,7 @@ project(main)
 add_subdirectory(${SNDFILE_DIR} ./sndfile-bin)
 add_subdirectory(${OBOE_DIR} ./oboe-bin)
 
-add_compile_options(-std=c++17 -O2 -Wall)
+add_compile_options(-std=c++17 -O3 -Wall)
 
 file(GLOB SRC
     "cpp/*.hpp"

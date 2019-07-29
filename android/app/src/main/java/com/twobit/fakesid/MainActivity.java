@@ -83,14 +83,16 @@ public class MainActivity extends Activity {
         super.onResume();
         mView.onResume();
         Lib.startAudio();
+        Log.i(TAG, "onResume");
     }
     @Override protected void onPause() {
         super.onPause();
         mView.onPause();
         Lib.stopAudio();
         mView.queueEvent(new Runnable() { public void run() {
-            Lib.storePrefs();
+            Lib.saveSettings();
         }});
+        Log.i(TAG, "onPause");
     }
 
     static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;

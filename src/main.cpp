@@ -1,6 +1,7 @@
 #include "app.hpp"
 #include "foo.hpp"
-#include "project_view.hpp"
+#include "player.hpp"
+#include "settings.hpp"
 
 #ifdef ANDROID
 
@@ -12,6 +13,8 @@
 AAssetManager* g_asset_manager;
 JNIEnv*        g_env;
 
+static bool s_paused = true;
+
 extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am) {
         g_env = env;
@@ -21,8 +24,8 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
         app::free();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_storePrefs(JNIEnv * env, jobject obj) {
-        store_prefs();
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_saveSettings(JNIEnv * env, jobject obj) {
+        save_settings();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
         app::resize(width, height);
@@ -37,10 +40,19 @@ extern "C" {
         app::key(key, unicode);
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_startAudio(JNIEnv * env, jobject obj) {
-        android::start_audio();
+        if (s_paused) {
+            android::start_audio();
+            s_paused = false;
+        }
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_stopAudio(JNIEnv * env, jobject obj) {
-        android::stop_audio();
+        if (settings().play_in_background && player::is_playing()) {
+            // don't pause audio
+        }
+        else {
+            android::stop_audio();
+            s_paused = true;
+        }
     }
 }
 
@@ -53,8 +65,8 @@ namespace {
 
 SDL_Window*   s_window;
 bool          s_running       = true;
-int           s_screen_width  = 600;
-int           s_screen_height = 1000;
+int           s_screen_width  = app::WIDTH;
+int           s_screen_height = app::MIN_HEIGHT;
 SDL_GLContext s_gl_context;
 
 void free() {

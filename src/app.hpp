@@ -2,6 +2,11 @@
 #include "gui.hpp"
 
 namespace app {
+    enum {
+        WIDTH      = 360,
+        MIN_HEIGHT = 590,
+    };
+
     void init();
     void free();
     void resize(int width, int height);

@@ -14,11 +14,6 @@ gfx::Texture2D*   m_canvas;
 float             m_canvas_scale;
 int               m_canvas_offset;
 
-enum {
-    WIDTH      = 360,
-    MIN_HEIGHT = 590,
-};
-
 
 } // namespace
 

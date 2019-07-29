@@ -1,6 +1,7 @@
 #include "track_view.hpp"
 #include "project_view.hpp"
 #include "edit.hpp"
+#include "settings.hpp"
 #include "player.hpp"
 #include <algorithm>
 
@@ -241,7 +242,7 @@ void draw_track_view() {
     int max_scroll = std::max(0, track.length - page_length);
     m_track_scroll = std::min(m_track_scroll, max_scroll);
 
-    int highlight = track_row_highlight();
+    int highlight = settings().track_row_highlight;
 
     int player_row = player::row();
     for (int i = 0; i < page_length; ++i) {
