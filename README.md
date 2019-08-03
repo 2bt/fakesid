@@ -10,4 +10,4 @@ Check it out on [Google Play Store](https://play.google.com/store/apps/details?i
 
 Listen to the demo songs on [SoundCloud](https://soundcloud.com/dnllngnr/sets/fake-sid-demo-songs)!
 
-Read the [Documentation](docs/index.md)!
+Read the [tutorial](docs/tutorial.md)!
