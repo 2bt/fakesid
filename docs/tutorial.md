@@ -2,44 +2,47 @@
 
 ## 1. Introduction
 
+Fake SID is a C64 music tracker for Android.
 Trackers are special programs for music creation.
-There are many great trackers for the C64 out there,
-but running them requires either the real hardware,
-or an emulator like VICE.
+There are many great trackers out there for the C64,
+but running them requires either the real hardware or an emulator like VICE.
 A few cross-platform trackers exist which run on PC,
 GoatTracker being probably the most popular.
+Fake SID, however, lets you create music on the go.
+Its UI has been design especially for the phone.
 
-Fake SID, on the other hand, is a C64 music tracker for Android.
-It is highly inspired by Linus Åkesson's [Blackbird](https://www.linusakesson.net/software/blackbird/index.php).
-As with all trackers, the UI may require some time to get used to.
-If you are already familiar with other trackers (especially C64 ones),
-the transition should not be too hard.
+Fake SID is highly inspired by Linus Åkesson's amazing [Blackbird](https://www.linusakesson.net/software/blackbird/index.php).
+The emulation of the SID chip is based on TinySID by Tammo Hinrichs.
 
+As with all trackers, it may require some time to get familiar with all the ins and outs.
+If you already have experience with other trackers (especially C64 ones),
+the transition should not be too hard, however.
 But maybe this is your first time encountering a music tracker.
 Maybe you just installed Fake SID on your phone
 and are excited to create your very first chiptune.
 But after starting up the app, you feel overwhelmed and have no idea what is going on.
 Do not despair!
-This little tutorial is exactly for you.
+This little tutorial will help you get started.
 
 
 ## 2. Playing Songs
 
-<img align="right" src="main-view.png">
 
-After startup, things should look just like shown in the image on the right.
+After startup, things should look just like shown in the image below.
 Notice the row of buttons on the top of the screen.
-These are tabs to all the different views and each view deals with one aspect of the song creation.
+These are tabs to all the different views and each view deals with one aspect of the music creation.
+
+<img src="main-view.png">
 
 Currently, we are looking at the **MAIN** view.
 Here, you can:
 + set the title and author of the song you are currently editing
 + load, save, and delete songs
 + reset the song data of the current song
-+ export a song to OGG or WAV
++ export songs
 
 In Fake SID you edit exactly one song at a time.
-When the app starts, a very basic song is loaded that just plays one note.
+When the app starts, a very basic song is loaded that contains just one note.
 Try it out by pressing the **play** button at the bottom of the screen.
 You should hear a short beep.
 
@@ -50,30 +53,33 @@ Next, touch **LOAD** to load the selected file.
 A dialog pops up, asking for permission to overwrite the current song.
 Press **OK** to confirm.
 The song is now loaded.
-Finally, press **play** and enjoy.
+Lastly, press **play** and enjoy.
 
 
-
-<div style="clear:both"></div>
-<img align="right" src="song-view.png">
-
-Let us switch to **SONG** view by pressing the corresponding tab button at the top.
-
-
-The bottom row of buttons is accessible from all views.
+Just like the view tabs, the bottom row of buttons is accessible from all views.
 Besides the **play** and **stop** buttons,
 there are buttons for fast forwarding/backwarding
 and a button that toggles loop mode.
 These buttons will make more sense in **SONG** view.
+Let us switch to in by pressing the corresponding tab button.
+
+<img src="song-view.png">
+
+In **SONG** view
+
+explain song view:
++ big table
++ each row represents a small section of the song (usually 4 measures)
++ 6 columns
+  + hexadecimal row number
+  + tempo/swing
+  + 4 channels
+
++ buttons below the table for deleting/adding rows
+  + there can be between 1 and 255 rows in a song.
 
 
-
-+ explain song view
-
-
-
-<div style="clear:both"></div>
-
++ fast forward/backward, loop mode
 
 
 ## 3. Jamming
@@ -88,8 +94,6 @@ These buttons will make more sense in **SONG** view.
 
 ## 4. Your First Own Song
 
-The text input fields for **TITLE** and **AUTHOR**
-
 Song files are stored in the directory `fakesid/songs` of your phone's internal shared storage.
 
 
@@ -97,7 +101,7 @@ Song files are stored in the directory `fakesid/songs` of your phone's internal 
 
 
 
-# X. Song Export
+## X. Song Export
 
 
 Fake SID lacks export to SID or any file format native to the C64.
@@ -105,13 +109,3 @@ Although the app was not designed with this functionality in mind,
 it could be added in some later point in time.
 
 Exported songs are stored in the directory `fakesid/exports` of your phone's internal shared storage.
-
-
-
-
-
-## X. Tips
-
-+ ...
-+ ...
-+ ...
