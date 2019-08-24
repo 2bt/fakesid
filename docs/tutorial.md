@@ -16,7 +16,7 @@ The emulation of the SID chip is based on TinySID by Tammo Hinrichs.
 
 As with all trackers, it may require some time to get familiar with all the ins and outs.
 If you already have experience with other trackers (especially C64 ones),
-the transition should not be too hard, however.
+the transition should not be too hard.
 But maybe this is your first time encountering a music tracker.
 Maybe you just installed Fake SID on your phone
 and are excited to create your very first chiptune.
@@ -58,8 +58,8 @@ Lastly, press **play** and enjoy.
 
 Just like the view tabs, the bottom row of buttons is accessible from all views.
 Besides the **play** and **stop** buttons,
-there are buttons for fast forwarding/backwarding
-and a button that toggles loop mode.
+there are buttons for **fast forwarding/backwarding**
+and a button that toggles **loop mode**.
 These buttons will make more sense in **SONG** view.
 Let us switch to in by pressing the corresponding tab button.
 
@@ -67,19 +67,30 @@ Let us switch to in by pressing the corresponding tab button.
 
 In **SONG** view
 
+
 explain song view:
+
 + big table
 + each row represents a small section of the song (usually 4 measures)
++ the yellow row the the part of the song that is currently playing.
 + 6 columns
   + hexadecimal row number
   + tempo/swing
   + 4 channels
 
++ play around with fast forward/backward
+  + jump to next/previous row
++ loop mode loops the current row.
+
++ press stop.
++ use row buttons in first column
+
+
 + buttons below the table for deleting/adding rows
   + there can be between 1 and 255 rows in a song.
 
 
-+ fast forward/backward, loop mode
+
 
 
 ## 3. Jamming
@@ -106,6 +117,6 @@ Song files are stored in the directory `fakesid/songs` of your phone's internal 
 
 Fake SID lacks export to SID or any file format native to the C64.
 Although the app was not designed with this functionality in mind,
-it could be added in some later point in time.
+it could be added at some later point in time.
 
 Exported songs are stored in the directory `fakesid/exports` of your phone's internal shared storage.
