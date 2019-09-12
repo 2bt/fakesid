@@ -644,9 +644,21 @@ void touch(int x, int y, bool pressed) {
     m_touch.pressed = pressed;
 }
 
+
+// int m_touch_fade = 0;
+
 void render(gfx::RenderTarget* rt) {
+    // // visualize touch
+    // if (m_touch.pressed) m_touch_fade = 200;
+    // Icon icon = I_TOUCH;
+    // m_dc.copy(m_touch.pos - Vec(8), Vec(16),
+    //           { icon % 8 * 16, 96 + icon / 8 * 16 },
+    //           { 255, 255, 255, m_touch_fade });
+    // m_touch_fade = std::max(0, m_touch_fade - 10);
+
     render::draw(rt, m_dc.vertices(), m_texture);
     m_dc.clear();
+
 
     // update touch
     m_touch.prev_pos     = m_touch.pos;

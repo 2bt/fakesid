@@ -1,0 +1,228 @@
+# Fake SID Reference
+
+## 1. Introduction
+
+Fake SID is a C64 music tracker for Android.
+Trackers are special programs for music creation.
+There are many great trackers out there for the C64,
+but running them requires either the real hardware or an emulator like VICE.
+A few cross-platform trackers exist which run on PC,
+GoatTracker being probably the most popular.
+Fake SID, however, lets you create music on the go.
+Its UI has been design especially for the phone.
+
+Fake SID is highly inspired by Linus Åkesson's amazing [Blackbird](https://www.linusakesson.net/software/blackbird/index.php).
+The emulation of the SID chip is based on TinySID by Tammo Hinrichs.
+
+Notice the row of buttons on the top of the screen.
+These are tabs to all the different views and each view deals with one aspect of the music creation.
+Let's go through each view and discuss them in more detail.
+
+## 2. MAIN
+
+
+The **MAIN** view is split in two areas – **PROJECT** and **SETTINGS**.
+Currently, we are looking at the **PROJECT** area.
+Here, you can:
++ set the title and author of the song you are currently editing
++ load, save, and delete songs
++ reset the song data of the current song
++ export songs
+
+<img src="main-view.png">
+
+In Fake SID you edit exactly one song at a time.
+When the app starts, a very basic song is loaded that contains just one note.
+Try it out by pressing the **play** button at the bottom of the screen.
+You should hear a short beep.
+
+To load a previously saved song, simply select a song from the song list.
+This will enter the song name in the song name input field.
+Now press **LOAD**.
+Press **SAVE** to save the current song under the name in the input field.
+Press **DELETE** to delete the selected song.
+Press **RESET** to reset the current song.
+
+You may render the current song to **WAV** or **OGG**
+by first selecting the desired file format and then pressing **EXPORT**.
+Song files and exported songs are stored in the directories
+`fakesid/songs` and `fakesid/exports` of your phone's internal shared storage.
+
+Fake SID lacks export to SID or any file format native to the C64.
+Although the app was not designed with this functionality in mind,
+it could in theory be added at some later point in time.
+
+TODO: settings
+
+## 3. SONG
+
+<img src="song-view.png">
+
+A song in Fake SID is basically a table with one column per voice.
+Table entries are references to tracks.
+Each row represents a small section of the song (usually 4 measures).
+Voices can be muted and unmuted by pressing the relevant buttons in the table header.
+
+The first column shows hexadecimal row numbers.
+Press a row number button to select a row.
+The tree buttons below the table let you delete the selected row,
+insert a new row above the selected row,
+and insert a new row below the selected row, respectively.
+The selected row also sets the player position if no playback is active,
+which is indicated by the yellow row.
+
+The second column specifies the tempo and swing of the song.
+As is common with most C64 trackers, time is split into slices of 1/50 of a second, called frames.
+**TEMPO** is the number of frames spent per track row.
+**SWING** is the number additional frames for even-numbered track rows.
+
+
+The other four columns represent the four voices.
+Assign a reference to a table cell by touching it.
+This will open up the track select screen with all 252 available track references from `00` to `BK`.
+Non-empty tracks are highlighted.
+Choose the reference you wish to assign, or touch **CLEAR** to clear the table cell.
+
+Press and hold a track reference button to switch into **TRACK** view and see the referenced track.
+
+
+
+The three buttons at the bottom are visible in all views.
+The first button toggles looping.
+Looping causes the player to repeat the current song row indefinitely.
+The second button stops playback and resets the player position.
+The third button toggles playback.
+### XXX
+Just like the view tabs, the bottom row of buttons is accessible from all views.
+Besides the **play** and **stop** buttons,
+there are buttons for **fast forwarding/backwarding**
+and a button that toggles **loop mode**.
+These buttons will make more sense in **SONG** view.
+Let us switch to it by pressing the corresponding tab button.
+
+## 4. TRACK
+
+<img src="track-view.png">
+
+Tracks represent one bar of music for one voice.
+Tracks are tables with three columns for instrument references, effect references, and notes, in that order.
+
+The two rows of buttons at the top list references to the most recently used instruments and effects, respectively.
+Press the corresponding button to select an instrument or effect.
+There are 48 slots for instruments and as many for effects.
+Press and hold the **INSTRUMENT** tab to open up the instrument select screen,
+which allows you to select an instrument from among all available instruments.
+Selecting effects works the same way.
+
+Below, you find the reference of the current track.
+Touch it to open up the track select screen.
+(Alternatively, you can also touch the **TRACK** tab.)
+The arrow buttons let you set the number of rows of the curren track.
+Right next to it are buttons for copying and pasting tracks.
+
+The main area of the screen shows the track table and the note matrix.
+Use the scrollbars to navigate.
+Insert notes by touching the respective cell in the note matrix.
+This will also assign the selected instrument and effect to the track row.
+Changing notes works the same, except that the rows' instrument and effect references are unaffected.
+To clear a row, press the note button.
+Press it again to insert a note-off event.
+Assign and remove an instrument or effect reference from a track row by pressing the relevant button.
+To pick up an instrument or effect, press and hold the instrument/effect reference button.
+
+
+## 5. INSTRUMENT
+
+Instruments control the volume and waveform of a voice.
+They may also control the filter.
+
+The row of buttons on the top lists references to the most recently used instruments.
+Selecting instruments works just like in the **TRACK** view.
+Below, there is the instrument name input field.
+Right next to it are buttons for copying and pasting instruments.
+
+Select **WAVE** to view the instrument's envelope settings and the wavetable.
+Select **FILTER** to view the filter table.
+
+
+### 5.1 WAVE
+
+The sliders labeled **ATTACK**, **DECAY**, **SUSTAIN**, and **RELEASE** let you adjust the envelope parameters.
+The button on the right toggles hard restart.
+Two frames before an instrument with enabled hard restart is triggered,
+the voice's gate is cleared and sustain and release are set to zero,
+effectively creating a short pause between notes.
+
+The main area of the screen shows the wavetable.
+The wavetable defines how the SID control register and the pulse width are updated over time.
+// XXX
+Add and remove rows by respectively pressing the buttons labeled *`+`* and *`-`* below the table.
+When an instrument is triggered, its wavetable is played, beginning at the top
+and progressing to the next row with each frame.
+Playback loops after the last row.
+Set the loop point by pressing the corresponding row index.
+
+The first four buttons of a wavetable row configure the waveform.
+They stand for noise, pulse, sawtooth, and triangle.
+Fake SID combines multiple waveforms by binary AND-ing them.
+Note that the SID chip is not emulated correctly in this regard.
+The next three buttons stand for ring modulation, hardsync, and gate.
+The next button specifies the pulse width command, which can be toggled between *`=`* and *`+`*.
+The slider on the right sets the command parameter.
+The *`=`* command sets the pulse width to the specified value.
+The *`+`* command increases the pulse width by the specified amount (scaled down by some factor).
+Note that only the pulse wave is affected by the pulse width.
+
+
+### 5.2 FILTER
+
+Just like the original SID chip, Fake SID has one global filter.
+Filter parameters are controlled via filter tables.
+An instrument's non-empty filter table gets activated any time the instrument is triggered,
+replacing the previously active filter table.
+
+The four buttons above the filter table toggle filter routing.
+The filter routing configuration is applied with the filter table,
+meaning it only takes effect if there's at least one row in the table.
+
+As with wavetables, one row represents one frame.
+Setting the loop point and adding and removing rows works the same.
+
+The first three buttons of a filter table row configure the filter type.
+They stand for low-pass, band-pass, and high-pass.
+The slider next the them sets the resonance.
+The next button specifies the cut-off frequency command, which can be toggled between *`+`*, *`=`*, and *`-`*.
+The slider on the right sets the command parameter.
+The *`=`* command sets the cut-off frequency to the specified value.
+The *`-`* and *`+`* commands respectively decrease and increase the cut-off frequency
+by the specified amount (scaled down by some factor).
+
+
+## 6. EFFECT
+
+Effects modify the pitch of a voice.
+They are useful to create arpeggios, vibrato, and percussion sounds.
+
+The row of buttons on the top lists references to the most recently used effects.
+Selecting effects works just like in the **TRACK** view.
+Below, there is the effect name input field.
+Right next to it are buttons for copying and pasting effects.
+
+As with wavetables, one row represents one frame.
+Setting the loop point and adding and removing rows works the same.
+
+Each effect table row has a button that specifies the pitch command,
+as well as a slider for the command parameter.
+The command button can be toggled between *`+`*, *`~`*, and *`=`*.
+The *`+`* command sets a voice's pitch offset in semitones.
+The actual pitch of a voice is the sum of this offset and the pitch of the most recent track note.
+The *`~`* command works similarly except that the unit is 1/4 of a semitone, which is useful for vibrato and pitch slides.
+The *`=`* command sets the absolute pitch, ignoring the note pitch.
+
+
+## 7. JAM
+
+Play notes live by touching the note matrix.
+Selecting instruments and effects works just like in **TRACK** view.
+Jamming uses the fourth voice,
+so expect collisions when there are track notes playing on the fourth voice.

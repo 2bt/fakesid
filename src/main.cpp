@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
 
     s_window = SDL_CreateWindow(
-            "app",
+            "Fake SID",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             s_screen_width, s_screen_height,

@@ -34,6 +34,7 @@ namespace gui {
         I_PLAY,
         I_FAST_BACKWARD,
         I_FAST_FORWARD,
+        I_TOUCH,
         I_COPY = 8,
         I_PASTE,
         I_LOWPASS = 16,
