@@ -37,7 +37,9 @@ Switch to **TRACK** view.
 Make sure, track `00` is selected.
 Enter notes like so:
 
-<img src="bassline2.png">
+Track view|Notes
+:-:|:-:
+<img src="bassline.png">|<img src="bassline2.png">|
 
 You can press **play** to listen to our bassline.
 Let's change its tempo.
