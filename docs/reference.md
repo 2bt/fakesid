@@ -107,7 +107,7 @@ which allows you to select an instrument from among all available instruments.
 Selecting effects works the same way.
 
 Below, you find the reference of the current track.
-Touch it to open up the track select screen.
+Touch it to open up the track select screen*.
 (Alternatively, you can also touch the **TRACK** tab.)
 The arrow buttons let you set the number of rows of the curren track.
 Right next to it are buttons for copying and pasting tracks.
@@ -148,35 +148,35 @@ effectively creating a short pause between notes.
 
 The main area of the screen shows the wavetable.
 The wavetable defines how the SID control register and the pulse width are updated over time.
-
-Adding and removing rows from the table works just like in **SONG** view.
 When an instrument is triggered, its wavetable is played, beginning at the top
 and progressing to the next row with each frame.
 Playback loops after the last row.
 Set the loop point by pressing the corresponding row index.
+Adding and removing rows from the table works just like in **SONG** view.
 
 The first four buttons of a wavetable row configure the waveform.
 They stand for noise, pulse, sawtooth, and triangle.
 Fake SID combines multiple waveforms by binary AND-ing them.
 Note that the SID chip is not emulated correctly in this regard.
 The next three buttons stand for ring modulation, hardsync, and gate.
-The next button specifies the pulse width command, which can be toggled between *`=`* and *`+`*.
+The next button specifies the pulse width command, which can be toggled between **`=`** and **`+`**.
 The slider on the right sets the command parameter.
-The *`=`* command sets the pulse width to the specified value.
-The *`+`* command increases the pulse width by the specified amount (scaled down by some factor).
+The **`=`** command sets the pulse width to the specified value.
+The **`+`** command increases the pulse width by the specified amount (scaled down by some factor).
 Note that only the pulse wave is affected by the pulse width.
 
 
 ### 5.2 FILTER
 
-<img src="instr-view-filter.png">
-
 Just like the original SID chip, Fake SID has one global filter.
 Filter parameters are controlled via filter tables.
 An instrument's non-empty filter table gets activated any time the instrument is triggered,
 replacing the previously active filter table.
+Note, that a filter table may remain active even after the instrument that triggered it is not playing anymore.
 
-The four buttons above the filter table toggle filter routing.
+<img src="instr-view-filter.png">
+
+The four buttons above the filter table toggle filter routing for each voice.
 The filter routing configuration is applied with the filter table,
 meaning it only takes effect if there's at least one row in the table.
 
@@ -186,10 +186,10 @@ Setting the loop point and adding and removing rows works the same.
 The first three buttons of a filter table row configure the filter type.
 They stand for low-pass, band-pass, and high-pass.
 The slider next the them sets the resonance.
-The next button specifies the cut-off frequency command, which can be toggled between *`+`*, *`=`*, and *`-`*.
+The next button specifies the cut-off frequency command, which can be toggled between **`+`**, **`=`**, and **`-`**.
 The slider on the right sets the command parameter.
-The *`=`* command sets the cut-off frequency to the specified value.
-The *`-`* and *`+`* commands respectively decrease and increase the cut-off frequency
+The **`=`** command sets the cut-off frequency to the specified value.
+The **`-`** and **`+`** commands respectively decrease and increase the cut-off frequency
 by the specified amount (scaled down by some factor).
 
 
@@ -198,7 +198,9 @@ by the specified amount (scaled down by some factor).
 Effects modify the pitch of a voice.
 They are useful to create arpeggios, vibrato, and percussion sounds.
 
-The row of buttons on the top lists references to the most recently used effects.
+<img src="effect-view.png">
+
+The row of buttons on the shows lists references to the most recently used effects.
 Selecting effects works just like in the **TRACK** view.
 Below, there is the effect name input field.
 Right next to it are buttons for copying and pasting effects.
@@ -221,3 +223,5 @@ Play notes live by touching the note matrix.
 Selecting instruments and effects works just like in **TRACK** view.
 Jamming uses the fourth voice,
 so expect collisions when there are track notes playing on the fourth voice.
+
+<img src="jam-view.png">

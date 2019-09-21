@@ -13,5 +13,5 @@ Listen to the demo songs on [SoundCloud](https://soundcloud.com/dnllngnr/sets/fa
 
 ## Documentation
 
-+ [Reference](docs/reference.md) (WIP)
++ [Reference](docs/reference.md)
 + [Tutorial](docs/tutorial.md) (WIP)
