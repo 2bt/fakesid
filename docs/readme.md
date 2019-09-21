@@ -159,12 +159,15 @@ They stand for **noise**, **pulse**, **sawtooth**, and **triangle**.
 Fake SID combines multiple waveforms by binary AND-ing them.
 Note that the SID chip is not emulated correctly in this regard.
 The next three buttons stand for **ring modulation**, **hardsync**, and **gate**.
-The next button specifies the pulse width command, which can be toggled between:
+The next button specifies the pulse width command,
+together with a slider for the command parameter.
+The command button can be toggled between:
+
 Command | Effect
 -|-
 **`=`** | Set the pulse width to the specified value.
 **`+`** | Increase the pulse width by the specified amount.
-The slider on the right sets the command parameter.
+
 Note that only the pulse wave is affected by the pulse width.
 
 
@@ -189,13 +192,14 @@ The first three buttons of a filter table row configure the filter type.
 They stand for low-pass, band-pass, and high-pass.
 The slider next the them sets the resonance.
 The next button specifies the cut-off frequency command,
-which can be toggled between:
+together with a slider for the command parameter.
+The command button can be toggled between:
+
 Command | Effect
 -|-
 **`=`** | Set the cut-off frequency to the value.
 **`+`** | Increase the cut-off frequency by some amount.
 **`-`** | Decrease the cut-off frequency by some amount.
-The slider on the right sets the command parameter.
 
 
 ## 6. EFFECT
@@ -216,6 +220,7 @@ Setting the loop point and adding and removing rows works the same.
 Each effect table row has a button that specifies the pitch command,
 as well as a slider for the command parameter.
 The command button can be toggled between:
+
 Command | Effect
 -|-
 **`+`** | Set a voice's pitch offset in semitones. The actual pitch of a voice is the sum of this offset and the pitch of the most recent track note.
