@@ -111,9 +111,10 @@ struct Effect {
 struct Song {
 
     uint8_t block_length(int block) const {
-        uint8_t t = table[block].tracks[0];
-        if (t == 0) return MAX_TRACK_LENGTH;
-        return tracks[t - 1].length;
+        for (uint8_t t : table[block].tracks) {
+            if (t > 0) tracks[t - 1].length;
+        }
+        return MAX_TRACK_LENGTH;
     }
 
     void get_block_tempo_and_swing(int block, uint8_t& tempo, uint8_t& swing) const {

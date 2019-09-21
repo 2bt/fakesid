@@ -3,25 +3,20 @@
 ## 1. Introduction
 
 Fake SID is a C64 music tracker for Android.
-Trackers are special programs for music creation.
-There are many great trackers out there for the C64,
-but running them requires either the real hardware or an emulator like VICE.
-A few cross-platform trackers exist which run on PC,
-GoatTracker being probably the most popular.
-Fake SID, however, lets you create music on the go.
-Its UI has been design especially for the phone.
-
-Fake SID is highly inspired by Linus Åkesson's amazing [Blackbird](https://www.linusakesson.net/software/blackbird/index.php).
+It is highly inspired by Linus Åkesson's amazing [Blackbird](https://www.linusakesson.net/software/blackbird/index.php).
 The emulation of the SID chip is based on TinySID by Tammo Hinrichs.
 
-Notice the row of buttons on the top of the screen.
-These are tabs to all the different views and each view deals with one aspect of the music creation.
-Let's go through each view and discuss them in more detail.
+The UI is split into a number of views
+to which you can switch by pressing the corresponding tab button
+on the top of the screen.
+Each view deals with one aspect of the music creation.
+Let's go through the views and discuss them in more detail.
+
 
 ## 2. MAIN
 
-
 The **MAIN** view is split in two areas – **PROJECT** and **SETTINGS**.
+
 Currently, we are looking at the **PROJECT** area.
 Here, you can:
 + set the title and author of the song you are currently editing
@@ -40,6 +35,8 @@ To load a previously saved song, simply select a song from the song list.
 This will enter the song name in the song name input field.
 Now press **LOAD**.
 Press **SAVE** to save the current song under the name in the input field.
+An existing song file of that name will be overwritten.
+Change the file name before saving to create a new file.
 Press **DELETE** to delete the selected song.
 Press **RESET** to reset the current song.
 
@@ -52,16 +49,18 @@ Fake SID lacks export to SID or any file format native to the C64.
 Although the app was not designed with this functionality in mind,
 it could in theory be added at some later point in time.
 
-TODO: settings
+In the **SETTINGS** area, you can toggle background playback
+and configure track row highlighting in **TRACK** view.
+
 
 ## 3. SONG
-
-<img src="song-view.png">
 
 A song in Fake SID is basically a table with one column per voice.
 Table entries are references to tracks.
 Each row represents a small section of the song (usually 4 measures).
 Voices can be muted and unmuted by pressing the relevant buttons in the table header.
+
+<img src="song-view.png">
 
 The first column shows hexadecimal row numbers.
 Press a row number button to select a row.
@@ -75,7 +74,7 @@ The second column specifies the tempo and swing of the song.
 As is common with most C64 trackers, time is split into slices of 1/50 of a second, called frames.
 **TEMPO** is the number of frames spent per track row.
 **SWING** is the number additional frames for even-numbered track rows.
-
+This is useful to create jazzy rhythms.
 
 The other four columns represent the four voices.
 Assign a reference to a table cell by touching it.
@@ -86,28 +85,21 @@ Choose the reference you wish to assign, or touch **CLEAR** to clear the table c
 Press and hold a track reference button to switch into **TRACK** view and see the referenced track.
 
 
-
-The three buttons at the bottom are visible in all views.
-The first button toggles looping.
-Looping causes the player to repeat the current song row indefinitely.
-The second button stops playback and resets the player position.
-The third button toggles playback.
-### XXX
 Just like the view tabs, the bottom row of buttons is accessible from all views.
-Besides the **play** and **stop** buttons,
+Besides the **play** and **stop** button,
 there are buttons for **fast forwarding/backwarding**
 and a button that toggles **loop mode**.
-These buttons will make more sense in **SONG** view.
-Let us switch to it by pressing the corresponding tab button.
+Loop mode causes the player to repeat the current song row indefinitely.
+
 
 ## 4. TRACK
-
-<img src="track-view.png">
 
 Tracks represent one bar of music for one voice.
 Tracks are tables with three columns for instrument references, effect references, and notes, in that order.
 
-The two rows of buttons at the top list references to the most recently used instruments and effects, respectively.
+<img src="track-view.png">
+
+The two rows of buttons at the top show references to the most recently used instruments and effects, respectively.
 Press the corresponding button to select an instrument or effect.
 There are 48 slots for instruments and as many for effects.
 Press and hold the **INSTRUMENT** tab to open up the instrument select screen,
@@ -128,7 +120,7 @@ Changing notes works the same, except that the rows' instrument and effect refer
 To clear a row, press the note button.
 Press it again to insert a note-off event.
 Assign and remove an instrument or effect reference from a track row by pressing the relevant button.
-To pick up an instrument or effect, press and hold the instrument/effect reference button.
+You can also select an instrument or effect from a track row by holding the button.
 
 
 ## 5. INSTRUMENT
@@ -136,14 +128,15 @@ To pick up an instrument or effect, press and hold the instrument/effect referen
 Instruments control the volume and waveform of a voice.
 They may also control the filter.
 
-The row of buttons on the top lists references to the most recently used instruments.
+<img src="instr-view-wave.png">
+
+The row of buttons on the top shows references to the most recently used instruments.
 Selecting instruments works just like in the **TRACK** view.
 Below, there is the instrument name input field.
 Right next to it are buttons for copying and pasting instruments.
 
-Select **WAVE** to view the instrument's envelope settings and the wavetable.
-Select **FILTER** to view the filter table.
-
+Select the **WAVE** tab to view the instrument's envelope settings and the wavetable.
+Select the **FILTER** tab to view the filter table.
 
 ### 5.1 WAVE
 
@@ -155,8 +148,8 @@ effectively creating a short pause between notes.
 
 The main area of the screen shows the wavetable.
 The wavetable defines how the SID control register and the pulse width are updated over time.
-// XXX
-Add and remove rows by respectively pressing the buttons labeled *`+`* and *`-`* below the table.
+
+Adding and removing rows from the table works just like in **SONG** view.
 When an instrument is triggered, its wavetable is played, beginning at the top
 and progressing to the next row with each frame.
 Playback loops after the last row.
@@ -175,6 +168,8 @@ Note that only the pulse wave is affected by the pulse width.
 
 
 ### 5.2 FILTER
+
+<img src="instr-view-filter.png">
 
 Just like the original SID chip, Fake SID has one global filter.
 Filter parameters are controlled via filter tables.
