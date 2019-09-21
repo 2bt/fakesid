@@ -17,7 +17,7 @@ This little tutorial will help you get started.
 
 
 After startup, things should look just like shown in the image below.
-Notice the row of buttons on the top of the screen.
+Notice the row of buttons at the top of the screen.
 These are tabs to all the different views and each view deals with one aspect of the music creation.
 
 <img src="main-view.png">
@@ -31,8 +31,8 @@ Next, touch **LOAD** to load the selected file.
 A dialog pops up, asking for permission to overwrite the current song.
 Press **OK** to confirm.
 The song is now loaded.
-Lastly, press **play** and enjoy.
-
+Not press **play** at the bottom of the screen and enjoy.
+Note that the song will loop indefinitely, so don't wait for it to finish.
 
 Just like the view tabs, the bottom row of buttons is accessible from all views.
 Besides the **play** and **stop** buttons,
@@ -43,32 +43,11 @@ Let us switch to it by pressing the corresponding tab button.
 
 <img src="song-view.png">
 
-In **SONG** view
-
-
-explain song view:
-
-+ big table
-+ each row represents a small section of the song (usually 4 measures)
-+ the yellow row the the part of the song that is currently playing.
-+ 6 columns
-  + hexadecimal row number
-  + tempo/swing
-  + 4 channels
-
-+ play around with fast forward/backward
-  + jump to next/previous row
-+ loop mode loops the current row.
-
-+ press stop.
-+ use row buttons in first column
-
-
-+ buttons below the table for deleting/adding rows
-  + there can be between 1 and 255 rows in a song.
-
-
-
+**SONG** view shows you a big table.
+Each row represents a small section of the song (usually 4 measures).
+The yellow row the the part of the song that is currently playing.
+Let's play around with the **fast forward/backward** buttons.
+Notice how the yellow line jumps to the next/previous row.
 
 
 ## 3. Jamming

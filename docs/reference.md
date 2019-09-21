@@ -1,4 +1,4 @@
-# Fake SID Reference
+# Fake SID Reference Manual
 
 ## 1. Introduction
 
@@ -107,7 +107,7 @@ which allows you to select an instrument from among all available instruments.
 Selecting effects works the same way.
 
 Below, you find the reference of the current track.
-Touch it to open up the track select screen*.
+Touch it to open up the track select screen.
 (Alternatively, you can also touch the **TRACK** tab.)
 The arrow buttons let you set the number of rows of the curren track.
 Right next to it are buttons for copying and pasting tracks.
