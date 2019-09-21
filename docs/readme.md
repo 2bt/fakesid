@@ -140,8 +140,8 @@ Select the **FILTER** tab to view the filter table.
 
 ### 5.1 WAVE
 
-The sliders labeled **ATTACK**, **DECAY**, **SUSTAIN**, and **RELEASE** let you adjust the envelope parameters.
-The button on the right toggles hard restart.
+The sliders labeled **ATTACK**, **DECAY**, **SUSTAIN**, and **RELEASE** let you configure the volume envelope.
+The button on the right toggles **hard restart**.
 Two frames before an instrument with enabled hard restart is triggered,
 the voice's gate is cleared and sustain and release are set to zero,
 effectively creating a short pause between notes.
@@ -155,14 +155,16 @@ Set the loop point by pressing the corresponding row index.
 Adding and removing rows from the table works just like in **SONG** view.
 
 The first four buttons of a wavetable row configure the waveform.
-They stand for noise, pulse, sawtooth, and triangle.
+They stand for **noise**, **pulse**, **sawtooth**, and **triangle**.
 Fake SID combines multiple waveforms by binary AND-ing them.
 Note that the SID chip is not emulated correctly in this regard.
-The next three buttons stand for ring modulation, hardsync, and gate.
-The next button specifies the pulse width command, which can be toggled between **`=`** and **`+`**.
+The next three buttons stand for **ring modulation**, **hardsync**, and **gate**.
+The next button specifies the pulse width command, which can be toggled between:
+Command | Effect
+-|-
+**`=`** | Set the pulse width to the specified value.
+**`+`** | Increase the pulse width by the specified amount.
 The slider on the right sets the command parameter.
-The **`=`** command sets the pulse width to the specified value.
-The **`+`** command increases the pulse width by the specified amount (scaled down by some factor).
 Note that only the pulse wave is affected by the pulse width.
 
 
@@ -186,11 +188,14 @@ Setting the loop point and adding and removing rows works the same.
 The first three buttons of a filter table row configure the filter type.
 They stand for low-pass, band-pass, and high-pass.
 The slider next the them sets the resonance.
-The next button specifies the cut-off frequency command, which can be toggled between **`+`**, **`=`**, and **`-`**.
+The next button specifies the cut-off frequency command,
+which can be toggled between:
+Command | Effect
+-|-
+**`=`** | Set the cut-off frequency to the value.
+**`+`** | Increase the cut-off frequency by some amount.
+**`-`** | Decrease the cut-off frequency by some amount.
 The slider on the right sets the command parameter.
-The **`=`** command sets the cut-off frequency to the specified value.
-The **`-`** and **`+`** commands respectively decrease and increase the cut-off frequency
-by the specified amount (scaled down by some factor).
 
 
 ## 6. EFFECT
@@ -210,11 +215,12 @@ Setting the loop point and adding and removing rows works the same.
 
 Each effect table row has a button that specifies the pitch command,
 as well as a slider for the command parameter.
-The command button can be toggled between *`+`*, *`~`*, and *`=`*.
-The *`+`* command sets a voice's pitch offset in semitones.
-The actual pitch of a voice is the sum of this offset and the pitch of the most recent track note.
-The *`~`* command works similarly except that the unit is 1/4 of a semitone, which is useful for vibrato and pitch slides.
-The *`=`* command sets the absolute pitch, ignoring the note pitch.
+The command button can be toggled between:
+Command | Effect
+-|-
+**`+`** | Set a voice's pitch offset in semitones. The actual pitch of a voice is the sum of this offset and the pitch of the most recent track note.
+**`~`** | Works similarly except that the unit is 1/4 of a semitone, which is useful for vibrato and pitch slides.
+**`=`** | Set the absolute pitch, ignoring the note pitch.
 
 
 ## 7. JAM
