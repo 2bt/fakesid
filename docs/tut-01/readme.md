@@ -1,6 +1,6 @@
 # Fake SID Tutorial – A Basic Song
 
-## The Bass
+## Bass
 
 Let's start by creating a nice bass instrument.
 Open Fake SID, switch to **INSTRUMENT** view,
@@ -105,3 +105,13 @@ Press **play**. It should now sound like this:
 [tut_1.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_1.ogg)
 
 Again, don't forget to save.
+
+
+## Kick and Snare
+
+TODO
+
+
+## Melody
+
+TODO
