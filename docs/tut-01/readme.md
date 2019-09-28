@@ -53,9 +53,10 @@ This is how it should sound:
 [tut_0.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_0.ogg)
 
 At this point, it's a good idea to save our song.
-Switch to **MAIN** view,
+Switch to **MAIN** view and
 set the song title and, file name.
 Then hit **SAVE**.
+Notice the new file in the song file list.
 
 <img src="save.png">
 
@@ -101,16 +102,32 @@ Track view|Notes
 :-:|:-:
 <img src="arp-track.png">|<img src="arp-notes.png">
 
-Press **play**. It should now sound like this:
+Press **play**. It should sound like this:
 [tut_1.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_1.ogg)
 
-Again, don't forget to save.
+Again, don't forget to save your work.
 
 
-## Kick and Snare
+## Snare and Kick
 
-TODO
+Let's add a snare drum.
+We set up an instrument-effect pair like shown below.
+Feel free to experiment and play around with the settings.
 
+Wave|Filter|Effect
+:-:|:-:|:-:
+<img src="snare-wave.png">|<img src="snare-filter.png">|<img src="snare-effect.png">
+
+Conveniently, we won't have the bass und the snare drum play simultaneously,
+so we can add the snare to our bassline
+and save the third voice for the melody.
+
+Track view|Notes
+:-:|:-:
+<img src="snare-track.png">|<img src="snare-notes.png">
+
+
+TODO: kick
 
 ## Melody
 
