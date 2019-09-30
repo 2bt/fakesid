@@ -58,7 +58,9 @@ set the song title and, file name.
 Then hit **SAVE**.
 Notice the new file in the song file list.
 
-<img src="save.png">
+Main view|
+:-:|
+<img src="save.png">|
 
 
 ## Arpeggios
@@ -108,7 +110,7 @@ Press **play**. It should sound like this:
 Again, don't forget to save your work.
 
 
-## Snare and Kick
+## Snare
 
 Let's add a snare drum.
 We set up an instrument-effect pair like shown below.
@@ -126,8 +128,33 @@ Track view|Notes
 :-:|:-:
 <img src="snare-track.png">|<img src="snare-notes.png">
 
+The result will sound like so:
+[tut_2.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_2.ogg)
 
-TODO: kick
+
+## Kick
+
+It's boring to have a snare without a nice kick.
+I like having kick and bass play at the same time.
+We need an extra instrument-effect pair for that:
+
+Wave|Filter|Effect
+:-:|:-:|:-:
+<img src="kick-wave.png">|<img src="kick-filter.png">|<img src="kick-effect.png">
+
+Now, we need to revisit track `00` and apply minor changes.
+
+Track view|Notes
+:-:|:-:
+<img src="kick-track.png">|<img src="kick-notes.png">
+
+We want to swap some `A`s with `D`s at certain rows.
+This can easily be achieved by first making sure we have selected the right instrument and effect (`E`),
+and then double tapping the right instrument and effect buttons in the track.
+
+The resulting song will sound like this:
+[tut_3.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_3.ogg)
+
 
 ## Melody
 
