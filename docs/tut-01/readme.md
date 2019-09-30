@@ -150,7 +150,7 @@ Track view|Notes
 
 We want to replace **`A`** with **`D`** at certain rows.
 This can easily be achieved by first making sure
-we have selected the right instrument and effect (**`E`**),
+we have selected the right instrument and effect (**`D`**),
 and then double tapping the right instrument and effect buttons in the track.
 
 The resulting song will sound like this:
