@@ -148,8 +148,9 @@ Track view|Notes
 :-:|:-:
 <img src="kick-track.png">|<img src="kick-notes.png">
 
-We want to swap some `A`s with `D`s at certain rows.
-This can easily be achieved by first making sure we have selected the right instrument and effect (`E`),
+We want to swap some **`A`**s with **`D`**s at certain rows.
+This can easily be achieved by first making sure
+we have selected the right instrument and effect (**`E`**),
 and then double tapping the right instrument and effect buttons in the track.
 
 The resulting song will sound like this:
