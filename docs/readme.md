@@ -1,4 +1,4 @@
-# Fake SID Reference Manual
+# Fake SID Manual
 
 ## 1. Introduction
 
