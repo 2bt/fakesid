@@ -50,7 +50,7 @@ Tempo select|Song view
 <img src="tempo-select.png">|<img src="song1.png">
 
 This is how it should sound:
-[demo-0.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-0.ogg)
+[demo-0.mp3](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-0.mp3)
 
 At this point, it's a good idea to save our song.
 Switch to **MAIN** view and
@@ -105,7 +105,7 @@ Track view|Notes
 <img src="arp-track.png">|<img src="arp-notes.png">
 
 Press **play**. It should sound like this:
-[demo-1.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-1.ogg)
+[demo-1.mp3](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-1.mp3)
 
 Again, don't forget to save your work.
 
@@ -129,7 +129,7 @@ Track view|Notes
 <img src="snare-track.png">|<img src="snare-notes.png">
 
 The result will sound like so:
-[demo-2.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-2.ogg)
+[demo-2.mp3](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-2.mp3)
 
 
 ## Kick
@@ -154,7 +154,7 @@ we have selected the right instrument and effect (**`D`**),
 and then double tapping the right instrument and effect buttons in the track.
 
 The resulting song will sound like this:
-[tut_3.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_3.ogg)
+[demo-3.mp3](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-3.mp3)
 
 
 ## Melody
