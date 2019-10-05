@@ -50,7 +50,7 @@ Tempo select|Song view
 <img src="tempo-select.png">|<img src="song1.png">
 
 This is how it should sound:
-[tut_0.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_0.ogg)
+[demo-0.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-0.ogg)
 
 At this point, it's a good idea to save our song.
 Switch to **MAIN** view and
@@ -105,7 +105,7 @@ Track view|Notes
 <img src="arp-track.png">|<img src="arp-notes.png">
 
 Press **play**. It should sound like this:
-[tut_1.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_1.ogg)
+[demo-1.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-1.ogg)
 
 Again, don't forget to save your work.
 
@@ -129,7 +129,7 @@ Track view|Notes
 <img src="snare-track.png">|<img src="snare-notes.png">
 
 The result will sound like so:
-[tut_2.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/tut_2.ogg)
+[demo-2.ogg](https://raw.githubusercontent.com/2bt/fakesid/master/docs/tut-01/demo-2.ogg)
 
 
 ## Kick
