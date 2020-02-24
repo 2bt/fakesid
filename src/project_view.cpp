@@ -297,6 +297,12 @@ void draw_confirmation() {
 
 void init_confirmation(ConfirmationType t) {
     std::string name = m_file_name.data();
+    if (name.empty()) {
+        if (t == CT_LOAD)   status("LOAD ERROR: EMPTY SONG NAME");
+        if (t == CT_DELETE) status("DELETE ERROR: EMPTY SONG NAME");
+        if (t == CT_SAVE)   status("SAVE ERROR: EMPTY SONG NAME");
+        return;
+    }
     if (t == CT_LOAD || t == CT_DELETE) {
         if (std::find(m_file_names.begin(), m_file_names.end(), name) == m_file_names.end()) {
             if (t == CT_LOAD) status("LOAD ERROR: SONG NOT LISTED");
@@ -305,10 +311,6 @@ void init_confirmation(ConfirmationType t) {
         }
     }
     if (t == CT_SAVE) {
-        if (name.empty()) {
-            status("SAVE ERROR: EMPTY SONG NAME");
-            return;
-        }
         std::string path = m_songs_dir + name + FILE_SUFFIX;
         struct stat st;
         if (stat(path.c_str(), &st) == -1) {
