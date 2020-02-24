@@ -15,14 +15,13 @@ Let's go through the views and discuss them in more detail.
 
 ## 2. MAIN
 
-The **MAIN** view is split in two areas – **PROJECT** and **SETTINGS**.
-
-Currently, we are looking at the **PROJECT** area.
+The **MAIN** view is the default view when you start the app.
 Here, you can:
 + set the title and author of the song you are currently editing
 + load, save, and delete songs
 + reset the song data of the current song
 + export songs
++ edit miscellaneous settings
 
 <img src="main-view.png">
 
@@ -49,6 +48,7 @@ Fake SID lacks export to SID or any file format native to the C64.
 Although the app was not designed with this functionality in mind,
 it could in theory be added at some later point in time.
 
+The **MAIN** view is split in two areas – **PROJECT** and **SETTINGS**.
 In the **SETTINGS** area, you can toggle background playback
 and configure track row highlighting in **TRACK** view.
 
@@ -60,7 +60,9 @@ Table entries are references to tracks.
 Each row represents a small section of the song (usually 4 measures).
 Voices can be muted and unmuted by pressing the relevant buttons in the table header.
 
-<img src="song-view.png">
+Song view|Track select
+:-:|:-:
+<img src="song-view.png">|<img src="track-select.png">
 
 The first column shows hexadecimal row numbers.
 Press a row number button to select a row.
@@ -105,6 +107,10 @@ There are 48 slots for instruments and as many for effects.
 Press and hold the **INSTRUMENT** tab to open up the instrument select screen,
 which allows you to select an instrument from among all available instruments.
 Selecting effects works the same way.
+
+Instrument select|Effect select
+:-:|:-:
+<img src="instrument-select.png">|<img src="effect-select.png">
 
 Below, you find the reference of the current track.
 Touch it to open up the track select screen.
