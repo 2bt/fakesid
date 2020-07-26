@@ -112,7 +112,7 @@ struct Song {
 
     uint8_t block_length(int block) const {
         for (uint8_t t : table[block].tracks) {
-            if (t > 0) tracks[t - 1].length;
+            if (t > 0) return tracks[t - 1].length;
         }
         return MAX_TRACK_LENGTH;
     }
