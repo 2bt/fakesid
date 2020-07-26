@@ -1,5 +1,6 @@
 #include "gui.hpp"
 #include "foo.hpp"
+#include <cstring>
 #include <cstdarg>
 #include <algorithm>
 #include <array>

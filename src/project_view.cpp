@@ -5,6 +5,7 @@
 #include "foo.hpp"
 #include <algorithm>
 #include <string>
+#include <cstring>
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>

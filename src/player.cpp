@@ -7,7 +7,7 @@ namespace {
 
 
 constexpr Filter     null_filter     = {};
-constexpr Instrument null_instrument = {};
+const     Instrument null_instrument = {};
 constexpr Effect     null_effect     = {};
 
 constexpr std::array<int, 16> attack_speeds = {
