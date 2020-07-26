@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set(OBOE_DIR "../../../../../oboe")
-set(SNDFILE_DIR "../../../../../../lib/libsndfile")
+set(LIB_DIR "../../../../lib")
+set(OBOE_DIR "${LIB_DIR}/oboe")
+set(SNDFILE_DIR "${LIB_DIR}/libsndfile")
 
 project(main)
 
@@ -18,7 +19,7 @@ file(GLOB SRC
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    "../../../../../../lib" # glm
+    "${LIB_DIR}/glm"
     "${OBOE_DIR}/include"
     "${OBOE_DIR}/src"
     "${SNDFILE_DIR}"
