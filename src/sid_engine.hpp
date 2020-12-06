@@ -5,13 +5,11 @@
 
 class SidEngine {
 public:
-    virtual int     chan_level(int c) const = 0;
+    virtual float   chan_level(int c) const = 0;
     virtual uint8_t chan_reg(int c, int r) const = 0;
-    virtual void    set_chan_reg(int c, int r, uint8_t value) = 0;
-
     virtual uint8_t global_reg(int r) const = 0;
+    virtual void    set_chan_reg(int c, int r, uint8_t value) = 0;
     virtual void    set_global_reg(int r, uint8_t value) = 0;
-
     virtual void    mix(short* buffer, int length) = 0;
 
     void set_chan_freq(int c, float pitch) {
@@ -21,4 +19,5 @@ public:
     }
 
     static SidEngine& get_tinysid();
+//    static SidEngine& get_resid();
 };

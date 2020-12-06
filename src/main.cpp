@@ -17,26 +17,32 @@ static bool s_paused = true;
 
 extern "C" {
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am) {
+        LOGD("Java_com_twobit_fakesid_Lib_init");
         g_env = env;
         g_asset_manager = AAssetManager_fromJava(env, am);
         app::init();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
+        if (!g_env) return;
         app::free();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_saveSettings(JNIEnv * env, jobject obj) {
+        if (!g_env) return;
         save_settings();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
+        if (!g_env) return;
         app::resize(width, height);
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_draw(JNIEnv * env, jobject obj) {
+        if (!g_env) return;
         app::draw();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_touch(JNIEnv * env, jobject obj, jint x, jint y, jint action) {
         app::touch(x, y, action == 0 || action == 2);
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_key(JNIEnv * env, jobject obj, jint key, jint unicode) {
+        if (!g_env) return;
         app::key(key, unicode);
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_startAudio(JNIEnv * env, jobject obj) {

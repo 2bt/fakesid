@@ -7,6 +7,7 @@ enum EView {
     VIEW_TRACK,
     VIEW_INSTRUMENT,
     VIEW_EFFECT,
+    VIEW_JAM,
 };
 
 namespace edit {

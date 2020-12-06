@@ -10,6 +10,11 @@ bool    m_jam_gate;
 
 } // namespace
 
+void exit_jam_view() {
+    m_jam_gate = false;
+    m_jam_note = 0;
+    player::jam({ 0, 0, 255 });
+}
 
 void draw_jam_view() {
 
@@ -42,7 +47,6 @@ void draw_jam_view() {
             int note = x + (7 - y) * 12 + 1;
             int index = 1;
             if ((1 << x) & 0b010101001010) index = 0;
-
 
             if (gui::touch().pressed && box.contains(gui::touch().pos)) {
                 if (gui::touch().just_pressed()) {

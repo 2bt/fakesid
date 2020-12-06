@@ -24,12 +24,14 @@ void (*m_popup_func)(void);
 
 
 void set_view(EView v) {
+    if (m_view == VIEW_JAM) exit_jam_view();
     m_view = v;
     if (m_view == VIEW_PROJECT) init_project_view();
 }
 
 
 void set_popup(void (*func)(void)) {
+    if (m_view == VIEW_JAM) exit_jam_view();
     m_popup_func = func;
 }
 
@@ -43,8 +45,8 @@ Vec const& screen_size() {
 
 void init() {
     static bool first = true;
-    if (first) first = false;
-    else return;
+    if (!first) return;
+    first = false;
 
     load_settings();
     set_view(VIEW_PROJECT);

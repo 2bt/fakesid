@@ -1,4 +1,5 @@
 #include "sid_engine.hpp"
+//#include "resid-0.16/sid.h"
 #include <array>
 
 
@@ -8,12 +9,50 @@ namespace {
 enum { MIXRATE = 44100 };
 
 
+//class ReSidEngine : public SidEngine {
+//public:
+//    ReSidEngine() {
+//        m_sid.reset();
+//        m_sid.set_chip_model(MOS8580);
+//        m_sid.set_sampling_parameters(985248, SAMPLE_RESAMPLE_INTERPOLATE, MIXRATE);
+//    }
+//    float   chan_level(int c) const override {
+//        if (c >= CHANNEL_COUNT) return 0;
+//        return m_sid.read_state().envelope_counter[c] * (1.0f / 0xff);
+//    }
+//    uint8_t chan_reg(int c, int r) const override {
+//        if (c >= CHANNEL_COUNT) return 0;
+//        return m_regs[c * 7 + r];
+//    }
+//    void    set_chan_reg(int c, int r, uint8_t value) override {
+//        if (c >= CHANNEL_COUNT) return;
+//        m_regs[c * 7 + r] + value;
+//        m_sid.write(c * 7 + r, value);
+//    }
+//    uint8_t global_reg(int r) const override {
+//        return m_regs[21 + r];
+//    }
+//    void    set_global_reg(int r, uint8_t value) override {
+//        m_regs[21 + r] = value;
+//        m_sid.write(21 + r, value);
+//    }
+//    void mix(int16_t* buffer, int length) override {
+//        int c = 999999999;
+//        m_sid.clock(c, buffer, length);
+//    }
+//private:
+//    enum { CHANNEL_COUNT = 3 };
+//    mutable SID m_sid;
+//    uint8_t     m_regs[25] = {};
+//};
+
+
 class TinySidEngine : public SidEngine {
 public:
     void    mix(int16_t* buffer, int length) override;
-    int     chan_level(int c) const override {
+    float   chan_level(int c) const override {
         if (c >= CHANNEL_COUNT) return 0;
-        return m_channels[c].level;
+        return m_channels[c].level * (1.0f / 0xffffff);
     }
     uint8_t chan_reg(int c, int r) const override {
         if (c >= CHANNEL_COUNT) return 0;
@@ -71,7 +110,6 @@ private:
     };
 
     struct {
-        int     freq_acc;
         uint8_t type;
         float   resonance;
         float   freq;
@@ -248,3 +286,8 @@ SidEngine& SidEngine::get_tinysid() {
     static TinySidEngine engine;
     return engine;
 }
+
+//SidEngine& SidEngine::get_resid() {
+//    static ReSidEngine engine;
+//    return engine;
+//}

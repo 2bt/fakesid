@@ -611,7 +611,7 @@ bool clavier(uint8_t& n, int offset) {
     return n != old_n;
 }
 
-
+// used in jam view
 void dumb_button(int state) {
     Vec size = m_min_item_size;
     Vec pos;

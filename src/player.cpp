@@ -37,6 +37,8 @@ struct {
 
 
 SidEngine& m_engine = SidEngine::get_tinysid();
+//SidEngine& m_engine = SidEngine::get_resid();
+
 
 Song    m_song;
 bool    m_is_playing;
@@ -192,7 +194,7 @@ void tick() {
 
         m_engine.set_global_reg(0, m_filter.freq_acc & 0x7);
         m_engine.set_global_reg(1, m_filter.freq_acc >> 3);
-        m_engine.set_global_reg(2, (m_engine.global_reg(2) & 0xf) | (row.resonance << 4));
+        m_engine.set_global_reg(2, (row.resonance << 4) | (m_engine.global_reg(2) & 0xf));
         m_engine.set_global_reg(3, (row.type << 4) | 0xf);
     }
 
@@ -274,6 +276,7 @@ void set_playing(bool p) {
         m_is_playing = false;
         m_filter = {};
         for (Channel& chan : m_channels) {
+            m_engine.set_chan_reg(chan.id, 4, 0x00);
             m_engine.set_chan_reg(chan.id, 5, 0x00);
             m_engine.set_chan_reg(chan.id, 6, 0x00);
         }
@@ -292,7 +295,7 @@ void  block(int b) {
 }
 bool  block_loop() { return m_block_loop; }
 void  block_loop(bool b) { m_block_loop = b; }
-float channel_level(int c) { return m_engine.chan_level(c) / float(0xffffff); }
+float channel_level(int c) { return m_engine.chan_level(c); }
 bool  is_channel_active(int c) { return m_channels[c].active; }
 void  set_channel_active(int c, bool a) { m_channels[c].active = a; }
 void  jam(Track::Row const& row) { m_jam_row = row; }

@@ -63,12 +63,12 @@ bool start_audio() {
 
     auto rate = s_stream->getSampleRate();
     if (rate != MIXRATE) {
-        LOGW("mixrate is %d but should be %d", rate, MIXRATE);
+        LOGW("start_audio: mixrate is %d but should be %d", rate, MIXRATE);
     }
 
     result = s_stream->requestStart();
     if (result != oboe::Result::OK) {
-        LOGE("result is not okay: %s", oboe::convertToText(result));
+        LOGE("start_audio: AudioStream::requestStart failed: %s", oboe::convertToText(result));
         return false;
     }
     return true;
