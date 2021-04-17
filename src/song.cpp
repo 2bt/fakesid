@@ -1,6 +1,7 @@
 #include "song.hpp"
 #include "song_v0.hpp"
 #include <cstring>
+#include <cstdio>
 
 
 namespace  {
