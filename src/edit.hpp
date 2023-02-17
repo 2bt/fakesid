@@ -50,6 +50,7 @@ inline std::vector<int> calculate_column_widths(std::vector<int> const& weights,
 enum {
     BUTTON_BAR = 40,
     BUTTON_BIG = 30,
-    BUTTON_SMALL = 20,
+//    BUTTON_SMALL = 20,
+    BUTTON_SMALL = 16,
     SCROLLBAR_WIDTH = 16,
 };

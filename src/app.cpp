@@ -112,7 +112,7 @@ void draw() {
     render::DrawContext dc;
     Vec s = { m_canvas->width(),  m_canvas->height() };
     dc.copy(Vec(m_canvas_offset, 0), Vec(glm::vec2(s) * m_canvas_scale), {}, s);
-    render::draw(gfx::screen(), dc.vertices(), m_canvas);
+    render::draw(gfx::screen(), dc, m_canvas);
     dc.clear();
 }
 

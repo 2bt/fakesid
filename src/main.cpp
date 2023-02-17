@@ -64,6 +64,7 @@ extern "C" {
 
 #else
 
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 
@@ -75,11 +76,6 @@ int           s_screen_width  = app::WIDTH;
 int           s_screen_height = app::MIN_HEIGHT;
 SDL_GLContext s_gl_context;
 
-void free() {
-    SDL_GL_DeleteContext(s_gl_context);
-    SDL_DestroyWindow(s_window);
-    SDL_Quit();
-}
 
 } // namespace
 
@@ -99,8 +95,7 @@ int main(int argc, char** argv) {
     s_gl_context = SDL_GL_CreateContext(s_window);
     if (!s_gl_context) {
         fprintf(stderr, "error: SDL_GL_CreateContext() failed\n");
-        free();
-        return 1;
+        goto FREE;
     }
 
     SDL_GL_SetSwapInterval(1);
@@ -167,7 +162,10 @@ int main(int argc, char** argv) {
 
     app::free();
     android::stop_audio();
-    free();
+FREE:
+    SDL_GL_DeleteContext(s_gl_context);
+    SDL_DestroyWindow(s_window);
+    SDL_Quit();
     return 0;
 }
 

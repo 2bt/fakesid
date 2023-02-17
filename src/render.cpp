@@ -69,7 +69,7 @@ void init() {
     m_va->set_attribute(1, m_vb, gfx::ComponentType::Int16, 2, false, 4, 12);
     m_va->set_attribute(2, m_vb, gfx::ComponentType::Uint8, 4, true,  8, 12);
 
-    m_rs.blend_enabled      = true;
+    m_rs.blend_enabled        = true;
     m_rs.blend_func_src_rgb   = gfx::BlendFunc::SrcAlpha;
     m_rs.blend_func_src_alpha = gfx::BlendFunc::SrcAlpha;
     m_rs.blend_func_dst_rgb   = gfx::BlendFunc::OneMinusSrcAlpha;
@@ -86,14 +86,14 @@ void free() {
     m_vb     = nullptr;
 }
 
-void draw(gfx::RenderTarget* rt, std::vector<Vertex> const& vertice, gfx::Texture2D* texture) {
+void draw(gfx::RenderTarget* rt, DrawContext const& dc, gfx::Texture2D* texture) {
     m_shader->set_uniform("screen_scale", 2.0f / glm::vec2(rt->width(), rt->height()));
     m_shader->set_uniform("texture_scale", 1.0f / glm::vec2(texture->width(), texture->height()));
     m_shader->set_uniform("texture", texture);
     m_shader->set_uniform("flip", dynamic_cast<gfx::Screen*>(rt) != nullptr);
 
-    m_vb->init_data(vertice);
-    m_va->set_count(vertice.size());
+    m_vb->init_data(dc.vertices());
+    m_va->set_count(dc.vertices().size());
     rt->draw(m_rs, m_shader, m_va);
 }
 

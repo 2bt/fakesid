@@ -145,6 +145,10 @@ class DrawContext : public render::DrawContext {
 public:
 
     void rect(const Vec& pos, const Vec& size, const Color& c, ButtonStyle style=BS_NORMAL) {
+        if (style == BS_NORMAL) {
+            copy(pos, size - Vec(1), Vec(1, 65), Vec(1), c);
+            return;
+        }
         int s = 8;
         int o = 64;
         if (size.x < 16 || size.y < 16) {
@@ -564,7 +568,7 @@ bool vertical_drag_int(int& value, int min, int max, int page) {
 
 
 bool clavier(uint8_t& n, int offset) {
-    Box box = item_box({ 100, 20 });
+    Box box = item_box({ 100, m_min_item_size.y });
 
     void const* id = get_id(&n);
     if (m_active_item == nullptr && m_touch.box_touched(box) && m_touch.just_pressed()) {
@@ -657,7 +661,7 @@ void render(gfx::RenderTarget* rt) {
     //           { 255, 255, 255, m_touch_fade });
     // m_touch_fade = std::max(0, m_touch_fade - 10);
 
-    render::draw(rt, m_dc.vertices(), m_texture);
+    render::draw(rt, m_dc, m_texture);
     m_dc.clear();
 
 

@@ -4,17 +4,16 @@
 #include "settings.hpp"
 #include "foo.hpp"
 #include <algorithm>
+#include <filesystem>
 #include <string>
 #include <cstring>
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/stat.h>
 #include <sndfile.h>
 #include <pthread.h>
 
 
 #define FILE_SUFFIX ".sng"
 
+namespace fs = std::filesystem;
 
 namespace {
 
@@ -43,8 +42,7 @@ void status(std::string const& msg) {
 
 bool copy_demo_song(std::string const& name) {
     std::string dst_name = m_songs_dir + name + FILE_SUFFIX;
-    struct stat st;
-    if (stat(dst_name.c_str(), &st) != -1) return true;
+    if (fs::exists(dst_name)) return true;
 
     std::vector<uint8_t> buffer;
     if (!android::load_asset(name + FILE_SUFFIX, buffer)) {
@@ -67,14 +65,11 @@ bool init_dirs() {
     }
     if (m_root_dir.empty()) return false;
 
-    struct stat st = {};
-
     m_songs_dir   = m_root_dir + "/songs/";
     m_exports_dir = m_root_dir + "/exports/";
 
-    if (stat(m_root_dir.c_str(), &st) == -1)    mkdir(m_root_dir.c_str(), 0700);
-    if (stat(m_songs_dir.c_str(), &st) == -1)   mkdir(m_songs_dir.c_str(), 0700);
-    if (stat(m_exports_dir.c_str(), &st) == -1) mkdir(m_exports_dir.c_str(), 0700);
+    fs::create_directories(m_songs_dir);
+    fs::create_directories(m_exports_dir);
 
     copy_demo_song("demo1");
     copy_demo_song("demo2");
@@ -264,7 +259,7 @@ void draw_confirmation() {
         std::string path = m_songs_dir + m_file_name.data() + FILE_SUFFIX;
         switch (m_confirmation_type) {
         case CT_DELETE:
-            unlink(path.c_str());
+            fs::remove(path);
             init_project_view();
             status("SONG WAS DELETED");
             break;
@@ -313,8 +308,7 @@ void init_confirmation(ConfirmationType t) {
     }
     if (t == CT_SAVE) {
         std::string path = m_songs_dir + name + FILE_SUFFIX;
-        struct stat st;
-        if (stat(path.c_str(), &st) == -1) {
+        if (!fs::exists(path)) {
             // the file doesn't exist yet, so no confirmation needed
             save();
             return;
@@ -454,18 +448,12 @@ void init_project_view() {
     }
 
     m_file_names.clear();
-    if (DIR* dir = opendir(m_songs_dir.c_str())) {
-        while (struct dirent* ent = readdir(dir)) {
-            if (ent->d_type == DT_REG) {
-                std::string name = ent->d_name;
-                if (name.size() > 4 && name.substr(name.size() - 4) == FILE_SUFFIX) {
-                    m_file_names.emplace_back(name.substr(0, name.size() - 4));
-                }
-            }
-        }
-        closedir(dir);
-        std::sort(m_file_names.begin(), m_file_names.end());
+    for (auto const& entry : fs::directory_iterator(m_songs_dir)) {
+        if (!entry.is_regular_file()) continue;
+        if (entry.path().extension().string() != FILE_SUFFIX) continue;
+        m_file_names.emplace_back(entry.path().stem().string());
     }
+    std::sort(m_file_names.begin(), m_file_names.end());
 
     m_status_msg = "";
 }

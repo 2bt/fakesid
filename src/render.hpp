@@ -49,8 +49,8 @@ namespace render {
 
     void init();
     void free();
-    void draw(gfx::RenderTarget*         rt,
-              std::vector<Vertex> const& vertice,
-              gfx::Texture2D*            texture);
+    void draw(gfx::RenderTarget* rt,
+              DrawContext const& dc,
+              gfx::Texture2D*    texture);
 
 } // namespace
