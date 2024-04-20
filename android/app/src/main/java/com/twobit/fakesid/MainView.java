@@ -10,11 +10,10 @@ import javax.microedition.khronos.opengles.GL10;
 
 class MainView extends GLSurfaceView {
     static String TAG = "FOOBAR";
-    Renderer mRenderer;
+    Renderer mRenderer = new Renderer();
 
     public MainView(Context context) {
         super(context);
-        mRenderer = new Renderer();
         setPreserveEGLContextOnPause(true);
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 0, 0);

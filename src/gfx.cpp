@@ -3,6 +3,7 @@
 #include <array>
 #include <variant>
 #include <regex>
+#include <cstring>
 
 #ifdef ANDROID
 
