@@ -433,6 +433,10 @@ void draw_project_tab() {
 void draw_settings_tab() {
     gui::min_item_size({ edit::screen_size().x, BUTTON_BIG });
     if (gui::button("PLAY IN BACKGROUND", settings().play_in_background)) settings().play_in_background ^= 1;
+    if (gui::button("FULLSCREEN", settings().fullscreen_enabled)) {
+        settings().fullscreen_enabled ^= 1;
+        android::update_setting(0); // 0 = SETTING_FULLSCREEN_ENABLED
+    }
     gui::drag_int("TRACK ROW HIGHLIGHT", "%d", settings().track_row_highlight, 3, 9, 1);
 }
 

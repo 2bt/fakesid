@@ -28,11 +28,6 @@ gfx::Texture2D* load_texture(char const*     name,
 std::string get_storage_dir();
 void show_keyboard();
 void hide_keyboard();
-
-bool load_pref(char const* name, bool value);
-int  load_pref(char const* name, int value);
-void store_pref(char const* name, bool value);
-void store_pref(char const* name, int value);
-void store_pref_apply();
+void update_setting(int i);
 
 } // namespace

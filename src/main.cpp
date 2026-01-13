@@ -26,10 +26,6 @@ extern "C" {
         if (!g_env) return;
         app::free();
     }
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_saveSettings(JNIEnv * env, jobject obj) {
-        if (!g_env) return;
-        save_settings();
-    }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_resize(JNIEnv * env, jobject obj, jint width, jint height) {
         if (!g_env) return;
         app::resize(width, height);
@@ -59,6 +55,20 @@ extern "C" {
             android::stop_audio();
             s_paused = true;
         }
+    }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setInsets(JNIEnv * env, jclass, jint topInset, jint bottomInset) {
+        if (!g_env) return;
+        app::set_insets(topInset, bottomInset);
+    }
+    JNIEXPORT jstring JNICALL Java_com_twobit_fakesid_Lib_getSettingName(JNIEnv * env, jclass, jint i) {
+        char const* name = get_setting_name(i);
+        return name ? env->NewStringUTF(name) : nullptr;
+    }
+    JNIEXPORT jint JNICALL Java_com_twobit_fakesid_Lib_getSettingValue(JNIEnv * env, jclass, jint i) {
+        return get_setting_value(i);
+    }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setSettingValue(JNIEnv * env, jclass, jint i, jint v) {
+        set_setting_value(i, v);
     }
 }
 

@@ -1,21 +1,42 @@
 #include "settings.hpp"
-#include "foo.hpp"
 
 namespace {
 
 Settings m_settings;
 
+enum {
+    #define X(n, ...) SETTING_##n,
+    SETTINGS(X)
+    #undef X
+};
+
 } // namespace
 
 Settings& settings() { return m_settings; }
 
-void load_settings() {
-    m_settings.play_in_background  = android::load_pref("playInBackground", m_settings.play_in_background);
-    m_settings.track_row_highlight = android::load_pref("trackRowHighlight", m_settings.track_row_highlight);
+char const* get_setting_name(int i) {
+    switch (i) {
+    #define X(n, ...) case SETTING_##n: return #n;
+    SETTINGS(X)
+    #undef X
+    default: return nullptr;
+    }
 }
 
-void save_settings() {
-    android::store_pref("playInBackground", m_settings.play_in_background);
-    android::store_pref("trackRowHighlight", m_settings.track_row_highlight);
-    android::store_pref_apply();
+int get_setting_value(int i) {
+    switch (i) {
+    #define X(n, ...) case SETTING_##n: return m_settings.n;
+    SETTINGS(X)
+    #undef X
+    default: return 0;
+    }
+}
+
+void set_setting_value(int i, int v) {
+    switch (i) {
+    #define X(n, ...) case SETTING_##n: m_settings.n = v; break;
+    SETTINGS(X)
+    #undef X
+    default: break;
+    }
 }

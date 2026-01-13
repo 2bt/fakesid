@@ -48,7 +48,7 @@ void init() {
     if (!first) return;
     first = false;
 
-    load_settings();
+    // Settings are loaded by Java
     set_view(VIEW_PROJECT);
     init_song(player::song());
     return;
