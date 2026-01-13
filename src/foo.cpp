@@ -101,7 +101,7 @@ bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
 std::string get_storage_dir() {
 
     jclass j_env_class = g_env->FindClass("android/os/Environment");
-    jmethodID j_mid = g_env->GetStaticMethodID(j_env_class, "getExternalStorageDirectory",  "()Ljava/io/File;");
+    jmethodID j_mid = g_env->GetStaticMethodID(j_env_class, "getExternalStorageDirectory", "()Ljava/io/File;");
     jobject j_file = g_env->CallStaticObjectMethod(j_env_class, j_mid);
     if (!j_file) return "";
 

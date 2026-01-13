@@ -6,13 +6,12 @@ import android.content.pm.PackageManager;
 import android.Manifest;
 import android.os.Bundle;
 import android.app.Activity;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
-
-import java.util.prefs.Preferences;
 
 public class MainActivity extends Activity {
     static String TAG = "FOOBAR";

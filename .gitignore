@@ -5,3 +5,16 @@ build
 release
 /android/local.properties
 .externalNativeBuild
+.cxx
+
+# Build artifacts
+fakesid
+fakesid-win
+exports/
+lib/
+
+# IDE and user-specific files
+CMakeLists.txt.user
+Makefile
+todo.md
+songs/
