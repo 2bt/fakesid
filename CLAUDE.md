@@ -70,13 +70,16 @@ docs/                  # User documentation
 
 ### JNI Bridge
 The Java layer calls into C++ via these native methods (defined in `Lib.java`):
-- `init(AssetManager)` - Initialize C++ with Android assets
+- `init(AssetManager, String storageDir)` - Initialize C++ with Android assets and storage directory
 - `resize(int, int)` - Handle surface resize
 - `draw()` - Render OpenGL frame
 - `touch(int, int, int)` - Forward touch events to C++
 - `key(int, int)` - Forward key events to C++
 - `startAudio()/stopAudio()` - Audio lifecycle
-- `saveSettings()` - Persist preferences
+- `setInsets(int, int)` - Handle system insets (status bar, navigation bar)
+- `getSettingName(int)/getSettingValue(int)/setSettingValue(int, int)` - Settings management
+- `importSong(String path)` - Import song from SAF-provided path
+- `exportSong(String path, String title)` - Export song (currently unused, export handled via platform layer)
 
 ## Important Implementation Notes
 
@@ -92,9 +95,13 @@ The Java layer calls into C++ via these native methods (defined in `Lib.java`):
 
 ### File Storage
 - **Desktop:** Direct file I/O using libsndfile
-- **Android:** NOT YET WORKING - needs to be updated for scoped storage (Android 10+)
-  - Old code used `WRITE_EXTERNAL_STORAGE` permission
-  - Needs migration to app-specific storage or Storage Access Framework
+- **Android:** Storage Access Framework (SAF) - fully implemented
+  - **Storage Location:** `getExternalFilesDir()` - `/storage/emulated/0/Android/data/com.twobit.fakesid/files/`
+  - **Song Import:** SAF file picker (`ACTION_OPEN_DOCUMENT`) → copies to cache → loads into app
+  - **Song Export:** Renders to app storage → shares via FileProvider → user chooses destination
+  - **WAV/OGG Export:** Renders to app storage → shares via FileProvider → user chooses destination
+  - **No permissions required** - Uses SAF for all user-facing file operations
+  - **FileProvider configured** in `AndroidManifest.xml` with `res/xml/file_paths.xml`
 
 ### Dependencies
 - **resid-0.16:** SID chip emulation (kb's TinySID)
@@ -131,62 +138,14 @@ cd android
 
 ## Known Issues
 
-1. **Android file I/O broken** - Song load/save doesn't work due to scoped storage restrictions
-2. **No CI/CD** - Manual builds only
-3. **Old gradle files removed** - Migration to Kotlin DSL completed (Dec 2024)
+1. **No CI/CD** - Manual builds only
+2. **Song file export** - Can save .sng files to app storage, but no UI button to export/share them yet (only WAV/OGG export implemented)
 
+## Recent Changes
 
-## Planned Migration: File Storage Modernization
-
-**Status:** Planned, not yet started
-
-**Goal:** Migrate from broken `WRITE_EXTERNAL_STORAGE` approach to Storage Access Framework (SAF) like GTMobile.
-
-**Reference Implementation:** `/home/dlangner/Programming/c++/GTMobile`
-
-### Migration Strategy
-
-**Phase 1: Add Migration Logic (First Update)**
-- Detect old files from legacy storage
-- Copy `.fsid` files to app-specific storage
-- Show migration dialog to users
-- Request legacy permission one-time only for migration
-- Mark migration complete in SharedPreferences
-
-**Phase 2: Implement GTMobile-style File Handling**
-
-**Java Layer Changes:**
-- Add `FileUtils.java` class (copy from GTMobile)
-- Add `startSongImport()` method - file picker via `ACTION_OPEN_DOCUMENT`
-- Add `exportSong()` method - share intent with FileProvider
-- Add migration helper methods
-- Add FileProvider configuration to AndroidManifest.xml
-
-**C++ Layer Changes:**
-- Use cache directory for imported files
-- Add export function to save to app-specific directory
-- Keep song data in memory during editing (current behavior)
-
-**Manifest Changes:**
-- Add FileProvider authority
-- Remove `WRITE_EXTERNAL_STORAGE` permission
-- Update targetSdk to match (currently 34)
-
-**User Experience Flow:**
-- **Existing users:** One-time migration prompt → copy old songs → new SAF workflow
-- **New users:** SAF from the start
-
-**Benefits:**
-- ✅ No storage permissions required
-- ✅ Works on all Android versions including Android 10+
-- ✅ User controls where files go
-- ✅ No file access loss on app updates
-- ✅ Backward compatible with existing users' songs
-
-## Recent Changes (Dec 2024 - Jan 2025)
-
+- Migrated to Storage Access Framework (SAF) for file operations
+- Removed storage permissions, files now user-accessible via FileProvider
 - Migrated Android build from Groovy to Kotlin DSL
-- Removed unused Jetpack Compose dependencies
+- Added edge-to-edge display support
 - Updated to targetSdk/compileSdk 34 with AndroidX libraries
-- Restored original PNG app icons
-- Fixed build configuration for modern Android Studio
+
