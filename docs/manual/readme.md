@@ -41,8 +41,11 @@ Press **RESET** to reset the current song.
 
 You may render the current song to **WAV** or **OGG**
 by first selecting the desired file format and then pressing **EXPORT**.
-Song files and exported songs are stored in the directories
-`fakesid/songs` and `fakesid/exports` of your phone's internal shared storage.
+
+As of v3.0, song files are stored in the app's internal storage.
+Use the **IMPORT** button to load songs from anywhere (Downloads, Google Drive, etc.)
+and the **SAVE AS** button to export songs to any location.
+You can also open `.sng` files directly from other apps (WhatsApp, email, etc.).
 
 Fake SID lacks export to SID or any file format native to the C64.
 Although the app was not designed with this functionality in mind,

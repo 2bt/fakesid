@@ -17,13 +17,12 @@ This is a chiptune tracker app with shared C++ core logic and platform-specific 
 ## Project Structure
 
 ```
-src/                    # Shared C++ source code
-  ├── *.cpp/*.hpp      # Core tracker logic
-  └── sid_engine.cpp   # SID chip emulation (based on kb's TinySID)
+src/                   # Shared C++ source code
+  └── *.cpp/*.hpp      # Core tracker logic
 android/               # Android app project
   ├── app/
   │   ├── src/main/
-  │   │   ├── cpp/     # Android-specific C++ code (JNI glue)
+  │   │   ├── cpp/     # Shared C++ source (same as src/, JNI glue in main.cpp)
   │   │   ├── java/    # Java activity and view classes
   │   │   └── res/     # Android resources
   │   └── build.gradle.kts
