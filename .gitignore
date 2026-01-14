@@ -18,3 +18,4 @@ CMakeLists.txt.user
 Makefile
 todo.md
 songs/
+.claude/settings.local.json
