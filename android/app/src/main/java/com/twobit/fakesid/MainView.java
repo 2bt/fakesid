@@ -76,7 +76,7 @@ class MainView extends GLSurfaceView {
 
     class Renderer implements GLSurfaceView.Renderer {
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            String storageDir = getContext().getFilesDir().getAbsolutePath();
+            String storageDir = getContext().getExternalFilesDir(null).getAbsolutePath();
             Lib.init(getResources().getAssets(), storageDir);
         }
         public void onSurfaceChanged(GL10 gl, int width, int height) {

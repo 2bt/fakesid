@@ -143,6 +143,7 @@ void draw_export_progress() {
 
         if (m_export_canceled) status("SONG EXPORT WAS CANCELED");
         else {
+            // Export completed successfully, share the file via SAF
             std::string path = m_exports_dir + m_file_name.data();
             path += m_export_format == EF_OGG ? ".ogg" : ".wav";
             android::export_song(path, m_file_name.data());
