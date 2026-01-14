@@ -240,6 +240,26 @@ void save() {
 }
 
 
+void share_song() {
+    std::string name = m_file_name.data();
+    if (name.empty()) {
+        status("SAVE ERROR: EMPTY FILE NAME");
+        return;
+    }
+
+    // Save to app storage first
+    std::string path = m_songs_dir + name + FILE_SUFFIX;
+    if (!save_song(player::song(), path.c_str())) {
+        status("SAVE ERROR: ?");
+        return;
+    }
+
+    // Share via SAF - user picks destination
+    android::export_song(path, name);
+    init_project_view();
+}
+
+
 void draw_confirmation() {
     const char* text;
     switch (m_confirmation_type) {
@@ -358,6 +378,7 @@ void draw_project_tab() {
     gui::min_item_size({ widths[0], BUTTON_BIG });
     if (gui::button("LOAD")) init_confirmation(CT_LOAD);
     if (gui::button("SAVE")) init_confirmation(CT_SAVE);
+    if (gui::button("SAVE AS")) share_song();
     if (gui::button("DELETE")) init_confirmation(CT_DELETE);
     if (gui::button("RESET")) init_confirmation(CT_RESET);
 
