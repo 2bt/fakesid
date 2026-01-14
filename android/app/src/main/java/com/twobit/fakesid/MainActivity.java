@@ -109,6 +109,36 @@ public class MainActivity extends Activity {
 
         // Apply fullscreen setting
         updateSetting(SETTING_FULLSCREEN_ENABLED);
+
+        // Check if app was opened from another app (WhatsApp, etc.)
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        String action = intent.getAction();
+        if (action == null) return;
+
+        if (Intent.ACTION_VIEW.equals(action) || Intent.ACTION_SEND.equals(action)) {
+            Uri uri = intent.getData();
+            if (uri == null) {
+                // Handle SEND intent with clip data
+                uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            }
+            if (uri != null) {
+                String fileName = FileUtils.getFileName(this, uri);
+                if (fileName == null) fileName = "song.sng";
+                String path = new File(getCacheDir(), fileName).getAbsolutePath();
+                FileUtils.copyUriToFile(this, uri, path);
+                Lib.importSong(path);
+                Log.i(TAG, "Imported file from intent: " + fileName);
+            }
+        }
     }
 
     private void loadSettings() {
