@@ -19,5 +19,4 @@ public:
     }
 
     static SidEngine& get_tinysid();
-//    static SidEngine& get_resid();
 };

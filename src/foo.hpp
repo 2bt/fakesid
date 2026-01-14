@@ -25,8 +25,6 @@ bool load_asset(std::string const& name, std::vector<uint8_t>& buf);
 gfx::Texture2D* load_texture(char const*     name,
                              gfx::FilterMode filter = gfx::FilterMode::Nearest,
                              gfx::WrapMode   wrap   = gfx::WrapMode::Clamp);
-std::string const& storage_dir();
-void set_storage_dir(std::string const& storage_dir);
 void show_keyboard();
 void hide_keyboard();
 void export_song(std::string const& path, std::string const& title);

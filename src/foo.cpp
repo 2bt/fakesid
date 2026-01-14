@@ -8,6 +8,7 @@
 #include "stb_image.h"
 
 
+
 #ifdef ANDROID
 #include <android/asset_manager.h>
 #include <jni.h>
@@ -98,13 +99,6 @@ bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
 }
 
 
-static std::string g_storage_dir = ".";
-
-std::string const& storage_dir() { return g_storage_dir; }
-
-void set_storage_dir(std::string const& storage_dir) { g_storage_dir = storage_dir; }
-
-
 void show_keyboard() {
     jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
     jmethodID method = g_env->GetStaticMethodID(clazz, "showKeyboard", "()V");
@@ -174,9 +168,6 @@ bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
     return true;
 }
 
-
-
-std::string get_storage_dir() { return "."; }
 
 
 void show_keyboard() {}

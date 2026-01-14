@@ -2,6 +2,7 @@
 #include "foo.hpp"
 #include "player.hpp"
 #include "settings.hpp"
+#include "project_view.hpp"
 
 #ifdef ANDROID
 
@@ -22,7 +23,7 @@ extern "C" {
         g_asset_manager = AAssetManager_fromJava(env, am);
         if (storageDir) {
             char const* storage_dir = env->GetStringUTFChars(storageDir, nullptr);
-            android::set_storage_dir(storage_dir);
+            set_storage_dir(storage_dir);
             env->ReleaseStringUTFChars(storageDir, storage_dir);
         }
         app::init();

@@ -27,6 +27,7 @@ SubTab                   m_sub_tab = ST_PROJECT;
 int                      m_file_scroll;
 std::array<char, 28>     m_file_name;
 std::vector<std::string> m_file_names;
+std::string              m_storage_dir = ".";
 std::string              m_root_dir;
 std::string              m_songs_dir;
 std::string              m_exports_dir;
@@ -61,7 +62,7 @@ bool copy_demo_song(std::string const& name) {
 bool init_dirs() {
 
     if (m_root_dir.empty()) {
-        m_root_dir = android::storage_dir();
+        m_root_dir = m_storage_dir;
     }
     if (m_root_dir.empty()) return false;
 
@@ -484,6 +485,9 @@ void draw_settings_tab() {
 
 
 } // namespace
+
+
+void set_storage_dir(std::string const& storage_dir) { m_storage_dir = storage_dir; }
 
 
 void init_project_view() {

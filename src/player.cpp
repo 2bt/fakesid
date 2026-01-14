@@ -37,7 +37,6 @@ struct {
 
 
 SidEngine& m_engine = SidEngine::get_tinysid();
-//SidEngine& m_engine = SidEngine::get_resid();
 
 
 Song    m_song;

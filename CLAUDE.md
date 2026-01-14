@@ -18,8 +18,8 @@ This is a chiptune tracker app with shared C++ core logic and platform-specific 
 
 ```
 src/                    # Shared C++ source code
-  ├── resid-0.16/      # SID chip emulation library
   ├── *.cpp/*.hpp      # Core tracker logic
+  └── sid_engine.cpp   # SID chip emulation (based on kb's TinySID)
 android/               # Android app project
   ├── app/
   │   ├── src/main/
@@ -55,13 +55,14 @@ docs/                  # User documentation
 
 ### C++ Core (src/)
 - **main.cpp** - Entry point (desktop) or JNI initialization (Android)
-- **sid_engine.cpp** - SID chip emulation (wrapper around resid-0.16)
+- **sid_engine.cpp** - SID chip emulation (based on kb's TinySID)
 - **player.cpp** - Music playback engine
 - **song.cpp/song.hpp** - Song data structures
 - **gui.cpp** - Main UI logic
 - **gfx.cpp** - OpenGL rendering
 - **app.cpp, edit.cpp, settings.cpp** - Various app features
 - ***_view.cpp** - Different UI screens (track, song, project, jam, instrument effect)
+- **resid-0.16/** - Removed - using custom SID emulation based on kb's TinySID
 
 ### Android Java Layer
 - **MainActivity.java** - Activity lifecycle, permissions, keyboard control
@@ -78,8 +79,8 @@ The Java layer calls into C++ via these native methods (defined in `Lib.java`):
 - `startAudio()/stopAudio()` - Audio lifecycle
 - `setInsets(int, int)` - Handle system insets (status bar, navigation bar)
 - `getSettingName(int)/getSettingValue(int)/setSettingValue(int, int)` - Settings management
-- `importSong(String path)` - Import song from SAF-provided path
-- `exportSong(String path, String title)` - Export song (currently unused, export handled via platform layer)
+- `importSong(String path)` - Import song from SAF-provided path or intent
+- `exportSong(String path, String title)` - Export song via FileProvider (unused in current implementation)
 
 ## Important Implementation Notes
 
@@ -96,18 +97,21 @@ The Java layer calls into C++ via these native methods (defined in `Lib.java`):
 ### File Storage
 - **Desktop:** Direct file I/O using libsndfile
 - **Android:** Storage Access Framework (SAF) - fully implemented
-  - **Storage Location:** `getExternalFilesDir()` - `/storage/emulated/0/Android/data/com.twobit.fakesid/files/`
-  - **Song Import:** SAF file picker (`ACTION_OPEN_DOCUMENT`) → copies to cache → loads into app
-  - **Song Export:** Renders to app storage → shares via FileProvider → user chooses destination
-  - **WAV/OGG Export:** Renders to app storage → shares via FileProvider → user chooses destination
+  - **Storage Location:** `getExternalFilesDir()` - app-specific storage
+  - **Song Import:**
+    - Via IMPORT button: SAF file picker → copies to cache → loads into app
+    - From other apps: WhatsApp/email → intent → cache → loads into app
+  - **Song Export:** SAVE AS button → saves to app storage → FileProvider share intent → user chooses destination
+  - **WAV/OGG Export:** Renders to app storage → FileProvider share intent → user chooses destination
   - **No permissions required** - Uses SAF for all user-facing file operations
   - **FileProvider configured** in `AndroidManifest.xml` with `res/xml/file_paths.xml`
+  - **Intent filters:** ACTION_VIEW and ACTION_SEND to open files from other apps
 
 ### Dependencies
-- **resid-0.16:** SID chip emulation (kb's TinySID)
-- **libsndfile:** Sound file I/O (WAV output)
+- **sid_engine:** SID chip emulation (based on kb's TinySID)
+- **libsndfile:** Sound file I/O (WAV/OGG output)
 - **glm:** Math library (header-only)
-- **oboe:** Android audio only
+- **oboe:** Android audio (low-latency audio output)
 
 ## Common Tasks
 
@@ -139,13 +143,13 @@ cd android
 ## Known Issues
 
 1. **No CI/CD** - Manual builds only
-2. **Song file export** - Can save .sng files to app storage, but no UI button to export/share them yet (only WAV/OGG export implemented)
 
-## Recent Changes
+## Recent Changes (v3.0)
 
-- Migrated to Storage Access Framework (SAF) for file operations
-- Removed storage permissions, files now user-accessible via FileProvider
-- Migrated Android build from Groovy to Kotlin DSL
-- Added edge-to-edge display support
-- Updated to targetSdk/compileSdk 34 with AndroidX libraries
+- **Storage Access Framework (SAF)** - No storage permissions, modern file handling
+- **IMPORT button** - Load songs from anywhere (Downloads, Drive, etc.)
+- **SAVE AS button** - Export song files to any location
+- **Open from other apps** - Receive `.sng` files from WhatsApp, email, etc.
+- **Updated to targetSdk/compileSdk 36** - Android 14 compatibility
+- **Java 17** - Build compatibility
 

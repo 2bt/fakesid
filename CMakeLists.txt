@@ -5,23 +5,6 @@ project(fakesid)
 add_compile_options(-std=c++17 -Wall -O3)
 
 add_executable(${PROJECT_NAME}
-    src/resid-0.16/envelope.cc
-    src/resid-0.16/extfilt.cc
-    src/resid-0.16/filter.cc
-    src/resid-0.16/pot.cc
-    src/resid-0.16/sid.cc
-    src/resid-0.16/version.cc
-    src/resid-0.16/voice.cc
-    src/resid-0.16/wave6581_PS_.cc
-    src/resid-0.16/wave6581_PST.cc
-    src/resid-0.16/wave6581_P_T.cc
-    src/resid-0.16/wave6581__ST.cc
-    src/resid-0.16/wave8580_PS_.cc
-    src/resid-0.16/wave8580_PST.cc
-    src/resid-0.16/wave8580_P_T.cc
-    src/resid-0.16/wave8580__ST.cc
-    src/resid-0.16/wave.cc
-
     src/app.cpp
     src/edit.cpp
     src/foo.cpp
