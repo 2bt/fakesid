@@ -223,6 +223,7 @@ enum ConfirmationType {
     CT_LOAD,
     CT_SAVE,
     CT_DELETE,
+    CT_IMPORT,
 };
 
 ConfirmationType m_confirmation_type;
@@ -269,6 +270,7 @@ void draw_confirmation() {
     case CT_SAVE:
         text = "OVERRIDE THE EXISTING SONG?";
         break;
+    case CT_IMPORT:
     case CT_RESET:
     case CT_LOAD:
     default:
@@ -307,6 +309,9 @@ void draw_confirmation() {
             if (!load_song(player::song(), path.c_str())) status("LOAD ERROR: ?");
             else status("SONG WAS LOADED");
             break;
+        case CT_IMPORT:
+            android::start_song_import();
+            break;
         }
         edit::set_popup(nullptr);
     }
@@ -317,6 +322,13 @@ void draw_confirmation() {
 
 
 void init_confirmation(ConfirmationType t) {
+    // IMPORT doesn't need a file name, handle it first
+    if (t == CT_IMPORT) {
+        m_confirmation_type = t;
+        edit::set_popup(draw_confirmation);
+        return;
+    }
+
     std::string name = m_file_name.data();
     if (name.empty()) {
         if (t == CT_LOAD)   status("LOAD ERROR: EMPTY SONG NAME");
@@ -381,6 +393,10 @@ void draw_project_tab() {
     if (gui::button("SAVE AS")) share_song();
     if (gui::button("DELETE")) init_confirmation(CT_DELETE);
     if (gui::button("RESET")) init_confirmation(CT_RESET);
+
+#ifdef ANDROID
+    if (gui::button("IMPORT")) init_confirmation(CT_IMPORT);
+#endif
 
 
     // file select
