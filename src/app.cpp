@@ -2,6 +2,7 @@
 #include "render.hpp"
 #include "app.hpp"
 #include "edit.hpp"
+#include "project_view.hpp"
 
 
 namespace app {
@@ -16,6 +17,7 @@ int               m_canvas_offset;
 int               m_inset_top    = 0;
 int               m_inset_bottom = 0;
 bool              m_canvas_setup_requested = false;
+std::string       m_import_song_path;
 
 
 void setup_canvas() {
@@ -127,6 +129,12 @@ void draw() {
         setup_canvas();
     }
 
+    // import song
+    if (!m_import_song_path.empty()) {
+        ::import_song(m_import_song_path);
+        m_import_song_path.clear();
+    }
+
     gui::begin_frame();
 
     edit::draw();
@@ -141,6 +149,10 @@ void draw() {
     dc.copy(Vec(m_canvas_offset, m_inset_top), Vec(glm::vec2(s) * m_canvas_scale), {}, s);
     render::draw(gfx::screen(), dc, m_canvas);
     dc.clear();
+}
+
+void set_import_song_path(std::string const& import_song_path) {
+    m_import_song_path = import_song_path;
 }
 
 

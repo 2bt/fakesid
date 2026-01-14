@@ -6,7 +6,7 @@ public class Lib {
     static {
         System.loadLibrary("main");
     }
-    public static native void init(AssetManager am);
+    public static native void init(AssetManager am, String storageDir);
     public static native void free();
     public static native void resize(int width, int height);
     public static native void draw();
@@ -18,4 +18,6 @@ public class Lib {
     public static native String getSettingName(int i);
     public static native int getSettingValue(int i);
     public static native void setSettingValue(int i, int v);
+    public static native void importSong(String path);
+    public static native void exportSong(String path, String title);
 }

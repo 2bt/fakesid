@@ -1,22 +1,21 @@
 package com.twobit.fakesid;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.Manifest;
-import android.os.Bundle;
 import android.app.Activity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.view.WindowCompat;
 
-import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
-import android.view.KeyEvent;
-import android.view.Window;
+import java.io.File;
 
 public class MainActivity extends Activity {
     static String TAG = "FOOBAR";
@@ -26,6 +25,7 @@ public class MainActivity extends Activity {
     MainView mView;
 
     private static final int SETTING_FULLSCREEN_ENABLED = 0;
+    private static final int REQUEST_CODE_IMPORT_FILE = 1;
 
 
     static public void showKeyboard() {
@@ -90,7 +90,6 @@ public class MainActivity extends Activity {
         sInstance = this;
         mView = new MainView(getApplication());
         setContentView(mView);
-        getWritePermission();
 
         sPrefs    = getPreferences(MODE_PRIVATE);
         sPrefEdit = sPrefs.edit();
@@ -151,25 +150,52 @@ public class MainActivity extends Activity {
         Log.i(TAG, "onPause");
     }
 
-    static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;
-    boolean mWritePermission = false;
-
-    public void getWritePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            mWritePermission = true;
-        }
-        else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
-        }
+    // song import
+    // called from C++
+    static public void startSongImport() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/octet-stream");
+        sInstance.startActivityForResult(intent, REQUEST_CODE_IMPORT_FILE);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode != PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) return;
-        if (grantResults.length < 1) return;
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) mWritePermission = true;
+    protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i(TAG, "onActivityResult " + requestCode + " " + resultCode);
+        if (resultCode != Activity.RESULT_OK || data == null) return;
+        Uri fileUri = data.getData();
+        if (requestCode == REQUEST_CODE_IMPORT_FILE) {
+            String fileName = FileUtils.getFileName(this, fileUri);
+            if (fileName == null) fileName = "song.sng";
+            String path = new File(getCacheDir(), fileName).getAbsolutePath();
+            FileUtils.copyUriToFile(this, fileUri, path);
+            Lib.importSong(path);
+        }
+    }
+
+    // song export
+    // called from C++
+    static public void exportSong(String path, String title) {
+        File file = new File(path);
+        Uri uri = androidx.core.content.FileProvider.getUriForFile(
+                sInstance,
+                sInstance.getPackageName() + ".fileprovider",
+                file);
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType(getMimeFromName(file.getName()));
+        share.putExtra(Intent.EXTRA_STREAM, uri);
+        share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        share.putExtra(Intent.EXTRA_SUBJECT, title);
+        share.putExtra(Intent.EXTRA_TEXT, title);
+        sInstance.startActivity(Intent.createChooser(share, "Export song"));
+    }
+
+    private static String getMimeFromName(String name) {
+        if (name.endsWith(".sng")) return "application/octet-stream";
+        if (name.endsWith(".ogg")) return "audio/ogg";
+        if (name.endsWith(".wav")) return "audio/wav";
+        return "application/octet-stream";
     }
 
 }

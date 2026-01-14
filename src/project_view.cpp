@@ -61,7 +61,7 @@ bool copy_demo_song(std::string const& name) {
 bool init_dirs() {
 
     if (m_root_dir.empty()) {
-        m_root_dir = android::get_storage_dir();
+        m_root_dir = android::storage_dir();
     }
     if (m_root_dir.empty()) return false;
 
@@ -142,7 +142,11 @@ void draw_export_progress() {
         android::start_audio();
 
         if (m_export_canceled) status("SONG EXPORT WAS CANCELED");
-        else status("SONG WAS EXPORTED");
+        else {
+            std::string path = m_exports_dir + m_file_name.data();
+            path += m_export_format == EF_OGG ? ".ogg" : ".wav";
+            android::export_song(path, m_file_name.data());
+        }
     }
 }
 
@@ -481,6 +485,21 @@ void draw_project_view() {
     case ST_PROJECT: draw_project_tab(); break;
     case ST_SETTINGS: draw_settings_tab(); break;
     default: break;
+    }
+}
+
+
+// called from Java
+void import_song(std::string const& path) {
+    m_file_name.fill(0);
+    if (!load_song(player::song(), path.c_str())) {
+        status("IMPORT ERROR");
+    }
+    else {
+        std::string name = fs::path(path).stem().string();
+        strncpy(m_file_name.data(), name.c_str(), m_file_name.size() - 1);
+        init_project_view();
+        status("SONG WAS IMPORTED");
     }
 }
 

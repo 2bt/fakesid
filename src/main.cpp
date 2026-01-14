@@ -16,10 +16,15 @@ JNIEnv*        g_env;
 static bool s_paused = true;
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am, jstring storageDir) {
         LOGD("Java_com_twobit_fakesid_Lib_init");
         g_env = env;
         g_asset_manager = AAssetManager_fromJava(env, am);
+        if (storageDir) {
+            char const* storage_dir = env->GetStringUTFChars(storageDir, nullptr);
+            android::set_storage_dir(storage_dir);
+            env->ReleaseStringUTFChars(storageDir, storage_dir);
+        }
         app::init();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {
@@ -68,6 +73,16 @@ extern "C" {
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setSettingValue(JNIEnv * env, jclass, jint i, jint v) {
         set_setting_value(i, v);
+    }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_importSong(JNIEnv * env, jclass, jstring jpath) {
+        if (!g_env) return;
+        char const* path = env->GetStringUTFChars(jpath, nullptr);
+        if (path) app::set_import_song_path(path);
+        env->ReleaseStringUTFChars(jpath, path);
+    }
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_exportSong(JNIEnv * env, jclass, jstring jpath, jstring jtitle) {
+        // Export is handled by platform::export_song() called from project_view
+        // This is a stub for future use if needed
     }
 }
 

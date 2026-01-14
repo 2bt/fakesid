@@ -14,4 +14,5 @@ namespace app {
     void draw();
     void touch(int x, int y, bool pressed);
     void key(int key, int unicode);
+    void set_import_song_path(std::string const& import_song_path);
 }

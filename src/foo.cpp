@@ -98,24 +98,11 @@ bool load_asset(std::string const& name, std::vector<uint8_t>& buf) {
 }
 
 
-std::string get_storage_dir() {
+static std::string g_storage_dir = ".";
 
-    jclass j_env_class = g_env->FindClass("android/os/Environment");
-    jmethodID j_mid = g_env->GetStaticMethodID(j_env_class, "getExternalStorageDirectory", "()Ljava/io/File;");
-    jobject j_file = g_env->CallStaticObjectMethod(j_env_class, j_mid);
-    if (!j_file) return "";
+std::string const& storage_dir() { return g_storage_dir; }
 
-    j_mid = g_env->GetMethodID(g_env->GetObjectClass(j_file), "mkdirs", "()Z");
-    g_env->CallBooleanMethod(j_file, j_mid);
-
-    j_mid = g_env->GetMethodID(g_env->GetObjectClass(j_file), "getAbsolutePath", "()Ljava/lang/String;");
-    jstring j_path = (jstring) g_env->CallObjectMethod(j_file, j_mid);
-    const char* str = g_env->GetStringUTFChars(j_path, nullptr);
-    std::string root_dir = str;
-    g_env->ReleaseStringUTFChars(j_path, str);
-
-    return root_dir + "/fakesid";
-}
+void set_storage_dir(std::string const& storage_dir) { g_storage_dir = storage_dir; }
 
 
 void show_keyboard() {
@@ -127,6 +114,22 @@ void show_keyboard() {
 void hide_keyboard() {
     jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
     jmethodID method = g_env->GetStaticMethodID(clazz, "hideKeyboard", "()V");
+    g_env->CallStaticVoidMethod(clazz, method);
+}
+
+void export_song(std::string const& path, std::string const& title) {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "exportSong", "(Ljava/lang/String;Ljava/lang/String;)V");
+    jstring jpath = g_env->NewStringUTF(path.c_str());
+    jstring jtitle = g_env->NewStringUTF(title.c_str());
+    g_env->CallStaticVoidMethod(clazz, method, jpath, jtitle);
+    g_env->DeleteLocalRef(jpath);
+    g_env->DeleteLocalRef(jtitle);
+}
+
+void start_song_import() {
+    jclass clazz = g_env->FindClass("com/twobit/fakesid/MainActivity");
+    jmethodID method = g_env->GetStaticMethodID(clazz, "startSongImport", "()V");
     g_env->CallStaticVoidMethod(clazz, method);
 }
 
@@ -178,6 +181,8 @@ std::string get_storage_dir() { return "."; }
 
 void show_keyboard() {}
 void hide_keyboard() {}
+void export_song(std::string const& path, std::string const& title) {}
+void start_song_import() {}
 void update_setting(int i) {}
 
 #endif

@@ -8,10 +8,10 @@ release
 .cxx
 
 # Build artifacts
-fakesid
-fakesid-win
-exports/
-lib/
+/fakesid
+/fakesid-win
+/exports/
+/lib/
 
 # IDE and user-specific files
 CMakeLists.txt.user
