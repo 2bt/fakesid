@@ -57,7 +57,6 @@ extern "C" {
         }
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_setInsets(JNIEnv * env, jclass, jint topInset, jint bottomInset) {
-        if (!g_env) return;
         app::set_insets(topInset, bottomInset);
     }
     JNIEXPORT jstring JNICALL Java_com_twobit_fakesid_Lib_getSettingName(JNIEnv * env, jclass, jint i) {

@@ -110,10 +110,6 @@ public class MainActivity extends Activity {
 
         // Apply fullscreen setting
         updateSetting(SETTING_FULLSCREEN_ENABLED);
-
-        // trigger inset listener
-        var decorView = getWindow().getDecorView();
-        decorView.post(() -> ViewCompat.requestApplyInsets(decorView));
     }
 
     private void loadSettings() {
