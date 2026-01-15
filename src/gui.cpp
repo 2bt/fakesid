@@ -213,7 +213,7 @@ public:
                 p.x = pos.x;
                 continue;
             }
-            if (c > 32 || c < 128) glyph(p, { 255, 255, 255, 255 }, c);
+            if (c > 32 && c < 128) glyph(p, { 255, 255, 255, 255 }, c);
             p.x += FONT_WIDTH;
         }
     }
@@ -225,7 +225,8 @@ Vec         m_cursor_min;
 Vec         m_cursor_max;
 Vec         m_min_item_size;
 
-int         m_hold_count;
+float       m_frame_time = 1.0f / 60.0f;
+float       m_hold_time;
 bool        m_hold;
 bool        m_same_line;
 void const* m_id;
@@ -349,7 +350,7 @@ void begin_frame() {
     m_same_line = false;
     if (!(m_touch.pressed | m_touch.prev_pressed)) {
         m_active_item = nullptr;
-        m_hold_count = 0;
+        m_hold_time = 0;
     }
     if (m_touch.just_pressed() && m_input_text_str) {
         m_input_text_str = nullptr;
@@ -391,16 +392,17 @@ void text(char const* fmt, ...) {
 
 
 static bool button_helper(Box const& box, bool active) {
-    enum { HOLD_TIME = 10 };
+    constexpr float HOLD_TIME = 0.333f;
     m_hold = false;
     Color c = m_button_theme->color_normal;
     bool clicked = false;
     if (m_active_item == nullptr && m_touch.box_touched(box)) {
         c = m_button_theme->color_hover;
         if (box.contains(m_touch.prev_pos)) {
-            if (++m_hold_count > HOLD_TIME) m_hold = true;
+            m_hold_time += m_frame_time;
+            if (m_hold_time > HOLD_TIME) m_hold = true;
         }
-        else m_hold_count = 0;
+        else m_hold_time = 0;
         if (m_touch.just_released()) clicked = true;
     }
     else {
@@ -638,6 +640,9 @@ void dumb_button(int state) {
 
 void init() {
     m_texture = android::load_texture("gui.png");
+}
+void set_refresh_rate(float refresh_rate) {
+    m_frame_time = 1.0f / refresh_rate;
 }
 void free() {
     delete m_texture;

@@ -11,7 +11,7 @@ android {
         applicationId = "com.twobit.fakesid"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
+        versionCode = 6
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -35,6 +35,7 @@ android {
     externalNativeBuild {
         cmake {
             path = file("src/main/CMakeLists.txt")
+            version = "3.22.1"
         }
     }
     compileOptions {

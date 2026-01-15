@@ -1,8 +1,11 @@
 package com.twobit.fakesid;
 
 import android.content.Context;
+import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -10,14 +13,40 @@ import javax.microedition.khronos.opengles.GL10;
 
 class MainView extends GLSurfaceView {
     static String TAG = "FOOBAR";
-    Renderer mRenderer = new Renderer();
 
     public MainView(Context context) {
         super(context);
+        Log.i(TAG, "View constructor");
+
+        float refreshRate;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+            Display display = displayManager.getDisplay(Display.DEFAULT_DISPLAY);
+            refreshRate = display.getRefreshRate();
+        }
+        else {
+            refreshRate = 60.0f;
+        }
+
+        String storageDir = context.getExternalFilesDir(null).getAbsolutePath();
+
         setPreserveEGLContextOnPause(true);
         setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 0, 0);
-        setRenderer(mRenderer);
+        setRenderer(new GLSurfaceView.Renderer() {
+            @Override
+            public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+                Lib.init(getResources().getAssets(), storageDir, refreshRate);
+            }
+            @Override
+            public void onSurfaceChanged(GL10 gl, int width, int height) {
+                Lib.resize(width, height);
+            }
+            @Override
+            public void onDrawFrame(GL10 gl) {
+                Lib.draw();
+            }
+        });
     }
 
     int     mTouchId;
@@ -72,19 +101,6 @@ class MainView extends GLSurfaceView {
         }
 
         return false;
-    }
-
-    class Renderer implements GLSurfaceView.Renderer {
-        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            String storageDir = getContext().getExternalFilesDir(null).getAbsolutePath();
-            Lib.init(getResources().getAssets(), storageDir);
-        }
-        public void onSurfaceChanged(GL10 gl, int width, int height) {
-            Lib.resize(width, height);
-        }
-        public void onDrawFrame(GL10 gl) {
-            Lib.draw();
-        }
     }
 }
 

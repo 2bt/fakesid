@@ -114,6 +114,7 @@ namespace gui {
     void touch(int x, int y, bool pressed);
     void key(int key, int unicode);
     void init();
+    void set_refresh_rate(float refresh_rate);
     void free();
     void render(gfx::RenderTarget* rt);
 

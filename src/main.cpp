@@ -17,7 +17,7 @@ JNIEnv*        g_env;
 static bool s_paused = true;
 
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am, jstring storageDir) {
+    JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_init(JNIEnv * env, jobject obj, jobject am, jstring storageDir, jfloat refreshRate) {
         LOGD("Java_com_twobit_fakesid_Lib_init");
         g_env = env;
         g_asset_manager = AAssetManager_fromJava(env, am);
@@ -26,6 +26,7 @@ extern "C" {
             set_storage_dir(storage_dir);
             env->ReleaseStringUTFChars(storageDir, storage_dir);
         }
+        gui::set_refresh_rate(refreshRate);
         app::init();
     }
     JNIEXPORT void JNICALL Java_com_twobit_fakesid_Lib_free(JNIEnv * env, jobject obj) {

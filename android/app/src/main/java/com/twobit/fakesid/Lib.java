@@ -6,7 +6,7 @@ public class Lib {
     static {
         System.loadLibrary("main");
     }
-    public static native void init(AssetManager am, String storageDir);
+    public static native void init(AssetManager am, String storageDir, float refreshRate);
     public static native void free();
     public static native void resize(int width, int height);
     public static native void draw();
