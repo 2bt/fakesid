@@ -1,5 +1,9 @@
 # Fake SID
 
+**Looking for a more serious experience?** If you require cycle-accurate emulation and GoatTracker 2 compatibility, please check out my flagship app: [GTMobile – C64 SID Tracker](https://2bt.github.io/GTMobile/).
+
+---
+
 This is a chiptune tracker for android that's trying to sound a lot like the MOS Technology SID.
 The synth code is based on TinySID by Tammo Hinrichs (kb).
 Some details of the SID chip aren't emulated correctly but it's close enough, I think.
